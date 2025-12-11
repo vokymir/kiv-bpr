@@ -1,0 +1,16 @@
+1. vybrat si model
+
+- ohen
+- zrnicka
+- evolucni hry
+- ... cokoliv jineho
+
+2. precist si o nem
+
+3. vybrat si graf (vlastni motivace)
+
+- k-regularni grafy (2=cara, 3=hexa-grid, 4=sachovnice, 6=trojuhelniky, 8=sachovnice)
+- nahodne grafy
+ - Erdős–Rényi (pst propojeni)
+ - small-world network (propojeni lidi, hub=influencer ma vic spojeni)
+- ... jakykoliv jiny
