@@ -1,13 +1,17 @@
 1. vybrat si model
 
 - ohen
+  https://en.wikipedia.org/wiki/Forest-fire_model
 - zrnicka
 - evolucni hry
 - ... cokoliv jineho
++ samo kriticky organizovane modely
+  https://en.wikipedia.org/wiki/Self-organized_criticality
 
 2. precist si o nem
 
-3. vybrat si graf (vlastni motivace)
+3. vybrat si graf (vlastni motivace=vymyslet co to bude zobrazovat,
+aby se nad tim lepe premyslelo, napr. sireni ohne na 3-regularni mrizce)
 
 - k-regularni grafy (2=cara, 3=hexa-grid, 4=sachovnice, 6=trojuhelniky, 8=sachovnice)
 - nahodne grafy
