@@ -1,0 +1,120 @@
+Dobrý den,
+pročetl jsem si články související s tématem na Wikipedii.
+Je toho fakt hodně a bavilo by mě dost věcí, všechny je napíšu,
+ale nepočítám s tím, že bychom se na všecky dostali, naopak si uvědomuji,
+že mám skoro určtě moc velké oči.
+(Občas budu v emailu používat anglické výrazy a názvy,
+protože jsem nenašel české ekvivalenty.)
+
+Podle toho, co jsme se domlouvali, jsem si vybral:
+Model: zrníčka písku [2]
+Graf: small-world network: Watts–Strogatz model [4] (podobný jako Erdős–Rényi,
+ale věrněji napodobuje graf mezilidských vztahů)
+Motivace: Představuji si graf jako liskou společnost a zrnečka písku jako
+náhodné stresové události. Pokud je člověk/vertex vystaven přílišnému tlaku,
+vybouchne a tím "vystresuje" všechny známé.
+
+Přišlo by mi zajímavé porovnávat stejné/podobné scénáře pro různé konfigurace
+grafů a drobné modifikace modelu. To bych si ideálně v hotovém projektu
+představoval jako přepínatelné možnosti.
+
+První kategorií konfigurace by mohla být tvorba grafu - small-world network
+je, jak jsem pochopil, charakterizováno jako graf s:
+a) high (global/local) clustering coefficient [7]
+b) low average shortest path length
+přičemž obě veličiny jsou měřitelné a existují vzorečky pro kvantifikaci
+*kvality* (z pohledu small-world network) grafu (small-coefficient σ,
+small-world measure ω, Small World Index SWI) které nejsou složité a bylo by
+zajímavé vědět, jak *dobrý* graf se používá pro simulaci modelu.
+
+Porovnání některých vlastností grafu mezilidských vztahů a náhodných s-w sítí.
+       | a)   | b)  | poznámka
+vztahy | high | low |
+ER [3] | low  | low | standard
+WS [4] | high | low | změnou β můžeme získat mřížku i téměř ER
+BA [5] | low  | low | power-law
+Všechny mají relativně jednoduchý algoritmus vytváření sítě a WS byl přímo
+vytvořen na to, aby se dal charakterizovat jako small-world network (má jiné
+nedostatky), proto jsem si ho vybral.
+
+Ještě jsem přemýšlel nad grafem nekonečným, orientovaným, multigrafem - ale
+to mi nesedí do příběhu/motivace a přijde mi to jako zbytečná komplikace.
+
+Další konfigurační potenciál vidím v padání zrníček, konkrétně:
+
+a) kam budou padat
+- použít pravděpodobnostní rozdělení, co jsem pochopil, používá se uniformní,
+ale dalo by možná použít normální a zohlednit stupeň vrcholu (nápad)
+- fixně na jednoho - nesedí do příběhu, ale mohlo by být zajímavé
+tímto způsobem se vytvářejí fraktální struktury na mřížce,
+jak by se chovalo na grafu?
+- na jednoho ze skupiny nebo podle kritéria
+například skupina nejméně/nejvíce zrnek na grafu, nejvíce sousedů,...
+
+b) kolik zrnek je třeba na zhroucení hromádky
+- tolik, kolik má vertex hran (standard)
+- všude stejně
+vytváří problém - co dělat, pokud je zrníček více/méně než sousedů
+možná řešení pro více zrníček než sousedů:
+  - zahodit přebývající
+  - nechat zbylá zrníčka na vertexu, který se bortí
+  - poslat více zrníček jednomu sousedovi
+možná řešení pro více sousedů než zrníček:
+  - vytvořit dost zrníček pro všechny sousedy
+  - náhodně rozeslat některým sousedům
+Řešení, která generují nová zrníčka nebo nezahazují stávající by mohla vést
+k rychlému *přesycení* grafu, který by bylo potřeba nejspíš zase nějak řešit.
+Další možnosti pro b), které mají stejné problémy:
+- proporcionálně k počtu sousedů (např. min 4, max 9 zrníček je třeba na
+zhroucení hromádky na vertexu)
+- náhodně
+
+V grafech se místo konce mřížky, ze které odpadávají zrníčka pryč, používá
+*sink vertex*, který se nikdy nezhroutí. Je tedy otázka, kam jej napojit.
+Dávalo by mi smysl:
+- na všechny vertexy
+- na listy v grafu
+
+Z těch všech možností bych si představoval, že nejprve bych implementoval jednu
+a postupně přidával další možnosti. Moje *oblíbená možnost*:
+Watts-Strogatz graf
+zrníčka padají na graf uniformě
+na zhroucení hromádky je třeba přesně tolik zrnek, kolik má vertex sousedů
+sink je napojen na listy
+
+Taky pořádně nevím, co na grafech sledovat. Jesli jsou nějak významné metriky:
+- průměrný počet zhroucení hromádek po přidání nového zrnka
+- avg počet zhroucení hromádek při zhroucení alespoň jedné
+- avg počet iterací (přidání zrnek) než bude každý vertex mít alespoň jedno
+Případně porovnání změřených průměrných hodnot s analyticky získanými
+minimálními a maximálními hodnotami.
+
+Taky předpokládám, že důležité by mohlo být pro konkrétní graf (anebo grafy
+vygenerované podle specifického modelu) spustit simulaci vícekrát, aby se
+ukázali outliers a zmírnil dopad hraničních případů na měřené metriky.
+
+Jeden odstavec z úplně jiného soudku:
+Kromě toho mě napadlo, že by bylo zajímavé distribuovat *zrnka písku* mezi
+lidi na univerzitě s instrukcemi, že pokud dostanou tři zrnka, zaznamenají to
+jednoduše na web stránku pro to vytvořenou a předají je (spolu s instrukcemi)
+třem jejich známým z univerzity.
+Nevím, jestli by to k něčemu bylo, ale pokud by to fungovalo, tak by bylo
+přinejmenším určitě zajímavé sledovat chování na reálné síti.
+To už je možná ale spíš disciplína sociologie.
+
+Omlouvám se za dlouhý email, chtěl jsem napsat všechno, co mě k tématu napadlo.
+
+S pozdravem
+Jakub Vokoun
+
+Seznam článků, na které jsem se díval:
+[1] https://en.wikipedia.org/wiki/Self-organized_criticality
+[2] https://en.wikipedia.org/wiki/Abelian_sandpile_model
+Erdős–Rényi:
+[3] https://en.wikipedia.org/wiki/Erd%C5%91s%E2%80%93R%C3%A9nyi_model
+Watts–Strogatz:
+[4] https://en.wikipedia.org/wiki/Watts%E2%80%93Strogatz_model
+Barabási–Albert:
+[5] https://en.wikipedia.org/wiki/Barab%C3%A1si%E2%80%93Albert_model
+[6] https://en.wikipedia.org/wiki/Small-world_network
+[7] https://en.wikipedia.org/wiki/Clustering_coefficient
