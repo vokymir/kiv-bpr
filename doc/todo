@@ -4,3 +4,8 @@ pro logiku udelat: kernel/engine co umi stepovat, generator co vyrabi grafy
 ui: tridy pro ui, mozna visualizer pro vykresleni grafu
 conf: sim_confpro reproducibilitu, vis_config taky
 observer = sbira staty, musi byt nejak napojen na simulaci
+
+ui?
+asi by se hodila, misto toho, aby to bylo v app...
+
+visualizer? to uvidime
