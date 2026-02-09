@@ -1,92 +1,115 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.25)
 
 # Simulation of Self-Organized Criticality
-project(ssoc.exe LANGUAGES C CXX)
+project(SSOC
+    VERSION 0.0.1
+    LANGUAGES C CXX # C is for igraph library
+)
 
 # =====
-# general settings
+# Global Configuration
 # =====
 
-# C++
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-
-# C (imgui, igraph)
-set(CMAKE_C_STANDARD 11)
-
-# bonus: might help on multi-platform shared/static libs
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
-# using with neovim
+# compile_commands.json (for Neovim/LSP)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # =====
-# Dear ImGui
+# Dependencies
 # =====
 
-set(IMGUI_DIR ${PROJECT_SOURCE_DIR}/external/imgui)
+# --- Dear ImGui ---
+
+set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/imgui")
+
+# Check if ImGui exists to avoid obscure errors
+if(NOT EXISTS "${IMGUI_DIR}/imgui.cpp")
+    message(FATAL_ERROR
+        "ImGui not found at ${IMGUI_DIR}. Did you forget git submodules?"
+    )
+endif()
 
 add_library(imgui STATIC
-    ${IMGUI_DIR}/imgui.cpp
-    ${IMGUI_DIR}/imgui_draw.cpp
-    ${IMGUI_DIR}/imgui_tables.cpp
-    ${IMGUI_DIR}/imgui_widgets.cpp
-    # ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
-    # ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
+    "${IMGUI_DIR}/imgui.cpp"
+    "${IMGUI_DIR}/imgui_draw.cpp"
+    "${IMGUI_DIR}/imgui_tables.cpp"
+    "${IMGUI_DIR}/imgui_widgets.cpp"
+    # "${IMGUI_DIR}/backends/imgui_impl_glfw.cpp"
+    # "${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp"
 )
 
 target_include_directories(imgui PUBLIC
-   ${IMGUI_DIR}
-   ${IMGUI_DIR}/backends
+    "${IMGUI_DIR}"
+    "${IMGUI_DIR}/backends"
 )
 
-# =====
-# igraph
-# =====
+# C++ standard for ImGui
+target_compile_features(imgui PUBLIC cxx_std_17)
 
+# --- igraph ---
+
+# Suppress igraph specific build options from cluttering cache
 set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
 set(IGRAPH_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
 
-add_subdirectory(external/igraph)
+# Check existence before adding
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/igraph/CMakeLists.txt")
+    add_subdirectory(external/igraph)
+else()
+    message(WARNING "igraph submodule missing.")
+endif()
 
 # =====
-# Simulation of Self-Organized Criticallity (SSOC)
+# Main Target (SSOC)
 # =====
 
-add_executable(${PROJECT_NAME} src/main.cpp)
+add_executable(sim_soc src/main.cpp)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
+set_target_properties(sim_soc PROPERTIES
+    OUTPUT_NAME "ssoc"
+)
+
+target_link_libraries(sim_soc PRIVATE
     imgui
     igraph
 )
 
+# =====
+# Compiler Settings (Target-Based)
+# =====
+
+set_target_properties(sim_soc PROPERTIES
+    CXX_STANDARD 23
+    CXX_STANDARD_REQUIRED ON
+    CXX_EXTENSIONS OFF
+)
+
+# Enable warnings
+if(MSVC)
+    target_compile_options(sim_soc PRIVATE /W4 /permissive-)
+else()
+    target_compile_options(sim_soc PRIVATE -Wall -Wextra -Wpedantic)
+endif()
 
 # =====
-# ./bin
+# Output Directory
 # =====
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
+# Moving the binary to ./bin in the source root.
+set_target_properties(sim_soc PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin"
 )
 
 # =====
-# compile_commands.jsoon
+# Dev Tools (Neovim support)
 # =====
 
+# Symlink compile_commands.json to root for LSP support
 if(CMAKE_EXPORT_COMPILE_COMMANDS)
-    add_custom_target(link_compile_commands ALL
+    add_custom_command(TARGET sim_soc POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E create_symlink
-            ${CMAKE_BINARY_DIR}/compile_commands.json
-            ${PROJECT_SOURCE_DIR}/compile_commands.json
+        "${CMAKE_BINARY_DIR}/compile_commands.json"
+        "${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json"
+        COMMENT "Symlinking compile_commands.json to source root"
+        VERBATIM
     )
 endif()
-
-
-
-
-
-
-
-
-
