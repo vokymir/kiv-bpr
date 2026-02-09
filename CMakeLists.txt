@@ -17,6 +17,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Dependencies
 # =====
 
+# --- OpenGL (for Dear ImGui) ---
+
+find_package(OpenGL REQUIRED)
+
+# --- SDL (for Dear ImGui) ---
+
+find_package(SDL3 REQUIRED)
+
 # --- Dear ImGui ---
 
 set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/imgui")
@@ -33,13 +41,18 @@ add_library(imgui STATIC
     "${IMGUI_DIR}/imgui_draw.cpp"
     "${IMGUI_DIR}/imgui_tables.cpp"
     "${IMGUI_DIR}/imgui_widgets.cpp"
-    # "${IMGUI_DIR}/backends/imgui_impl_glfw.cpp"
-    # "${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp"
+    "${IMGUI_DIR}/backends/imgui_impl_sdl3.cpp"
+    "${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp"
 )
 
 target_include_directories(imgui PUBLIC
     "${IMGUI_DIR}"
     "${IMGUI_DIR}/backends"
+)
+
+target_link_libraries(imgui PUBLIC
+    SDL3::SDL3
+    OpenGL::GL
 )
 
 # C++ standard for ImGui
@@ -62,7 +75,11 @@ endif()
 # Main Target (SSOC)
 # =====
 
-add_executable(sim_soc src/main.cpp)
+file(GLOB_RECURSE SOURCES
+    "${PROJECT_SOURCE_DIR}/src/*.cpp"
+)
+
+add_executable(sim_soc ${SOURCES})
 
 set_target_properties(sim_soc PROPERTIES
     OUTPUT_NAME "ssoc"
