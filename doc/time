@@ -7,3 +7,4 @@ date | total time [min] | other times | subject
 5.2.2026 | 250 | | consultation with mr. Ubl about GUI library, trying & looking at it
 9.2.2026 | 100 | 8.50-10.30 | preparing project with imgui and igraph, writing cmake, submodules etc.
  | 60 | 12:20 | architecture planning for graph, simulation - thinking about cache & parallelism
+ | 45 | 13:50 | architecture, trying to start with graph no-class

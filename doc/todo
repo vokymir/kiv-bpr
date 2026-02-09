@@ -1,11 +1,6 @@
-libs:
-- GUI
-  - Dear ImGui + ImPlot?
-- Graph
-  - igraph
-
-a) generate graph
-b) select mode (toppling rules, graph generation method etc) & parameters (size)
-c) run 1 simulation (visualization, stepping, ...)
-d) run batch simulations (collect stats)
-e) display stats (load, process)
+jestli dava graph smysl a neudelat jinak? trochu mi to unika.
+pridat nejaky adapter mezi igraph <-> muj graf
+pro logiku udelat: kernel/engine co umi stepovat, generator co vyrabi grafy
+ui: tridy pro ui, mozna visualizer pro vykresleni grafu
+conf: sim_confpro reproducibilitu, vis_config taky
+observer = sbira staty, musi byt nejak napojen na simulaci
