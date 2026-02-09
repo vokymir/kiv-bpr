@@ -1,10 +1,10 @@
-#include <igraph.h>
 
-namespace ssoc {
-
+#include "App.hpp"
 int main(void) {
-    return 0;
-}
 
-}
+  ssoc::App app{};
 
+  app.run();
+
+  return 0;
+}
