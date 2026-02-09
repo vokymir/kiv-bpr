@@ -1,10 +1,11 @@
 #pragma once
 
+#include <utility>
 #include <vector>
-namespace ssoc::graph{
+namespace ssoc {
 
-/* Store the topology of graph, the nodes in neighbours. */
-class Topology{
+/* Have nodes & edges. Data oriented memory layout for higher efficiency. */
+class Graph {
 private:
     /* How many nodes are in a graph. */
     int node_count_;
@@ -25,7 +26,13 @@ private:
      * neighbour_idxs_ list. */
     std::vector<int> neighbours_;
 
+    /* Sand count for every node. It's vectorized for batch runs, every run
+     * having it's own vector. */
+    std::vector<std::vector<int>> sand_;
+
+    /* Store the x,y coordinates in 2D UI layout. */
+    std::vector<std::pair<int, int>> positions_;
+
 };
 
 }
-
