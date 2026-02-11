@@ -28,7 +28,10 @@ public:
   // clear all data after ending the mainloop
   void clear();
 
-  void draw_graph(const ssoc::graph::Graph &g);
+  // draw one graph in a separate window
+  void draw_graph(const graph::Graph &g);
+
+  void draw_master_window();
 };
 
 } // namespace ssoc::ui

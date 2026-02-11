@@ -182,4 +182,6 @@ void UI::clear() {
 
 void UI::draw_graph(const ssoc::graph::Graph &g) { vis_.show_window(g); }
 
+void UI::draw_master_window() {}
+
 } // namespace ssoc::ui
