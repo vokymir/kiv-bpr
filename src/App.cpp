@@ -11,10 +11,11 @@ void ssoc::App::run(const graph::Graph &g) {
     ui_.pollevs(should_end);
 
     ui_.begin_frame();
+    // vvvvv
 
-    // TODO: call UI to do some actual drawing
     ui_.draw_graph(g);
 
+    // ^^^^^
     ui_.end_frame();
   }
 
