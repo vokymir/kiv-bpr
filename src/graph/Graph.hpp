@@ -31,7 +31,7 @@ public: // TODO: change to private as soon as it works
   std::vector<std::vector<int>> sand_;
 
   /* Store the x,y coordinates in 2D UI layout. */
-  std::vector<std::pair<int, int>> positions_;
+  std::vector<std::pair<double, double>> positions_;
 };
 
 } // namespace ssoc::graph
