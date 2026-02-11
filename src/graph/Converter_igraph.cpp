@@ -50,16 +50,15 @@ void to_ssoc__fill_neighbour_lists(Graph &g, const igraph_t &ig) {
     // memory management
     igraph_vector_int_destroy(&neighbours);
   }
+
+  adj_offsets.back() = adj_vertices.size();
 }
 
 std::unique_ptr<Graph> to_ssoc_graph(const igraph_t &igraph) {
   auto graph = std::make_unique<Graph>();
 
-  auto node_count = igraph_vcount(&igraph);
-  auto edge_count = igraph_ecount(&igraph);
-
-  graph->num_vertices(node_count);
-  graph->num_edges(edge_count);
+  graph->num_vertices(igraph_vcount(&igraph));
+  graph->num_edges(igraph_ecount(&igraph));
 
   to_ssoc__resize_internal_vectors(*graph);
 
