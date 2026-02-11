@@ -6,14 +6,15 @@
 
 namespace ssoc::graph::convert {
 
-void to__resize_internal_vectors(Graph &graph) {
-  auto node_count = graph.node_count();
-  auto edge_count = graph.edge_count();
+// just resize the graphs internals to match the igraph
+void to_ssoc__resize_internal_vectors(Graph &graph) {
+  auto node_count = graph.num_vertices();
+  auto edge_count = graph.num_edge();
 
-  auto neighbour_idxs = graph.neighbour_idxs();
-  auto &neighbours_arr = graph.neighbours();
-  auto &positions = graph.positions();
-  auto &sand = graph.sand(0); // TODO: when batch running impl, this is problem
+  auto neighbour_idxs = graph.adj_offsets();
+  auto &neighbours_arr = graph.adj_vertices();
+  auto &positions = graph.layout_pos();
+  auto &sand = graph.sand_height(0);
 
   neighbour_idxs.resize(node_count);
 
@@ -28,10 +29,10 @@ void to__resize_internal_vectors(Graph &graph) {
 }
 
 void to__fill_neighbour_lists(Graph &g, const igraph_t &ig) {
-  auto node_count = g.node_count();
+  auto node_count = g.num_vertices();
 
-  auto neighbour_idxs = g.neighbour_idxs();
-  auto &neighbours_arr = g.neighbours();
+  auto neighbour_idxs = g.adj_offsets();
+  auto &neighbours_arr = g.adj_vertices();
 
   igraph_integer_t idx = 0;
   for (igraph_integer_t v = 0; v < node_count; ++v) {
@@ -59,16 +60,17 @@ std::unique_ptr<Graph> to_ssoc_graph(const igraph_t &igraph) {
   auto node_count = igraph_vcount(&igraph);
   auto edge_count = igraph_ecount(&igraph);
 
-  graph->node_count(node_count);
-  graph->edge_count(edge_count);
+  graph->num_vertices(node_count);
+  graph->num_edge(edge_count);
 
-  to__resize_internal_vectors(*graph);
+  to_ssoc__resize_internal_vectors(*graph);
 
   to__fill_neighbour_lists(*graph, igraph);
 
   return graph;
 }
 
+// NOTE: won't be able to convert sand
 std::unique_ptr<igraph_t, igraph_::igraph_Deleter>
 to_igraph([[maybe_unused]] const Graph &ssoc_graph) {
   // TODO: this is only useful if allowed changing layout after generating graph

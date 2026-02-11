@@ -47,10 +47,10 @@ void Visualizer::show_window(const graph::Graph &g) {
                   center.y + pan_.y + (float)pos.second * zoom_);
   };
 
-  auto node_count = g.node_count();
-  auto &positions = g.positions();
-  auto &neighbour_idxs = g.neighbour_idxs();
-  auto &neighbours = g.neighbours();
+  auto node_count = g.num_vertices();
+  auto &positions = g.layout_pos();
+  auto &neighbour_idxs = g.adj_offsets();
+  auto &neighbours = g.adj_vertices();
 
   // Draw Edges
   for (int v = 0; v < node_count; ++v) {

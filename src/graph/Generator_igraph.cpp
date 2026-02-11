@@ -102,8 +102,8 @@ fruchterman_reingold_2d_variant(igraph_t &g, igraph_matrix_t &layout,
 
 // convert layout from igraph to graph
 void layout_igraph_to_graph(const igraph_matrix_t &layout, Graph &graph) {
-  std::vector<std::pair<double, double>> positions = graph.positions();
-  auto node_count = graph.node_count();
+  std::vector<std::pair<double, double>> positions = graph.layout_pos();
+  auto node_count = graph.num_vertices();
 
   positions.resize(node_count);
   for (long v = 0; v < node_count; ++v) {

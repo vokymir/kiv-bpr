@@ -6,59 +6,56 @@
 #include <vector>
 namespace ssoc::graph {
 
-/* Have nodes & edges. Data oriented memory layout for higher efficiency. */
+/* Have vertices & edges. Data oriented memory layout for higher efficiency. */
 class Graph {
 private:
-  /* How many nodes are in a graph. */
-  int node_count_;
-  int edge_count_;
-  /* Store on which index in neighbours_ vector starts the list of neighbours
-   * for current node.
+  int num_vertices_;
+  int num_edges_;
+  /* Store on which index in adj_vertices_ vector starts the list of neighbours
+   * (=adjancent vertices) for current vertex.
    *
    * == Example:
-   * node_count = 4
-   * neighbour_idxs_ =
+   * num_vertices_ = 4
+   * adj_offsets_ =
    * [0,2,2,4] <- at which index neighbour starts
-   * neighbours_ =
+   * adj_vertices_ =
    *  0 1 2 3 4 5 6   <- indexes
    *  0 0 2 2 3 3 3   <- whose neighbour list is it
    * [1,2,1,0,1,0,3]
    * */
-  std::vector<int> neighbour_idxs_;
-  /* Neighbours list, to know how many neighbours for node exists, look into
-   * neighbour_idxs_ list. */
-  std::vector<int> neighbours_;
+  std::vector<int> adj_offsets_;
+  std::vector<int> adj_vertices_;
 
   /* Sand count for every node. It's vectorized for batch runs, every run
    * having it's own vector. */
-  std::vector<std::vector<int>> sand_;
+  std::vector<std::vector<int>> sand_height_;
 
   /* Store the x,y coordinates in 2D UI layout. */
-  std::vector<std::pair<double, double>> positions_;
+  std::vector<std::pair<double, double>> layout_pos_;
 
 public:
-  int node_count() const { return node_count_; }
-  void node_count(int count) { node_count_ = count; }
+  int num_vertices() const { return num_vertices_; }
+  void num_vertices(int count) { num_vertices_ = count; }
 
-  int edge_count() const { return edge_count_; }
-  void edge_count(int count) { edge_count_ = count; }
+  int num_edge() const { return num_edges_; }
+  void num_edge(int count) { num_edges_ = count; }
 
-  std::vector<int> &neighbour_idxs() { return neighbour_idxs_; }
-  const std::vector<int> &neighbour_idxs() const { return neighbour_idxs_; }
+  std::vector<int> &adj_offsets() { return adj_offsets_; }
+  const std::vector<int> &adj_offsets() const { return adj_offsets_; }
 
-  std::vector<int> &neighbours() { return neighbours_; }
-  const std::vector<int> &neighbours() const { return neighbours_; }
+  std::vector<int> &adj_vertices() { return adj_vertices_; }
+  const std::vector<int> &adj_vertices() const { return adj_vertices_; }
 
-  std::vector<int> &sand(int idx) {
-    while (static_cast<int>(sand_.size()) <= idx) {
-      sand_.push_back({});
+  std::vector<int> &sand_height(int idx) {
+    while (static_cast<int>(sand_height_.size()) <= idx) {
+      sand_height_.push_back({});
     }
-    return sand_[idx];
+    return sand_height_[idx];
   }
 
-  std::vector<std::pair<double, double>> &positions() { return positions_; }
-  const std::vector<std::pair<double, double>> &positions() const {
-    return positions_;
+  std::vector<std::pair<double, double>> &layout_pos() { return layout_pos_; }
+  const std::vector<std::pair<double, double>> &layout_pos() const {
+    return layout_pos_;
   }
 };
 
