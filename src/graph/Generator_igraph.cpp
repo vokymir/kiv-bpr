@@ -38,6 +38,35 @@ std::unique_ptr<Graph> igraph_from_config(const ssoc::Sim_Config &cfg) {
 
   std::unique_ptr<Graph> graph = graph::convert::to_ssoc_graph(*igraph_graph);
 
+  igraph_matrix_t layout;
+  igraph_matrix_init(&layout, 0, 0); // will be resized by the function
+
+  igraph_error_t err =
+      igraph_layout_fruchterman_reingold(igraph_graph.get(), &layout,
+                                         false, // use_seed: false, random start
+                                         500,   // niter: iterations
+                                         0.1,   // start_temp
+                                         IGRAPH_LAYOUT_NOGRID, // grid method
+                                         nullptr,              // weights
+                                         nullptr, nullptr,     // minx, maxx
+                                         nullptr, nullptr      // miny, maxy
+      );
+
+  if (err != IGRAPH_SUCCESS) {
+    igraph_matrix_destroy(&layout);
+    throw std::runtime_error("Failed to compute Fruchterman-Reingold layout");
+  }
+
+  // Copy layout to Graph::positions_
+  graph->positions_.resize(graph->node_count_);
+  for (long v = 0; v < graph->node_count_; ++v) {
+    double x = MATRIX(layout, v, 0);
+    double y = MATRIX(layout, v, 1);
+    graph->positions_[v] = {x, y};
+  }
+
+  igraph_matrix_destroy(&layout);
+
   return graph;
 }
 

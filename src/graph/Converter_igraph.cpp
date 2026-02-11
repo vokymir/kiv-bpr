@@ -3,7 +3,6 @@
 #include "igraph_constants.h"
 #include "igraph_interface.h"
 #include "igraph_lib.hpp"
-#include <print>
 
 namespace ssoc::graph::convert {
 
@@ -12,6 +11,8 @@ std::unique_ptr<Graph> to_ssoc_graph(const igraph_t &igraph) {
 
   const igraph_integer_t node_count = igraph_vcount(&igraph);
   const igraph_integer_t edge_count = igraph_ecount(&igraph);
+
+  graph->node_count_ = node_count;
 
   // ===== Resize internal vectors =====
   // neighbour_idxs_ needs node_count entries
@@ -40,12 +41,9 @@ std::unique_ptr<Graph> to_ssoc_graph(const igraph_t &igraph) {
       throw std::runtime_error("Failed to get neighbors");
     }
 
-    std::print("{}: ", static_cast<int>(v));
     for (long n = 0; n < igraph_vector_int_size(&neighbors); ++n) {
-      std::print("{}, ", VECTOR(neighbors)[n]);
       graph->neighbours_[idx++] = VECTOR(neighbors)[n];
     }
-    std::print("\n");
 
     igraph_vector_int_destroy(&neighbors);
   }
