@@ -176,6 +176,7 @@ void UI::clear() {
 
   SDL_GL_DestroyContext(gl_context_);
   SDL_DestroyWindow(window_);
+  window_ = nullptr;
   SDL_Quit();
 }
 
