@@ -11,6 +11,7 @@ class Graph {
 private:
   /* How many nodes are in a graph. */
   int node_count_;
+  int edge_count_;
   /* Store on which index in neighbours_ vector starts the list of neighbours
    * for current node.
    *
@@ -38,6 +39,9 @@ private:
 public:
   int node_count() const { return node_count_; }
   void node_count(int count) { node_count_ = count; }
+
+  int edge_count() const { return edge_count_; }
+  void edge_count(int count) { edge_count_ = count; }
 
   std::vector<int> &neighbour_idxs() { return neighbour_idxs_; }
   const std::vector<int> &neighbour_idxs() const { return neighbour_idxs_; }
