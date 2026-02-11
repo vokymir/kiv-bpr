@@ -11,4 +11,4 @@ date | total time [min] | other times | subject
  | 130 | 16:00 | prepare for graphs, mainly getting imgui to show up
 11.2.2026 | 70 | 9.10 | UI own class
 | 120 | 11.15 | get some working generator
-| 30 | 14 | vibecode mvp
+| 90 | 14 | vibecode mvp, it works, thinking about valid refactor
