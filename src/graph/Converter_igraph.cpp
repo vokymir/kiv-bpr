@@ -12,26 +12,31 @@ std::unique_ptr<Graph> to_ssoc_graph(const igraph_t &igraph) {
   const igraph_integer_t node_count = igraph_vcount(&igraph);
   const igraph_integer_t edge_count = igraph_ecount(&igraph);
 
-  graph->node_count_ = node_count;
+  graph->node_count(node_count);
 
   // ===== Resize internal vectors =====
   // neighbour_idxs_ needs node_count entries
-  graph->neighbour_idxs_.resize(node_count);
+  auto neighbour_idxs = graph->neighbour_idxs();
+  auto &neighbours_arr = graph->neighbours();
+  auto &positions = graph->positions();
+  auto &sand = graph->sand(0);
+
+  neighbour_idxs.resize(node_count);
 
   // Precompute neighbours size
-  graph->neighbours_.resize(
+  neighbours_arr.resize(
       2 * edge_count); // undirected graph: every edge stored twice
 
   // Positions vector (optional; set to 0,0 if igraph layout not provided)
-  graph->positions_.resize(node_count, {0, 0});
+  positions.resize(node_count, {0, 0});
 
   // Sand: initialize with empty vector (or 0 grains per node)
-  graph->sand_.resize(1, std::vector<int>(node_count, 0));
+  sand.resize(node_count);
 
   // ===== Fill neighbour lists =====
   igraph_integer_t idx = 0;
   for (igraph_integer_t v = 0; v < node_count; ++v) {
-    graph->neighbour_idxs_[v] = idx;
+    neighbour_idxs[v] = idx;
 
     igraph_vector_int_t neighbors;
     igraph_vector_int_init(&neighbors, 0);
@@ -42,7 +47,7 @@ std::unique_ptr<Graph> to_ssoc_graph(const igraph_t &igraph) {
     }
 
     for (long n = 0; n < igraph_vector_int_size(&neighbors); ++n) {
-      graph->neighbours_[idx++] = VECTOR(neighbors)[n];
+      neighbours_arr[idx++] = VECTOR(neighbors)[n];
     }
 
     igraph_vector_int_destroy(&neighbors);

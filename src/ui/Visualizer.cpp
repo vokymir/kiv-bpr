@@ -47,24 +47,29 @@ void Visualizer::show_window(const graph::Graph &g) {
                   center.y + pan_.y + (float)pos.second * zoom_);
   };
 
+  auto node_count = g.node_count();
+  auto &positions = g.positions();
+  auto &neighbour_idxs = g.neighbour_idxs();
+  auto &neighbours = g.neighbours();
+
   // Draw Edges
-  for (int v = 0; v < g.node_count_; ++v) {
-    ImVec2 p1 = to_screen(g.positions_[v]);
-    int start = g.neighbour_idxs_[v];
-    int end = (v + 1 < g.node_count_) ? g.neighbour_idxs_[v + 1]
-                                      : (int)g.neighbours_.size();
+  for (int v = 0; v < node_count; ++v) {
+    ImVec2 p1 = to_screen(positions[v]);
+    int start = neighbour_idxs[v];
+    int end =
+        (v + 1 < node_count) ? neighbour_idxs[v + 1] : (int)neighbours.size();
 
     for (int i = start; i < end; ++i) {
-      draw_list->AddLine(p1, to_screen(g.positions_[g.neighbours_[i]]),
+      draw_list->AddLine(p1, to_screen(positions[neighbours[i]]),
                          IM_COL32(150, 150, 150, 255));
     }
   }
 
   // Draw Nodes
-  for (int v = 0; v < g.node_count_; ++v) {
+  for (int v = 0; v < node_count; ++v) {
     // We keep the node radius constant-ish so they don't get giant
     // Or use: 5.0f * (zoom / 200.0f) if you want them to scale
-    draw_list->AddCircleFilled(to_screen(g.positions_[v]), 5.0f,
+    draw_list->AddCircleFilled(to_screen(positions[v]), 5.0f,
                                IM_COL32(200, 50, 50, 255));
   }
 

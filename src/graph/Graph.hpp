@@ -1,12 +1,14 @@
 #pragma once
 
+#include <format>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 namespace ssoc::graph {
 
 /* Have nodes & edges. Data oriented memory layout for higher efficiency. */
 class Graph {
-public: // TODO: change to private as soon as it works
+private:
   /* How many nodes are in a graph. */
   int node_count_;
   /* Store on which index in neighbours_ vector starts the list of neighbours
@@ -32,6 +34,28 @@ public: // TODO: change to private as soon as it works
 
   /* Store the x,y coordinates in 2D UI layout. */
   std::vector<std::pair<double, double>> positions_;
+
+public:
+  int node_count() const { return node_count_; }
+  void node_count(int count) { node_count_ = count; }
+
+  std::vector<int> &neighbour_idxs() { return neighbour_idxs_; }
+  const std::vector<int> &neighbour_idxs() const { return neighbour_idxs_; }
+
+  std::vector<int> &neighbours() { return neighbours_; }
+  const std::vector<int> &neighbours() const { return neighbours_; }
+
+  std::vector<int> &sand(int idx) {
+    while (static_cast<int>(sand_.size()) <= idx) {
+      sand_.push_back({});
+    }
+    return sand_[idx];
+  }
+
+  std::vector<std::pair<double, double>> &positions() { return positions_; }
+  const std::vector<std::pair<double, double>> &positions() const {
+    return positions_;
+  }
 };
 
 } // namespace ssoc::graph

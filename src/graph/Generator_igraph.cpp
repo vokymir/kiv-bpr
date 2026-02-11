@@ -57,12 +57,15 @@ std::unique_ptr<Graph> igraph_from_config(const ssoc::Sim_Config &cfg) {
     throw std::runtime_error("Failed to compute Fruchterman-Reingold layout");
   }
 
+  auto node_count = graph->node_count();
+  auto &positions = graph->positions();
+
   // Copy layout to Graph::positions_
-  graph->positions_.resize(graph->node_count_);
-  for (long v = 0; v < graph->node_count_; ++v) {
+  positions.resize(node_count);
+  for (long v = 0; v < node_count; ++v) {
     double x = MATRIX(layout, v, 0);
     double y = MATRIX(layout, v, 1);
-    graph->positions_[v] = {x, y};
+    positions[v] = {x, y};
   }
 
   igraph_matrix_destroy(&layout);
