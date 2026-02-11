@@ -9,3 +9,4 @@ date | total time [min] | other times | subject
  | 60 | 12:20 | architecture planning for graph, simulation - thinking about cache & parallelism
  | 45 | 13:50 | architecture, trying to start with graph no-class
  | 130 | 16:00 | prepare for graphs, mainly getting imgui to show up
+11.2.2026 | 70 | 9.10 | UI own class
