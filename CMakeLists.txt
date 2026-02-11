@@ -43,6 +43,7 @@ add_library(imgui STATIC
     "${IMGUI_DIR}/imgui_widgets.cpp"
     "${IMGUI_DIR}/backends/imgui_impl_sdl3.cpp"
     "${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp"
+    "${IMGUI_DIR}/imgui_demo.cpp" # TODO: remove when unuseful
 )
 
 target_include_directories(imgui PUBLIC
@@ -77,6 +78,7 @@ endif()
 
 file(GLOB_RECURSE SOURCES
     "${PROJECT_SOURCE_DIR}/src/*.cpp"
+    "${PROJECT_SOURCE_DIR}/src/*.hpp"
 )
 
 add_executable(sim_soc ${SOURCES})
