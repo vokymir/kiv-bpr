@@ -6,11 +6,11 @@ int main(void) {
 
   ssoc::Sim_Config cfg{};
 
-  ssoc::graph::generate::igraph_from_config(cfg);
+  auto res = ssoc::graph::generate::igraph_from_config(cfg);
 
   ssoc::App app{};
 
-  app.run();
+  app.run(*res);
 
   return 0;
 }

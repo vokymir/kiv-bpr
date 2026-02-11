@@ -2,7 +2,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_opengl.h>
 
-void ssoc::App::run() {
+void ssoc::App::run(const graph::Graph &g) {
   ui_.init();
 
   bool should_end = false;
@@ -14,6 +14,8 @@ void ssoc::App::run() {
 
     // TODO: call UI to do some actual drawing
     ui_.draw_demo();
+
+    ui_.draw_graph(g);
 
     ui_.end_frame();
   }
