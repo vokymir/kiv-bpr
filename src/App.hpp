@@ -11,7 +11,7 @@ class App {
 private:
   Sim_Config cfg_{};
   std::unique_ptr<graph::Graph> g_{};
-  ui::UI ui_{};
+  std::unique_ptr<ui::UI> ui_{};
 
 public:
   void run();
