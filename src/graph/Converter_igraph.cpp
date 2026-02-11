@@ -7,50 +7,48 @@
 namespace ssoc::graph::convert {
 
 // just resize the graphs internals to match the igraph
-void to_ssoc__resize_internal_vectors(Graph &graph) {
-  auto node_count = graph.num_vertices();
-  auto edge_count = graph.num_edge();
+void to_ssoc__resize_internal_vectors(Graph &g) {
 
-  auto neighbour_idxs = graph.adj_offsets();
-  auto &neighbours_arr = graph.adj_vertices();
-  auto &positions = graph.layout_pos();
-  auto &sand = graph.sand_height(0);
-
-  neighbour_idxs.resize(node_count);
+  // as many offsets as vertices
+  g.adj_offsets().resize(g.num_vertices());
 
   // undirected = every edge twice
-  neighbours_arr.resize(2 * edge_count);
+  g.adj_vertices().resize(2 * g.num_edge());
 
   // if no layout provided, set all nodes to be at origin
-  positions.resize(node_count, {0, 0});
+  g.layout_pos().resize(g.num_vertices(), {0, 0});
 
   // initialize sand with 0 on every node
-  sand.resize(node_count);
+  // sand_height[0] because we only have one when converting from igraph
+  g.sand_height(0).resize(g.num_vertices(), 0);
 }
 
-void to__fill_neighbour_lists(Graph &g, const igraph_t &ig) {
-  auto node_count = g.num_vertices();
+void to_ssoc__fill_neighbour_lists(Graph &g, const igraph_t &ig) {
 
-  auto neighbour_idxs = g.adj_offsets();
-  auto &neighbours_arr = g.adj_vertices();
+  auto &adj_offsets = g.adj_offsets();
+  auto &adj_vertices = g.adj_vertices();
 
   igraph_integer_t idx = 0;
-  for (igraph_integer_t v = 0; v < node_count; ++v) {
-    neighbour_idxs[v] = idx;
+  for (igraph_integer_t v = 0; v < g.num_vertices(); ++v) {
+    adj_offsets[v] = idx;
 
-    igraph_vector_int_t neighbors;
-    igraph_vector_int_init(&neighbors, 0);
-    if (igraph_neighbors(&ig, &neighbors, v, IGRAPH_ALL, IGRAPH_NO_LOOPS,
+    // find neighbours in igraph
+    igraph_vector_int_t neighbours;
+    igraph_vector_int_init(&neighbours, 0);
+
+    if (igraph_neighbors(&ig, &neighbours, v, IGRAPH_ALL, IGRAPH_NO_LOOPS,
                          IGRAPH_NO_MULTIPLE) != IGRAPH_SUCCESS) {
-      igraph_vector_int_destroy(&neighbors);
+      igraph_vector_int_destroy(&neighbours);
       throw std::runtime_error("Failed to get neighbors");
     }
 
-    for (long n = 0; n < igraph_vector_int_size(&neighbors); ++n) {
-      neighbours_arr[idx++] = VECTOR(neighbors)[n];
+    // copy neighbours from igraph format
+    for (long n = 0; n < igraph_vector_int_size(&neighbours); ++n) {
+      adj_vertices[idx++] = VECTOR(neighbours)[n];
     }
 
-    igraph_vector_int_destroy(&neighbors);
+    // memory management
+    igraph_vector_int_destroy(&neighbours);
   }
 }
 
@@ -65,7 +63,7 @@ std::unique_ptr<Graph> to_ssoc_graph(const igraph_t &igraph) {
 
   to_ssoc__resize_internal_vectors(*graph);
 
-  to__fill_neighbour_lists(*graph, igraph);
+  to_ssoc__fill_neighbour_lists(*graph, igraph);
 
   return graph;
 }
