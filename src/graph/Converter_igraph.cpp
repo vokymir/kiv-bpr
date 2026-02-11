@@ -9,8 +9,8 @@ namespace ssoc::graph::convert {
 // just resize the graphs internals to match the igraph
 void to_ssoc__resize_internal_vectors(Graph &g) {
 
-  // as many offsets as vertices
-  g.adj_offsets().resize(g.num_vertices());
+  // as many offsets as vertices + 1 for the last one
+  g.adj_offsets().resize(g.num_vertices() + 1);
 
   // undirected = every edge twice
   g.adj_vertices().resize(2 * g.num_edge());
