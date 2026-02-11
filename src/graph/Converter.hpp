@@ -2,6 +2,7 @@
 
 #include "Graph.hpp"
 #include "igraph.h"
+#include "igraph_lib.hpp"
 #include <memory>
 namespace ssoc::graph::convert {
 
@@ -16,13 +17,9 @@ namespace ssoc::graph::convert {
 // Library: igraph
 // =====
 
-// custor raii deleter to allow unique_ptr
-struct igraph_Deleter {
-  void operator()(igraph_t *g) const;
-};
-
 std::unique_ptr<Graph> to_ssoc_graph(const igraph_t &igraph);
 
-std::unique_ptr<igraph_t, igraph_Deleter> to_igraph(const Graph &ssoc_graph);
+std::unique_ptr<igraph_t, igraph_::igraph_Deleter>
+to_igraph(const Graph &ssoc_graph);
 
 } // namespace ssoc::graph::convert
