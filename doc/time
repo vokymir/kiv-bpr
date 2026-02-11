@@ -10,6 +10,7 @@ date | total time [min] | other times | subject
  | 45 | 13:50 | architecture, trying to start with graph no-class
  | 130 | 16:00 | prepare for graphs, mainly getting imgui to show up
 11.2.2026 | 70 | 9.10 | UI own class
-| 120 | 11.15 | get some working generator
-| 90 | 14 | vibecode mvp, it works, thinking about valid refactor
-| 110 | 17.30 | refactoring, generator OK, using config
+ | 120 | 11.15 | get some working generator
+ | 90 | 14 | vibecode mvp, it works, thinking about valid refactor
+ | 110 | 17.30 | refactoring, generator OK, using config
+ | 95 | 19.40 | working on UI, there is some dereferencing bug with graph vector
