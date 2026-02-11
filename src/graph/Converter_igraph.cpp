@@ -6,41 +6,40 @@
 
 namespace ssoc::graph::convert {
 
-std::unique_ptr<Graph> to_ssoc_graph(const igraph_t &igraph) {
-  auto graph = std::make_unique<Graph>();
+void to__resize_internal_vectors(Graph &graph) {
+  auto node_count = graph.node_count();
+  auto edge_count = graph.edge_count();
 
-  const igraph_integer_t node_count = igraph_vcount(&igraph);
-  const igraph_integer_t edge_count = igraph_ecount(&igraph);
-
-  graph->node_count(node_count);
-
-  // ===== Resize internal vectors =====
-  // neighbour_idxs_ needs node_count entries
-  auto neighbour_idxs = graph->neighbour_idxs();
-  auto &neighbours_arr = graph->neighbours();
-  auto &positions = graph->positions();
-  auto &sand = graph->sand(0);
+  auto neighbour_idxs = graph.neighbour_idxs();
+  auto &neighbours_arr = graph.neighbours();
+  auto &positions = graph.positions();
+  auto &sand = graph.sand(0); // TODO: when batch running impl, this is problem
 
   neighbour_idxs.resize(node_count);
 
-  // Precompute neighbours size
-  neighbours_arr.resize(
-      2 * edge_count); // undirected graph: every edge stored twice
+  // undirected = every edge twice
+  neighbours_arr.resize(2 * edge_count);
 
-  // Positions vector (optional; set to 0,0 if igraph layout not provided)
+  // if no layout provided, set all nodes to be at origin
   positions.resize(node_count, {0, 0});
 
-  // Sand: initialize with empty vector (or 0 grains per node)
+  // initialize sand with 0 on every node
   sand.resize(node_count);
+}
 
-  // ===== Fill neighbour lists =====
+void to__fill_neighbour_lists(Graph &g, const igraph_t &ig) {
+  auto node_count = g.node_count();
+
+  auto neighbour_idxs = g.neighbour_idxs();
+  auto &neighbours_arr = g.neighbours();
+
   igraph_integer_t idx = 0;
   for (igraph_integer_t v = 0; v < node_count; ++v) {
     neighbour_idxs[v] = idx;
 
     igraph_vector_int_t neighbors;
     igraph_vector_int_init(&neighbors, 0);
-    if (igraph_neighbors(&igraph, &neighbors, v, IGRAPH_ALL, IGRAPH_NO_LOOPS,
+    if (igraph_neighbors(&ig, &neighbors, v, IGRAPH_ALL, IGRAPH_NO_LOOPS,
                          IGRAPH_NO_MULTIPLE) != IGRAPH_SUCCESS) {
       igraph_vector_int_destroy(&neighbors);
       throw std::runtime_error("Failed to get neighbors");
@@ -52,11 +51,29 @@ std::unique_ptr<Graph> to_ssoc_graph(const igraph_t &igraph) {
 
     igraph_vector_int_destroy(&neighbors);
   }
+}
+
+std::unique_ptr<Graph> to_ssoc_graph(const igraph_t &igraph) {
+  auto graph = std::make_unique<Graph>();
+
+  auto node_count = igraph_vcount(&igraph);
+  auto edge_count = igraph_ecount(&igraph);
+
+  graph->node_count(node_count);
+  graph->edge_count(edge_count);
+
+  to__resize_internal_vectors(*graph);
+
+  to__fill_neighbour_lists(*graph, igraph);
 
   return graph;
 }
 
 std::unique_ptr<igraph_t, igraph_::igraph_Deleter>
-to_igraph(const Graph &ssoc_graph) {}
+to_igraph([[maybe_unused]] const Graph &ssoc_graph) {
+  // TODO: this is only useful if allowed changing layout after generating graph
+  // NOTE: [[maybe]] and null ptr is only to avoid warns
+  return nullptr;
+}
 
 } // namespace ssoc::graph::convert

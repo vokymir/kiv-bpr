@@ -17,9 +17,11 @@ namespace ssoc::graph::convert {
 // Library: igraph
 // =====
 
+// convert any igraph to ssoc graph format
 std::unique_ptr<Graph> to_ssoc_graph(const igraph_t &igraph);
 
-std::unique_ptr<igraph_t, igraph_::igraph_Deleter>
-to_igraph(const Graph &ssoc_graph);
+// convert any ssoc graph to igraph format
+// must not be simple unique_ptr because it needs custom deleter
+igraph_::unique_ptr_ to_igraph(const Graph &ssoc_graph);
 
 } // namespace ssoc::graph::convert
