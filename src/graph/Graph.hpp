@@ -70,6 +70,11 @@ public:
 
   Graph(Graph &&) noexcept = default;
   Graph &operator=(Graph &&) noexcept = default;
+
+  // =====
+  // constructors
+public:
+  Graph() {}
 };
 
 } // namespace ssoc::graph
