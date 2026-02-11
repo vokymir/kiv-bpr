@@ -6,7 +6,7 @@ namespace ssoc::graph {
 
 /* Have nodes & edges. Data oriented memory layout for higher efficiency. */
 class Graph {
-private:
+public: // TODO: change to private as soon as it works
   /* How many nodes are in a graph. */
   int node_count_;
   /* Store on which index in neighbours_ vector starts the list of neighbours
