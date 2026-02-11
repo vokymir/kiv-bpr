@@ -102,7 +102,7 @@ fruchterman_reingold_2d_variant(igraph_t &ig, igraph_matrix_t &layout,
 
 // convert layout from igraph to graph
 void layout_igraph_to_graph(Graph &g, const igraph_matrix_t &layout) {
-  std::vector<std::pair<double, double>> positions = g.layout_pos();
+  auto &positions = g.layout_pos();
   auto num_vertices = g.num_vertices();
 
   positions.resize(num_vertices);
