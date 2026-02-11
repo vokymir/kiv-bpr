@@ -43,7 +43,6 @@ add_library(imgui STATIC
     "${IMGUI_DIR}/imgui_widgets.cpp"
     "${IMGUI_DIR}/backends/imgui_impl_sdl3.cpp"
     "${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp"
-    "${IMGUI_DIR}/imgui_demo.cpp" # TODO: remove when unuseful
 )
 
 target_include_directories(imgui PUBLIC

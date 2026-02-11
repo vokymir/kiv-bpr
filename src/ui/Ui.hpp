@@ -28,8 +28,6 @@ public:
   // clear all data after ending the mainloop
   void clear();
 
-  void draw_demo();
-
   void draw_graph(const ssoc::graph::Graph &g);
 };
 

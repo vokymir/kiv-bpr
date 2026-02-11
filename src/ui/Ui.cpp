@@ -179,11 +179,6 @@ void UI::clear() {
   SDL_Quit();
 }
 
-void UI::draw_demo() {
-  bool open = true;
-  ImGui::ShowDemoWindow(&open);
-}
-
 void UI::draw_graph(const ssoc::graph::Graph &g) { vis_.show_window(g); }
 
 } // namespace ssoc::ui

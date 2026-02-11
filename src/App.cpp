@@ -13,8 +13,6 @@ void ssoc::App::run(const graph::Graph &g) {
     ui_.begin_frame();
 
     // TODO: call UI to do some actual drawing
-    ui_.draw_demo();
-
     ui_.draw_graph(g);
 
     ui_.end_frame();
