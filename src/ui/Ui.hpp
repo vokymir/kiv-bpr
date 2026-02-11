@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../graph/Graph.hpp"
+#include "Visualizer.hpp"
 #include "imgui.h"
 #include <SDL3/SDL.h>
 namespace ssoc::ui {
@@ -12,9 +13,7 @@ private:
   ImVec4 bg_clr_ = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
   // graph window TEMP
-  float zoom = 1.0f;
-  ImVec2 pan = ImVec2(0.0f, 0.0f);
-  bool is_dragging = false;
+  Visualizer vis_;
 
 public:
   // initialize everything the UI (ImGui, OpenGL & SDL) need
