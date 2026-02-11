@@ -69,8 +69,7 @@ std::unique_ptr<Graph> to_ssoc_graph(const igraph_t &igraph) {
 }
 
 // NOTE: won't be able to convert sand
-std::unique_ptr<igraph_t, igraph_::igraph_Deleter>
-to_igraph([[maybe_unused]] const Graph &ssoc_graph) {
+igraph_::unique_ptr_ to_igraph([[maybe_unused]] const Graph &ssoc_graph) {
   // TODO: this is only useful if allowed changing layout after generating graph
   // NOTE: [[maybe]] and null ptr is only to avoid warns
   return nullptr;
