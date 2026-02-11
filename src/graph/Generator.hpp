@@ -17,6 +17,9 @@ namespace ssoc::graph::generate {
 // Library: igraph
 // =====
 
+// 1. generate igraph based on config
+// 2. convert to ssoc::Graph
+// 3. generate layout for that graph
 std::unique_ptr<Graph> igraph_from_config(const ssoc::Sim_Config &cfg);
 
 } // namespace ssoc::graph::generate
