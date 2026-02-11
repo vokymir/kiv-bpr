@@ -39,8 +39,8 @@ public:
   int num_vertices() const { return num_vertices_; }
   void num_vertices(int count) { num_vertices_ = count; }
 
-  int num_edge() const { return num_edges_; }
-  void num_edge(int count) { num_edges_ = count; }
+  int num_edges() const { return num_edges_; }
+  void num_edges(int count) { num_edges_ = count; }
 
   std::vector<int> &adj_offsets() { return adj_offsets_; }
   const std::vector<int> &adj_offsets() const { return adj_offsets_; }

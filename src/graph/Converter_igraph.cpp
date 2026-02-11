@@ -13,7 +13,7 @@ void to_ssoc__resize_internal_vectors(Graph &g) {
   g.adj_offsets().resize(g.num_vertices() + 1);
 
   // undirected = every edge twice
-  g.adj_vertices().resize(2 * g.num_edge());
+  g.adj_vertices().resize(2 * g.num_edges());
 
   // if no layout provided, set all nodes to be at origin
   g.layout_pos().resize(g.num_vertices(), {0, 0});
@@ -59,7 +59,7 @@ std::unique_ptr<Graph> to_ssoc_graph(const igraph_t &igraph) {
   auto edge_count = igraph_ecount(&igraph);
 
   graph->num_vertices(node_count);
-  graph->num_edge(edge_count);
+  graph->num_edges(edge_count);
 
   to_ssoc__resize_internal_vectors(*graph);
 
