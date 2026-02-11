@@ -1,6 +1,7 @@
 #include "Converter.hpp"
 #include "Generator.hpp"
 #include "igraph.h"
+#include "igraph_lib.hpp"
 #include <format>
 #include <memory>
 #include <stdexcept>
@@ -10,7 +11,7 @@
 namespace ssoc::graph::generate {
 
 // generate 2D square lattice based on config->gga instruction
-void square_lattice_2d_variant(igraph_t &g, gga_::Square_Lattice_2D gga) {
+void square_lattice_2d_variant(igraph_t &ig, gga_::Square_Lattice_2D gga) {
   // prepare instructions from gga
   igraph_vector_int_t dimensions;
   igraph_vector_int_init(&dimensions, 2); // always 2D
@@ -24,7 +25,7 @@ void square_lattice_2d_variant(igraph_t &g, gga_::Square_Lattice_2D gga) {
 
   // let library generate
   auto err =
-      igraph_square_lattice(&g, &dimensions, 1, false, false, &circularity);
+      igraph_square_lattice(&ig, &dimensions, 1, false, false, &circularity);
 
   // delete unuseful igraph structures
   igraph_vector_int_destroy(&dimensions);
@@ -40,26 +41,25 @@ void square_lattice_2d_variant(igraph_t &g, gga_::Square_Lattice_2D gga) {
 
 // generate igraph
 // - delegate the generation to specialized method based on configs' gga
-std::unique_ptr<igraph_t, igraph_::igraph_Deleter>
-generate_igraph(Graph_Generation_Algorithm gga) {
+igraph_::unique_ptr_ generate_igraph(Graph_Generation_Algorithm gga) {
   igraph_setup();
 
   igraph_::igraph_Deleter deleter;
-  igraph_::unique_ptr_ ig(new igraph_t, deleter);
+  igraph_::unique_ptr_ igp(new igraph_t, deleter);
 
   // choose according to config, if any error happens, will propagate up
   std::visit(
-      [&ig](auto generation_alg) {
+      [&igp](auto generation_alg) {
         using T = std::decay_t<decltype(generation_alg)>;
         if constexpr (std::is_same_v<T, gga_::Square_Lattice_2D>) {
-          square_lattice_2d_variant(*ig, generation_alg);
+          square_lattice_2d_variant(*igp, generation_alg);
         } else {
           throw std::runtime_error("Unknown graph generation algorithm.\n");
         }
       },
       gga);
 
-  return ig;
+  return igp;
 }
 
 // =====
@@ -71,7 +71,7 @@ generate_igraph(Graph_Generation_Algorithm gga) {
 // return error code - for better error propagation and memory work (only one
 // free in mother function)
 igraph_error_t
-fruchterman_reingold_2d_variant(igraph_t &g, igraph_matrix_t &layout,
+fruchterman_reingold_2d_variant(igraph_t &ig, igraph_matrix_t &layout,
                                 gla_::Fruchterman_Reingold_2D gla) {
   bool use_seed = false;          // false means random start
   long iteration_count = 500;     // sensible default according to docs
@@ -96,17 +96,17 @@ fruchterman_reingold_2d_variant(igraph_t &g, igraph_matrix_t &layout,
   igraph_vector_t *max_y = nullptr;
 
   return igraph_layout_fruchterman_reingold(
-      &g, &layout, use_seed, iteration_count, start_temperature, grid_usage,
+      &ig, &layout, use_seed, iteration_count, start_temperature, grid_usage,
       weights, min_x, max_x, min_y, max_y);
 }
 
 // convert layout from igraph to graph
-void layout_igraph_to_graph(const igraph_matrix_t &layout, Graph &graph) {
-  std::vector<std::pair<double, double>> positions = graph.layout_pos();
-  auto node_count = graph.num_vertices();
+void layout_igraph_to_graph(Graph &g, const igraph_matrix_t &layout) {
+  std::vector<std::pair<double, double>> positions = g.layout_pos();
+  auto num_vertices = g.num_vertices();
 
-  positions.resize(node_count);
-  for (long v = 0; v < node_count; ++v) {
+  positions.resize(num_vertices);
+  for (long v = 0; v < num_vertices; ++v) {
     double x = MATRIX(layout, v, 0);
     double y = MATRIX(layout, v, 1);
     positions[v] = {x, y};
@@ -116,19 +116,17 @@ void layout_igraph_to_graph(const igraph_matrix_t &layout, Graph &graph) {
 // - decide which algorithm to use & delegate the work
 // - save the layout from igraph format to graph
 // - free any igraph remaining memory
-void generate_layout(igraph_t &igraph_graph, Graph &graph,
-                     Graph_Layout_Algorithm gla) {
+void generate_layout(igraph_t &ig, Graph &g, Graph_Layout_Algorithm gla) {
   igraph_matrix_t layout;
   igraph_matrix_init(&layout, 0, 0); // will be resized by functions
 
   // delegate the work
   igraph_error_t err = IGRAPH_SUCCESS;
   std::visit(
-      [&igraph_graph, &layout, &err](auto layout_alg) {
+      [&ig, &layout, &err](auto layout_alg) {
         using T = std::decay_t<decltype(layout_alg)>;
         if constexpr (std::is_same_v<T, gla_::Fruchterman_Reingold_2D>) {
-          err =
-              fruchterman_reingold_2d_variant(igraph_graph, layout, layout_alg);
+          err = fruchterman_reingold_2d_variant(ig, layout, layout_alg);
         } else {
           igraph_matrix_destroy(&layout);
           throw std::runtime_error("Unknown graph layout algorithm.");
@@ -142,15 +140,15 @@ void generate_layout(igraph_t &igraph_graph, Graph &graph,
         std::format("Failed to compute layout: {}", igraph_strerror(err)));
   }
 
-  layout_igraph_to_graph(layout, graph);
+  layout_igraph_to_graph(g, layout);
 
   igraph_matrix_destroy(&layout);
 }
 
-std::unique_ptr<Graph> igraph_from_config(const ssoc::Sim_Config &cfg) {
+std::unique_ptr<Graph> igraph_from_config(const Sim_Config &cfg) {
   igraph_::unique_ptr_ igraph_graph = generate_igraph(cfg.gga);
 
-  std::unique_ptr<Graph> graph = graph::convert::to_ssoc_graph(*igraph_graph);
+  std::unique_ptr<Graph> graph = convert::to_ssoc_graph(*igraph_graph);
 
   generate_layout(*igraph_graph, *graph, cfg.visual.gla);
 
