@@ -16,14 +16,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # =====
 # Dependencies
 # =====
+# igraph and imgui, but imgui also needs backend (sdl+opengl)
+# specification stored in vcpkg.json
 
-# --- OpenGL (for Dear ImGui) ---
-
+find_package(igraph CONFIG REQUIRED)
+find_package(SDL3 CONFIG REQUIRED)
 find_package(OpenGL REQUIRED)
-
-# --- SDL (for Dear ImGui) ---
-
-find_package(SDL3 REQUIRED)
 
 # --- Dear ImGui ---
 
@@ -58,19 +56,6 @@ target_link_libraries(imgui PUBLIC
 # C++ standard for ImGui
 target_compile_features(imgui PUBLIC cxx_std_17)
 
-# --- igraph ---
-
-# Suppress igraph specific build options from cluttering cache
-set(BUILD_TESTING OFF CACHE BOOL "" FORCE)
-set(IGRAPH_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
-
-# Check existence before adding
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/igraph/CMakeLists.txt")
-    add_subdirectory(external/igraph)
-else()
-    message(WARNING "igraph submodule missing.")
-endif()
-
 # =====
 # Main Target (SSOC)
 # =====
@@ -88,7 +73,7 @@ set_target_properties(sim_soc PROPERTIES
 
 target_link_libraries(sim_soc PRIVATE
     imgui
-    igraph
+    igraph::igraph
 )
 
 # =====

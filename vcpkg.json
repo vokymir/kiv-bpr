@@ -1,0 +1,8 @@
+{
+  "name": "ssoc",
+  "version-string": "0.0.1",
+  "dependencies": [
+    "igraph",
+    "sdl3"
+  ]
+}
