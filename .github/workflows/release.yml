@@ -58,12 +58,18 @@ jobs:
           export CC=gcc-14
           export CXX=g++-14
           export FC=gfortran-14
-        fi
 
-        cmake -B build -G Ninja \
-          -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }}
+          cmake -B build -G Ninja \
+            -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }}
+        else
+          # On Windows, we use the Visual Studio Generator to ensure MSVC is used
+          # This avoids the MinGW/ld.exe errors entirely
+          cmake -B build -G "Visual Studio 17 2022" -A x64 \
+            -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" \
+            -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }}
+        fi
 
         cmake --build build --config Release
 
