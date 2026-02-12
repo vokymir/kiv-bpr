@@ -76,6 +76,26 @@ void App::step() {
   int idx = dist_(rng_);
 
   g_->sand_height(0)[idx] += 1;
+
+  check_topple(idx);
+}
+
+void App::check_topple(int idx) {
+  auto &sand = g_->sand_height(0);
+
+  if (sand[idx] >= 4) {
+    sand[idx] -= 4;
+    auto neigh_start = g_->adj_offsets()[idx];
+    auto neigh_end = g_->adj_offsets()[idx + 1];
+
+    auto adj = g_->adj_vertices();
+
+    for (auto i = neigh_start; i < neigh_end; ++i) {
+      auto idxx = adj[i];
+      sand[idxx] += 1;
+      check_topple(idxx);
+    }
+  }
 }
 
 } // namespace ssoc

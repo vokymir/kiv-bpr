@@ -30,6 +30,8 @@ private:
 
   // if graph exists, do one step
   void step();
+
+  void check_topple(int idx);
 };
 
 } // namespace ssoc
