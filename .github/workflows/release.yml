@@ -34,8 +34,11 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install -y gcc-14 g++-14 gfortran-14 cmake ninja-build \
-                                libgl1-mesa-dev xorg-dev libasound2-dev libpulse-dev
+        sudo apt-get install -y \
+          gcc-14 g++-14 gfortran-14 libstdc++-14-dev \
+          cmake ninja-build pkg-config \
+          autoconf autoconf-archive automake libtool \
+          libgl1-mesa-dev xorg-dev libasound2-dev libpulse-dev
 
     # --- Setup vcpkg ---
     # GitHub Runners have vcpkg pre-installed at $VCPKG_INSTALLATION_ROOT
