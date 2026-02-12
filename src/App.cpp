@@ -33,14 +33,20 @@ void App::run() {
   ui_->init();
 
   bool should_end = false;
+  bool generate_graph = false;
 
   while (!should_end) {
     ui_->pollevs(should_end);
 
+    if (generate_graph) {
+      g_ = graph::generate::igraph_from_config(cfg_);
+      generate_graph = false;
+    }
+
     ui_->begin_frame();
     // vvvvv
 
-    ui_->draw_master_window();
+    ui_->draw_master_window(generate_graph);
     ui_->draw_config_window(cfg_);
     if (g_) {
       ui_->draw_graph(*g_);

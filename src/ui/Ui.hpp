@@ -34,7 +34,8 @@ public:
   // draw one graph in a separate window
   void draw_graph(const graph::Graph &g);
 
-  void draw_master_window();
+  // set bool to true, if user clicked
+  void draw_master_window(bool &generate_graph);
 
   void draw_config_window(Sim_Config &cfg);
 

@@ -189,11 +189,13 @@ void UI::draw_graph(const ssoc::graph::Graph &g) {
   }
 }
 
-void UI::draw_master_window() {
+void UI::draw_master_window(bool &generate_graph) {
   ImGui::Begin("Master window", nullptr);
 
   ImGui::Checkbox("Show graph", &show_vis_);
   ImGui::Checkbox("Show config", &show_cfg_);
+
+  generate_graph = ImGui::Button("Generate graph");
 
   ImGui::End();
 }
