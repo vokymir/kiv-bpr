@@ -67,6 +67,12 @@ void Visualizer::show_window(const graph::Graph &g, bool &show) {
   }
 
   // Draw Nodes
+  ImU32 color_normal = IM_COL32(200, 50, 50, 255);
+  ImU32 color_last = IM_COL32(50, 150, 150, 255);
+  ImU32 color_text = IM_COL32(255, 255, 255, 255);
+  auto history = g.sand_history_const(0);
+  auto last_idx = history[history.size() - 1];
+
   for (int v = 0; v < node_count; ++v) {
     int height = g.sand_height_const(0)[v];
     char buf[32];
@@ -77,13 +83,14 @@ void Visualizer::show_window(const graph::Graph &g, bool &show) {
     // We keep the node radius constant-ish so they don't get giant
     // Or use: 5.0f * (zoom / 200.0f) if you want them to scale
     float circle_size = 5.0f * zoom_ / 200.0f * (height + 1);
-    draw_list->AddCircleFilled(pos, circle_size, IM_COL32(200, 50, 50, 255));
+    draw_list->AddCircleFilled(pos, circle_size,
+                               last_idx != v ? color_normal : color_last);
 
     auto text_size = ImGui::CalcTextSize(buf);
     pos.x -= text_size.x / 2;
     pos.y -= text_size.y / 2;
 
-    draw_list->AddText(pos, IM_COL32(255, 255, 255, 255), buf);
+    draw_list->AddText(pos, color_text, buf);
   }
 
   draw_list->PopClipRect();
