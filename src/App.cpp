@@ -2,24 +2,35 @@
 #include "Sim_Config.hpp"
 #include "Vis_Config.hpp"
 #include "graph/Generator.hpp"
+#include "ui/Ui.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_opengl.h>
-#include <print>
+#include <memory>
+#include <stdexcept>
 
 namespace ssoc {
 
 void App::init() {
+  if (initialized_) {
+    throw std::runtime_error("App double initialization.");
+  }
+
   cfg_.gga = gga_::Square_Lattice_2D{3, 4, false, false};
   cfg_.visual.gla = gla_::Fruchterman_Reingold_2D{gla_::High};
 
-  std::print("before graph generate");
   g_ = graph::generate::igraph_from_config(cfg_);
+
+  ui_ = std::make_unique<ui::UI>();
+
+  initialized_ = true;
 }
 
 void App::run() {
-  std::print("before ui init");
+  if (!initialized_) {
+    init();
+  }
+
   ui_->init();
-  std::print("after ui init");
 
   bool should_end = false;
 

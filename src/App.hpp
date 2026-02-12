@@ -9,9 +9,10 @@ namespace ssoc {
 /* Orchestrates everything. */
 class App {
 private:
-  Sim_Config cfg_{};
-  std::unique_ptr<graph::Graph> g_{};
-  std::unique_ptr<ui::UI> ui_{};
+  bool initialized_ = false;
+  Sim_Config cfg_;
+  std::unique_ptr<graph::Graph> g_;
+  std::unique_ptr<ui::UI> ui_;
 
 public:
   void run();
