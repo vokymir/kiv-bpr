@@ -42,9 +42,14 @@ private:
   // draw all fields of config without wrapping them inside window
   void draw(Sim_Config &cfg);
   void draw(Vis_Config &cfg);
+  // === sim config
   void draw(Graph_Generation_Algorithm &gga);
   void draw(gga_::Square_Lattice_2D &cfg);
   void draw(gga_::Dummy_GGA &cfg);
+  // === vis config
+  void draw(Graph_Layout_Algorithm &gla);
+  void draw(gla_::Fruchterman_Reingold_2D &cfg);
+  void draw(gla_::Dummy_GLA &cfg);
 };
 
 } // namespace ssoc::ui

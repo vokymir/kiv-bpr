@@ -216,7 +216,9 @@ void UI::draw(Sim_Config &cfg) {
   }
 }
 
-void UI::draw(Vis_Config &cfg) {}
+void UI::draw(Vis_Config &cfg) { draw(cfg.gla); }
+
+// === sim config
 
 void UI::draw(Graph_Generation_Algorithm &gga) {
   constexpr const char *labels[] = {
@@ -258,5 +260,54 @@ void UI::draw(gga_::Dummy_GGA &cfg) {
   ImGui::Checkbox("Bool", &cfg.boolean);
   ImGui::InputFloat("FT", &cfg.ft);
 }
+
+// === vis config
+
+void UI::draw(Graph_Layout_Algorithm &gla) {
+  constexpr const char *labels[] = {
+      "Fruchterman Reingold 2D",
+      "Dummy",
+  };
+
+  std::size_t idx = gla.index();
+
+  for (std::size_t i = 0; i < std::size(labels); ++i) {
+    if (ImGui::RadioButton(labels[i], idx == i)) {
+      switch (i) {
+      case 0:
+        gla = gla_::Fruchterman_Reingold_2D{};
+        break;
+      case 1:
+        gla = gla_::Dummy_GLA{};
+        break;
+
+      default:
+        gla = gla_::Fruchterman_Reingold_2D{};
+        break;
+      }
+    }
+  }
+
+  std::visit([this](auto &alg) { draw(alg); }, gla);
+}
+
+void UI::draw(gla_::Fruchterman_Reingold_2D &cfg) {
+  std::size_t acc = cfg.accuracy;
+
+  ImGui::Text("Accuracy");
+  if (ImGui::RadioButton("High", acc == 0)) {
+    acc = 0;
+  }
+  if (ImGui::RadioButton("Low", acc == 1)) {
+    acc = 1;
+  }
+  if (ImGui::RadioButton("Auto", acc == 2)) {
+    acc = 2;
+  }
+
+  cfg.accuracy = static_cast<gla_::FR2D_Accuracy>(acc);
+}
+
+void UI::draw(gla_::Dummy_GLA &cfg) { ImGui::InputInt("x", &cfg.x); }
 
 } // namespace ssoc::ui
