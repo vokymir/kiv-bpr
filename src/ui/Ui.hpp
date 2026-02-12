@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Sim_Config.hpp"
 #include "../graph/Graph.hpp"
 #include "Visualizer.hpp"
 #include "imgui.h"
@@ -15,6 +16,7 @@ private:
   // graph window TEMP
   Visualizer vis_;
   bool show_vis_ = false;
+  bool show_cfg_ = false;
 
 public:
   // initialize everything the UI (ImGui, OpenGL & SDL) need
@@ -33,6 +35,16 @@ public:
   void draw_graph(const graph::Graph &g);
 
   void draw_master_window();
+
+  void draw_config_window(Sim_Config &cfg);
+
+private:
+  // draw all fields of config without wrapping them inside window
+  void draw(Sim_Config &cfg);
+  void draw(Vis_Config &cfg);
+  void draw(Graph_Generation_Algorithm &gga);
+  void draw(gga_::Square_Lattice_2D &cfg);
+  void draw(gga_::Dummy_GGA &cfg);
 };
 
 } // namespace ssoc::ui

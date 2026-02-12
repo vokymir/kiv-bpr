@@ -14,9 +14,16 @@ struct Square_Lattice_2D {
   bool circular_on_y;
 };
 
+struct Dummy_GGA {
+  int size;
+  bool boolean;
+  float ft;
+};
+
 } // namespace gga_
 
-using Graph_Generation_Algorithm = std::variant<gga_::Square_Lattice_2D>;
+using Graph_Generation_Algorithm =
+    std::variant<gga_::Square_Lattice_2D, gga_::Dummy_GGA>;
 
 /* Holds configuration for the simulation. Must be serializable, to save
  * specific config for future reference. */

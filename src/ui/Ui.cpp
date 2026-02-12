@@ -6,6 +6,8 @@
 #include <SDL3/SDL_opengl.h>
 #include <format>
 #include <stdexcept>
+#include <type_traits>
+#include <variant>
 
 namespace ssoc::ui {
 
@@ -190,8 +192,66 @@ void UI::draw_master_window() {
   ImGui::Begin("Master window", nullptr);
 
   ImGui::Checkbox("Show graph", &show_vis_);
+  ImGui::Checkbox("Show config", &show_cfg_);
 
   ImGui::End();
+}
+
+void UI::draw_config_window(Sim_Config &cfg) {
+  if (show_cfg_) {
+    ImGui::Begin("Config window", &show_cfg_);
+    draw(cfg);
+    ImGui::End();
+  }
+}
+
+void UI::draw(Sim_Config &cfg) {
+  draw(cfg.visual);
+
+  draw(cfg.gga);
+}
+
+void UI::draw(Vis_Config &cfg) {}
+
+void UI::draw(Graph_Generation_Algorithm &gga) {
+  constexpr const char *labels[] = {
+      "Square Lattice 2D",
+      "Dummy",
+  };
+
+  int idx = static_cast<int>(gga.index());
+
+  for (int i = 0; i < std::size(labels); ++i) {
+    if (ImGui::RadioButton(labels[i], idx == i)) {
+      switch (i) {
+      case 0:
+        gga = gga_::Square_Lattice_2D{};
+        break;
+      case 1:
+        gga = gga_::Dummy_GGA{};
+        break;
+
+      default:
+        gga = gga_::Square_Lattice_2D{};
+        break;
+      }
+    }
+  }
+
+  std::visit([this](auto &alg) { draw(alg); }, gga);
+}
+
+void UI::draw(gga_::Square_Lattice_2D &cfg) {
+  ImGui::InputInt("Width", &cfg.width);
+  ImGui::InputInt("Height", &cfg.height);
+  ImGui::Checkbox("Circular on x axis", &cfg.circular_on_x);
+  ImGui::Checkbox("Circular on y axis", &cfg.circular_on_y);
+}
+
+void UI::draw(gga_::Dummy_GGA &cfg) {
+  ImGui::InputInt("Size", &cfg.size);
+  ImGui::Checkbox("Bool", &cfg.boolean);
+  ImGui::InputFloat("FT", &cfg.ft);
 }
 
 } // namespace ssoc::ui
