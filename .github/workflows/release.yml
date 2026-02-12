@@ -37,7 +37,7 @@ jobs:
         sudo apt-get install -y \
           gcc-14 g++-14 gfortran-14 libstdc++-14-dev \
           cmake ninja-build pkg-config \
-          autoconf autoconf-archive automake libtool \
+          autoconf autoconf-archive automake libtool libltdl-dev \
           libgl1-mesa-dev xorg-dev libasound2-dev libpulse-dev
 
     # --- Setup vcpkg ---
