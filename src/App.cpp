@@ -6,6 +6,8 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_opengl.h>
 #include <memory>
+#include <print>
+#include <random>
 #include <stdexcept>
 
 namespace ssoc {
@@ -21,6 +23,8 @@ void App::init() {
   // g_ = graph::generate::igraph_from_config(cfg_);
 
   ui_ = std::make_unique<ui::UI>();
+
+  rng_ = std::default_random_engine(rd_());
 
   initialized_ = true;
 }
@@ -40,6 +44,7 @@ void App::run() {
 
     if (generate_graph) {
       g_ = graph::generate::igraph_from_config(cfg_);
+      set_dist();
       generate_graph = false;
     }
 
@@ -57,6 +62,17 @@ void App::run() {
   }
 
   ui_->clear();
+}
+
+void App::step() {
+  if (!g_) {
+    std::print("Tried to step on not existing graph.\n");
+    return;
+  }
+
+  int idx = dist_(rng_);
+
+  g_->sand_height(0)[idx] += 1;
 }
 
 } // namespace ssoc
