@@ -11,7 +11,7 @@ private:
   bool is_dragging_ = false;
 
 public:
-  void show_window(const graph::Graph &g);
+  void show_window(const graph::Graph &g, bool &show);
 };
 
 } // namespace ssoc::ui

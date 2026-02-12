@@ -180,8 +180,18 @@ void UI::clear() {
   SDL_Quit();
 }
 
-void UI::draw_graph(const ssoc::graph::Graph &g) { vis_.show_window(g); }
+void UI::draw_graph(const ssoc::graph::Graph &g) {
+  if (show_vis_) {
+    vis_.show_window(g, show_vis_);
+  }
+}
 
-void UI::draw_master_window() {}
+void UI::draw_master_window() {
+  ImGui::Begin("Master window", nullptr);
+
+  ImGui::Checkbox("Show graph", &show_vis_);
+
+  ImGui::End();
+}
 
 } // namespace ssoc::ui

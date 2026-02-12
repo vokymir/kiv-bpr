@@ -14,6 +14,7 @@ private:
 
   // graph window TEMP
   Visualizer vis_;
+  bool show_vis_ = false;
 
 public:
   // initialize everything the UI (ImGui, OpenGL & SDL) need

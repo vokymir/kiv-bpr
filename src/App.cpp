@@ -40,6 +40,7 @@ void App::run() {
     ui_->begin_frame();
     // vvvvv
 
+    ui_->draw_master_window();
     ui_->draw_graph(*g_);
 
     // ^^^^^

@@ -3,8 +3,8 @@
 
 namespace ssoc::ui {
 
-void Visualizer::show_window(const graph::Graph &g) {
-  ImGui::Begin("Graph Visualization");
+void Visualizer::show_window(const graph::Graph &g, bool &show) {
+  ImGui::Begin("Graph Visualization", &show);
 
   ImGui::Text("zoom: %f", zoom_);
 
