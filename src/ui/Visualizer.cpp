@@ -72,14 +72,18 @@ void Visualizer::show_window(const graph::Graph &g, bool &show) {
     char buf[32];
     std::snprintf(buf, sizeof(buf), "%i", height);
 
+    auto pos = to_screen(positions[v]);
+
     // We keep the node radius constant-ish so they don't get giant
     // Or use: 5.0f * (zoom / 200.0f) if you want them to scale
     float circle_size = 5.0f * zoom_ / 200.0f * (height + 1);
-    draw_list->AddCircleFilled(to_screen(positions[v]), circle_size,
-                               IM_COL32(200, 50, 50, 255));
+    draw_list->AddCircleFilled(pos, circle_size, IM_COL32(200, 50, 50, 255));
 
-    draw_list->AddText(to_screen(positions[v]), IM_COL32(255, 255, 255, 255),
-                       buf);
+    auto text_size = ImGui::CalcTextSize(buf);
+    pos.x -= text_size.x / 2;
+    pos.y -= text_size.y / 2;
+
+    draw_list->AddText(pos, IM_COL32(255, 255, 255, 255), buf);
   }
 
   draw_list->PopClipRect();
