@@ -15,3 +15,4 @@ date | total time [min] | other times | subject
  | 110 | 17.30 | refactoring, generator OK, using config
  | 95 | 19.40 | working on UI, there is some dereferencing bug with graph vector
 12.2.2026 | 125 | 9.50 | debug, allow customization of config via UI, allow generate graph
+ | 60 | 13 | stepping, have MVP by now, next do realease on github
