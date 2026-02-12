@@ -207,9 +207,13 @@ void UI::draw_config_window(Sim_Config &cfg) {
 }
 
 void UI::draw(Sim_Config &cfg) {
-  draw(cfg.visual);
+  if (ImGui::CollapsingHeader("General configuration")) {
+    draw(cfg.gga);
+  }
 
-  draw(cfg.gga);
+  if (ImGui::CollapsingHeader("Visual configuration")) {
+    draw(cfg.visual);
+  }
 }
 
 void UI::draw(Vis_Config &cfg) {}
