@@ -18,7 +18,7 @@ void App::init() {
   cfg_.gga = gga_::Square_Lattice_2D{3, 4, false, false};
   cfg_.visual.gla = gla_::Fruchterman_Reingold_2D{gla_::High};
 
-  g_ = graph::generate::igraph_from_config(cfg_);
+  // g_ = graph::generate::igraph_from_config(cfg_);
 
   ui_ = std::make_unique<ui::UI>();
 
@@ -41,7 +41,9 @@ void App::run() {
     // vvvvv
 
     ui_->draw_master_window();
-    ui_->draw_graph(*g_);
+    if (g_) {
+      ui_->draw_graph(*g_);
+    }
 
     // ^^^^^
     ui_->end_frame();
