@@ -118,6 +118,23 @@ set_target_properties(sim_soc PROPERTIES
 )
 
 # =====
+# Debug info
+# =====
+
+if(NOT MSVC)
+    target_compile_options(sim_soc PRIVATE
+        $<$<CONFIG:Debug>:-g3>
+        $<$<CONFIG:Debug>:-O0>
+        $<$<CONFIG:Debug>:-fsanitize=address,undefined>
+        $<$<CONFIG:Debug>:-fno-omit-frame-pointer>
+    )
+
+    target_link_options(sim_soc PRIVATE
+        $<$<CONFIG:Debug>:-fsanitize=address,undefined>
+    )
+endif()
+
+# =====
 # Dev Tools (Neovim support)
 # =====
 
