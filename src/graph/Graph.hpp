@@ -48,11 +48,13 @@ public:
   std::vector<int> &adj_vertices() { return adj_vertices_; }
   const std::vector<int> &adj_vertices() const { return adj_vertices_; }
 
-  std::vector<int> &sand_height(int idx) {
-    while (static_cast<int>(sand_height_.size()) <= idx) {
-      std::print("WARN: dynamically enlarging sand_height batch size: {} -> {}",
-                 sand_height_.size(), sand_height_.size() + 1);
-      sand_height_.push_back({});
+  // batch index, default = 0
+  std::vector<int> &sand_height(int idx = 0) {
+    if (idx < 0) {
+      throw std::out_of_range("sand_height index cannot be negative");
+    }
+    if (static_cast<int>(sand_height_.size()) <= idx) {
+      sand_height_.resize(idx + 1); // ensure idx is valid
     }
     return sand_height_[idx];
   }
