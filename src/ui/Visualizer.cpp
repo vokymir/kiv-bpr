@@ -71,7 +71,7 @@ void Visualizer::show_window(const graph::Graph &g, bool &show) {
   ImU32 color_last = IM_COL32(50, 150, 150, 255);
   ImU32 color_text = IM_COL32(255, 255, 255, 255);
   auto history = g.sand_history_const(0);
-  auto last_idx = history[history.size() - 1];
+  auto last_idx = history.size() > 0 ? history[history.size() - 1] : -1;
 
   for (int v = 0; v < node_count; ++v) {
     int height = g.sand_height_const(0)[v];
