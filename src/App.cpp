@@ -52,6 +52,9 @@ void App::run() {
     // vvvvv
 
     ui_->draw_master_window(generate_graph);
+    if (ui_->draw_stepping_control()) {
+      step();
+    }
     ui_->draw_config_window(cfg_);
     if (g_) {
       ui_->draw_graph(*g_);

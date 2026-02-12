@@ -194,6 +194,7 @@ void UI::draw_master_window(bool &generate_graph) {
 
   ImGui::Checkbox("Show graph", &show_vis_);
   ImGui::Checkbox("Show config", &show_cfg_);
+  ImGui::Checkbox("Show stepping", &show_step_);
 
   generate_graph = ImGui::Button("Generate graph");
 
@@ -311,5 +312,18 @@ void UI::draw(gla_::Fruchterman_Reingold_2D &cfg) {
 }
 
 void UI::draw(gla_::Dummy_GLA &cfg) { ImGui::InputInt("x", &cfg.x); }
+
+bool UI::draw_stepping_control() {
+  if (!show_step_) {
+    return false;
+  }
+  ImGui::Begin("Stepping control", &show_step_);
+
+  bool step = ImGui::Button("Step");
+
+  ImGui::End();
+
+  return step;
+}
 
 } // namespace ssoc::ui

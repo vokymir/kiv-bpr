@@ -15,8 +15,9 @@ private:
 
   // graph window TEMP
   Visualizer vis_;
-  bool show_vis_ = false;
-  bool show_cfg_ = false;
+  bool show_vis_ = true;
+  bool show_cfg_ = true;
+  bool show_step_ = true;
 
 public:
   // initialize everything the UI (ImGui, OpenGL & SDL) need
@@ -36,6 +37,8 @@ public:
 
   // set bool to true, if user clicked
   void draw_master_window(bool &generate_graph);
+
+  bool draw_stepping_control();
 
   void draw_config_window(Sim_Config &cfg);
 
