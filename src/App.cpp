@@ -75,6 +75,7 @@ void App::step() {
 
   int idx = dist_(rng_);
 
+  g_->sand_history(0).push_back(idx);
   g_->sand_height(0)[idx] += 1;
 
   check_topple(idx);
