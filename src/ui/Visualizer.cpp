@@ -68,14 +68,15 @@ void Visualizer::show_window(const graph::Graph &g, bool &show) {
 
   // Draw Nodes
   for (int v = 0; v < node_count; ++v) {
-    // We keep the node radius constant-ish so they don't get giant
-    // Or use: 5.0f * (zoom / 200.0f) if you want them to scale
-    draw_list->AddCircleFilled(to_screen(positions[v]), 5.0f,
-                               IM_COL32(200, 50, 50, 255));
-
     int height = g.sand_height_const(0)[v];
     char buf[32];
     std::snprintf(buf, sizeof(buf), "%i", height);
+
+    // We keep the node radius constant-ish so they don't get giant
+    // Or use: 5.0f * (zoom / 200.0f) if you want them to scale
+    float circle_size = 5.0f * zoom_ / 200.0f * (height + 1);
+    draw_list->AddCircleFilled(to_screen(positions[v]), circle_size,
+                               IM_COL32(200, 50, 50, 255));
 
     draw_list->AddText(to_screen(positions[v]), IM_COL32(255, 255, 255, 255),
                        buf);
