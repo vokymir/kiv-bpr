@@ -4,6 +4,7 @@
 #include "imgui_impl_sdl3.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_opengl.h>
+#include <cstddef>
 #include <format>
 #include <stdexcept>
 #include <type_traits>
@@ -219,9 +220,9 @@ void UI::draw(Graph_Generation_Algorithm &gga) {
       "Dummy",
   };
 
-  int idx = static_cast<int>(gga.index());
+  std::size_t idx = gga.index();
 
-  for (int i = 0; i < std::size(labels); ++i) {
+  for (std::size_t i = 0; i < std::size(labels); ++i) {
     if (ImGui::RadioButton(labels[i], idx == i)) {
       switch (i) {
       case 0:
