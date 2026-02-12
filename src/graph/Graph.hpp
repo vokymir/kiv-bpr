@@ -58,8 +58,8 @@ public:
       throw std::out_of_range("sand_height index cannot be negative");
     }
     if (static_cast<int>(sand_height_.size()) <= idx) {
-      sand_height_.resize(idx + 1); // ensure idx is valid
-      sand_history_.resize(idx + 1);
+      sand_height_.resize(idx + 1, std::vector<int>(num_vertices_, 0));
+      sand_history_.resize(idx + 1, {});
     }
     return sand_height_[idx];
   }
