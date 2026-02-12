@@ -1,5 +1,6 @@
 #include "Visualizer.hpp"
 #include "imgui.h"
+#include <cstdio>
 
 namespace ssoc::ui {
 
@@ -71,6 +72,13 @@ void Visualizer::show_window(const graph::Graph &g, bool &show) {
     // Or use: 5.0f * (zoom / 200.0f) if you want them to scale
     draw_list->AddCircleFilled(to_screen(positions[v]), 5.0f,
                                IM_COL32(200, 50, 50, 255));
+
+    int height = g.sand_height_const(0)[v];
+    char buf[32];
+    std::snprintf(buf, sizeof(buf), "%i", height);
+
+    draw_list->AddText(to_screen(positions[v]), IM_COL32(255, 255, 255, 255),
+                       buf);
   }
 
   draw_list->PopClipRect();

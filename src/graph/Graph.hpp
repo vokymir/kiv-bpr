@@ -2,6 +2,7 @@
 
 #include <format>
 #include <print>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 namespace ssoc::graph {
@@ -56,6 +57,13 @@ public:
     if (static_cast<int>(sand_height_.size()) <= idx) {
       sand_height_.resize(idx + 1); // ensure idx is valid
     }
+    return sand_height_[idx];
+  }
+  const std::vector<int> &sand_height_const(int idx = 0) const {
+    if (idx < 0 || idx >= static_cast<int>(sand_height_.size())) {
+      throw std::out_of_range("sand_height bad index");
+    }
+
     return sand_height_[idx];
   }
 
