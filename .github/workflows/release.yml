@@ -2,8 +2,7 @@ name: Release Build
 
 on:
   push:
-    tags:
-      - 'v*'
+    tags: ['v*']
 
 permissions:
   contents: write
@@ -13,62 +12,79 @@ jobs:
     name: Build ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false # Don't kill Linux if Windows fails (helpful for debugging)
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-24.04
             asset_name: ssoc-linux.tar.gz
+            triplet: x64-linux
           - os: windows-latest
             asset_name: ssoc-windows.zip
+            triplet: x64-windows
 
     steps:
-    - name: Checkout code
+    - name: Checkout Code
       uses: actions/checkout@v4
       with:
         submodules: recursive
-        fetch-depth: 0 # <--- FIX: This allows igraph to find the version tags
+        fetch-depth: 0 # Important for igraph versioning
 
-    - name: Install System Deps (Linux)
+    # --- Setup Linux Dependencies ---
+    - name: Install Linux Build Tools
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential cmake ninja-build libgl1-mesa-dev xorg-dev \
-                                libasound2-dev libpulse-dev libudev-dev libdbus-1-dev
+        sudo apt-get install -y gcc-14 g++-14 gfortran-14 cmake ninja-build \
+                                libgl1-mesa-dev xorg-dev libasound2-dev libpulse-dev
 
-    - name: Setup SDL3
-      id: sdl
-      uses: libsdl-org/setup-sdl@v1
+    # --- Setup vcpkg ---
+    # GitHub Runners have vcpkg pre-installed at $VCPKG_INSTALLATION_ROOT
+    - name: Restore vcpkg Cache
+      uses: actions/cache@v4
       with:
-        version: 3-latest
-        install-linux-dependencies: true
+        path: |
+          ${{ github.workspace }}/build/vcpkg_installed
+          ~/.cache/vcpkg
+        key: vcpkg-${{ matrix.os }}-${{ hashFiles('vcpkg.json') }}
 
-    - name: Configure CMake
-      # Using Ninja on Linux is much faster for cloud builds
-      run: cmake -B build -G "${{ runner.os == 'Linux' && 'Ninja' || 'Visual Studio 17 2022' }}" -DCMAKE_BUILD_TYPE=Release
-
-    - name: Build
-      run: cmake --build build --config Release
-
-    - name: Package (Linux)
-      if: runner.os == 'Linux'
+    # --- Build ---
+    - name: Configure and Build
+      shell: bash
       run: |
-        # In your CMake, RUNTIME_OUTPUT_DIRECTORY is set to "${CMAKE_CURRENT_SOURCE_DIR}/bin"
-        tar -czvf ${{ matrix.asset_name }} -C bin ssoc
+        if [ "${{ runner.os }}" == "Linux" ]; then
+          export CC=gcc-14
+          export CXX=g++-14
+          export FC=gfortran-14
+        fi
 
-    - name: Package (Windows)
-      if: runner.os == 'Windows'
+        cmake -B build -G Ninja \
+          -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }}
+
+        cmake --build build --config Release
+
+    # --- Packaging ---
+    - name: Package Binaries
       shell: bash
       run: |
         mkdir -p dist
-        # Copy the exe (it should be in bin/Release/ because of MSVC)
-        cp bin/Release/ssoc.exe dist/
-        # Copy the DLL from the SDL setup path
-        cp "${{ steps.sdl.outputs.prefix }}/bin/SDL3.dll" dist/
-        cd dist
-        7z a ../${{ matrix.asset_name }} *
+        if [ "${{ runner.os }}" == "Windows" ]; then
+          # Copy exe from your custom bin dir
+          cp bin/ssoc.exe dist/
+          # Copy SDL3.dll and other dependencies from vcpkg install folder
+          cp build/vcpkg_installed/${{ matrix.triplet }}/bin/*.dll dist/ || true
+          cd dist && 7z a ../${{ matrix.asset_name }} *
+        else
+          # Linux packaging
+          cp bin/ssoc dist/
+          tar -czvf ${{ matrix.asset_name }} -C dist ssoc
+        fi
 
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
+    # --- Create/Update Release ---
+    - name: Upload to Release
+      uses: softprops/action-gh-release@v2
       with:
         files: ${{ matrix.asset_name }}
         draft: true
+        generate_release_notes: true
