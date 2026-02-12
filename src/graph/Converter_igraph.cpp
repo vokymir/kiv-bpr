@@ -3,7 +3,6 @@
 #include "igraph_constants.h"
 #include "igraph_interface.h"
 #include "igraph_lib.hpp"
-#include <print>
 
 namespace ssoc::graph::convert {
 
@@ -31,7 +30,6 @@ void to_ssoc__fill_neighbour_lists(Graph &g, const igraph_t &ig) {
 
   igraph_integer_t idx = 0;
   for (igraph_integer_t v = 0; v < g.num_vertices(); ++v) {
-    std::print("{} / {}", v, g.num_vertices());
     adj_offsets[v] = idx;
 
     // find neighbours in igraph

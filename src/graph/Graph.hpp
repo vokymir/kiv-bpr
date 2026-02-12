@@ -51,7 +51,7 @@ public:
   std::vector<int> &sand_height(int idx) {
     while (static_cast<int>(sand_height_.size()) <= idx) {
       std::print("WARN: dynamically enlarging sand_height batch size: {} -> {}",
-                 sand_height_.size(), idx);
+                 sand_height_.size(), sand_height_.size() + 1);
       sand_height_.push_back({});
     }
     return sand_height_[idx];
