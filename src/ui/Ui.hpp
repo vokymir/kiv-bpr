@@ -8,7 +8,7 @@ namespace ssoc::ui {
 
 class UI {
 private:
-  SDL_Window *window_;
+  SDL_Window *window_ = nullptr;
   SDL_GLContext gl_context_;
   ImVec4 bg_clr_ = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
