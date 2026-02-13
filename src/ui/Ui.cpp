@@ -269,7 +269,7 @@ void UI::draw(gga_::Dummy_GGA &cfg) {
 void UI::draw(Graph_Layout_Algorithm &gla) {
   constexpr const char *labels[] = {
       "Fruchterman Reingold 2D",
-      "Dummy",
+      "Dummy ui",
   };
 
   std::size_t idx = gla.index();
