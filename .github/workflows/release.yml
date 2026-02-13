@@ -2,6 +2,7 @@ name: Draft Release with Executables
 
 on:
   push:
+    branches: ['main']
     tags: ['v*']
 
 permissions:
@@ -14,6 +15,12 @@ jobs:
   build:
     name: Build ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+
+    # on tag OR '[cache]' in commit message on push
+    if: |
+      startsWith(github.ref, 'refs/tags/') ||
+      contains(github.event.head_commit.message, '[cache]')
+
     strategy:
       fail-fast: false
       matrix:
@@ -115,6 +122,9 @@ jobs:
     name: Create Draft Release
     needs: build
     runs-on: ubuntu-latest
+
+    # only publish release on tags
+    if: startsWith(github.ref, 'refs/tags/')
 
     steps:
     - name: Download Artifacts
