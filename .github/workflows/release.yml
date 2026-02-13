@@ -76,7 +76,7 @@ jobs:
           Write-Host "No $env:VCPKG_INSTALLATION_ROOT\\.git found; skipping fetch"
         }
 
-    - name: Sanity: ensure ninja exists (Linux)
+    - name: Sanity, ensure ninja exists (Linux)
       if: runner.os == 'Linux'
       shell: bash
       run: |
