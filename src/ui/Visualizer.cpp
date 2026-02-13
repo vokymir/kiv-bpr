@@ -82,7 +82,7 @@ void Visualizer::show_window(const graph::Graph &g, bool &show) {
 
     // We keep the node radius constant-ish so they don't get giant
     // Or use: 5.0f * (zoom / 200.0f) if you want them to scale
-    float circle_size = 5.0f * zoom_ / 200.0f * (height + 1);
+    float circle_size = 5.0f * zoom_ / 100.0f * (height + 1);
     draw_list->AddCircleFilled(pos, circle_size,
                                last_idx != v ? color_normal : color_last);
 
