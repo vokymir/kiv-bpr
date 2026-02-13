@@ -60,6 +60,7 @@ jobs:
         restore-keys: |
           vcpkg-${{ matrix.os }}-
           ${{ matrix.os }}
+        save-always: true
 
     - name: Ensure vcpkg history
       # vcpkg comes pre-installed at $VCPKG_INSTALLATION_ROOT
