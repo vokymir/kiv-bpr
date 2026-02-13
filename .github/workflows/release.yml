@@ -50,41 +50,13 @@ jobs:
           ~/.cache/vcpkg
         key: vcpkg-${{ matrix.os }}-${{ hashFiles('vcpkg.json') }}
 
-    # Ensure vcpkg has full history so builtin-baseline can be checked out
-    - name: Ensure vcpkg git history (Linux)
-      if: runner.os == 'Linux'
+    - name: Ensure vcpkg has full history
       shell: bash
       run: |
         echo "VCPKG_INSTALLATION_ROOT=$VCPKG_INSTALLATION_ROOT"
-        if [ -d "${VCPKG_INSTALLATION_ROOT}/.git" ]; then
-          # fetch everything and tags, try to unshallow if this is a shallow clone
-          git -C "$VCPKG_INSTALLATION_ROOT" fetch --all --tags || true
-          git -C "$VCPKG_INSTALLATION_ROOT" fetch --unshallow || true
-        else
-          echo "No $VCPKG_INSTALLATION_ROOT/.git found; skipping fetch"
+        if [ -d "$VCPKG_INSTALLATION_ROOT/.git" ]; then
+            git -C "$VCPKG_INSTALLATION_ROOT" fetch --all --tags
         fi
-
-    - name: Ensure vcpkg git history (Windows)
-      if: runner.os == 'Windows'
-      shell: pwsh
-      run: |
-        Write-Host "VCPKG_INSTALLATION_ROOT=$env:VCPKG_INSTALLATION_ROOT"
-        if (Test-Path "$env:VCPKG_INSTALLATION_ROOT\.git") {
-          git -C $env:VCPKG_INSTALLATION_ROOT fetch --all --tags -f || Write-Host "git fetch failed but continuing"
-          git -C $env:VCPKG_INSTALLATION_ROOT fetch --unshallow -f || Write-Host "'fetch --unshallow' failed but continuing"
-        } else {
-          Write-Host "No $env:VCPKG_INSTALLATION_ROOT\\.git found; skipping fetch"
-        }
-
-    - name: Sanity, ensure ninja exists (Linux)
-      if: runner.os == 'Linux'
-      shell: bash
-      run: |
-        if ! command -v ninja >/dev/null 2>&1; then
-          sudo apt-get update
-          sudo apt-get install -y ninja-build
-        fi
-        ninja --version || true
 
     # --- Build ---
     - name: Configure and Build
