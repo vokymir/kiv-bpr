@@ -7,6 +7,9 @@ on:
 permissions:
   contents: write
 
+env:
+  VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
+
 jobs:
   build:
     name: Build ${{ matrix.os }}
@@ -42,9 +45,14 @@ jobs:
     - name: Restore vcpkg Cache
       uses: actions/cache@v4
       with:
-        path: ${{ github.workspace }}/build/vcpkg_installed
+        path: |
+          ${{ env.VCPKG_DEFAUL_BINARY_CACHE }}
+          ${{ github.workspace }}/build/vcpkg_installed
+          ${{ github.workspace }}/vcpkg_installed
         key: vcpkg-${{ matrix.os }}-${{ hashFiles('vcpkg.json') }}
-        restore-keys: vcpkg-${{ matrix.os }}-
+        restore-keys: |
+          vcpkg-${{ matrix.os }}-
+          ${{ matrix.os }}
 
     - name: Ensure vcpkg history
       # vcpkg comes pre-installed at $VCPKG_INSTALLATION_ROOT
@@ -81,8 +89,9 @@ jobs:
       shell: bash
       run: |
         mkdir -p dist
-        # windows might put is somwhere, also there is .exe which is not on unix
-        find bin -type f -name "ssoc*" -exec cp {} dist/${{ matrix.artifact_name }} \;
+        # windows might put is somwhere (not in bin),
+        # also it have .exe which is not on unix
+        find . -type f -name "ssoc*" -not -path "./dist/*" -exec cp {} dist/${{ matrix.artifact_name }} \;
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
