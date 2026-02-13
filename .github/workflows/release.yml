@@ -97,7 +97,7 @@ jobs:
 
     - name: Store vcpkg Cache
       # if cache already exists, don't save it again
-      if: always() && steps.vcpkg-cache.outputs.cache-hit != 'true'
+      if: always() && steps.vcpkg-cache-restore.outputs.cache-hit != 'true'
       uses: actions/cache/save@v4
       with:
         path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
