@@ -17,4 +17,5 @@ date | total time [min] | other times | subject
 12.2.2026 | 125 | 9.50 | debug, allow customization of config via UI, allow generate graph
  | 60 | 13 | stepping, have MVP by now, next do realease on github
  | 100 | 15 | migrating to vcpkg for igraph, sdl3; to make github CI easier, failed to release
-
+13.2.2026 | 75 | 9.15 | getting the github action to work, email
+ | | 11.20 |
