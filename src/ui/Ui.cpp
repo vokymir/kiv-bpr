@@ -185,11 +185,15 @@ void UI::clear() {
 
 void UI::draw_graph(const ssoc::graph::Graph &g) {
   if (show_vis_) {
+    ImGui::SetNextWindowPos(ImVec2(385, 86), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(729, 571), ImGuiCond_FirstUseEver);
     vis_.show_window(g, show_vis_);
   }
 }
 
 void UI::draw_master_window(bool &generate_graph) {
+  ImGui::SetNextWindowPos(ImVec2(31, 21), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(249, 189), ImGuiCond_FirstUseEver);
   ImGui::Begin("Master window", nullptr);
 
   ImGui::Checkbox("Show graph", &show_vis_);
@@ -203,6 +207,8 @@ void UI::draw_master_window(bool &generate_graph) {
 
 void UI::draw_config_window(Sim_Config &cfg) {
   if (show_cfg_) {
+    ImGui::SetNextWindowPos(ImVec2(22, 233), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(352, 459), ImGuiCond_FirstUseEver);
     ImGui::Begin("Config window", &show_cfg_);
     draw(cfg);
     ImGui::End();
@@ -317,6 +323,8 @@ bool UI::draw_stepping_control() {
   if (!show_step_) {
     return false;
   }
+  ImGui::SetNextWindowPos(ImVec2(423, 16), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(175, 54), ImGuiCond_FirstUseEver);
   ImGui::Begin("Stepping control", &show_step_);
 
   bool step = ImGui::Button("Step");
