@@ -1,4 +1,4 @@
-name: Release Build
+name: Draft Release with Executables
 
 on:
   push:
@@ -16,32 +16,29 @@ jobs:
       matrix:
         include:
           - os: ubuntu-24.04
-            asset_name: ssoc-linux.tar.gz
             triplet: x64-linux
+            artifact_name: ssoc-linux
+            # igraph uses some obscure libs not standard on ubuntu
+            install: |
+              sudo apt-get update
+              sudo apt-get install -y \
+                gcc-14 g++-14 gfortran-14 cmake ninja-build pkg-config libgl1-mesa-dev xorg-dev libasound2-dev libpulse-dev
+
           - os: windows-latest
-            asset_name: ssoc-windows.zip
             triplet: x64-windows-static # static so its single executable
+            artifact_name: ssoc-windows.exe
+            install: echo "Nothing to install..."
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
       with:
         submodules: recursive
-        fetch-depth: 0 # Important for igraph versioning
+        fetch-depth: 0 # due to igraph (versioning)
 
-    # --- Setup Linux Dependencies ---
-    - name: Install Linux Build Tools
-      if: runner.os == 'Linux'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          gcc-14 g++-14 gfortran-14 libstdc++-14-dev \
-          cmake ninja-build pkg-config \
-          autoconf autoconf-archive automake libtool libltdl-dev \
-          libgl1-mesa-dev xorg-dev libasound2-dev libpulse-dev
+    - name: Install Dependencies
+      run: ${{ matrix.install }}
 
-    # --- Setup vcpkg ---
-    # GitHub Runners have vcpkg pre-installed at $VCPKG_INSTALLATION_ROOT
     - name: Restore vcpkg Cache
       uses: actions/cache@v4
       with:
@@ -50,33 +47,29 @@ jobs:
           ~/.cache/vcpkg
         key: vcpkg-${{ matrix.os }}-${{ hashFiles('vcpkg.json') }}
 
-    - name: Ensure vcpkg has full history
+    - name: Ensure vcpkg history
+      # vcpkg comes pre-installed at $VCPKG_INSTALLATION_ROOT
+      # by default the baseline commit in vcpkg.json might not be available
       shell: bash
       run: |
-        echo "VCPKG_INSTALLATION_ROOT=$VCPKG_INSTALLATION_ROOT"
         if [ -d "$VCPKG_INSTALLATION_ROOT/.git" ]; then
             git -C "$VCPKG_INSTALLATION_ROOT" fetch --all --tags
         fi
 
-    # --- Build ---
     - name: Configure and Build
       shell: bash
       run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
           export CC=gcc-14 CXX=g++-14 FC=gfortran-14
 
-          # We inject the static flags ONLY here.
-          # -static-libstdc++: Includes the C++ runner in the file.
-          # -static-libgcc: Includes the C runner.
+        # ninja is better, uses vcpkg as config, static means its single exec
           cmake -B build -G Ninja \
             -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" \
             -DCMAKE_BUILD_TYPE=Release \
             -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} \
             -DCMAKE_EXE_LINKER_FLAGS="-static-libstdc++ -static-libgcc"
         else
-          # On Windows, we use x64-windows-static for vcpkg
-          # AND we inject CMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded (the /MT flag)
-          # This forces MSVC to bake the runtime into the .exe
+        # use msvc, multithreaded for single executable
           cmake -B build -G "Visual Studio 17 2022" -A x64 \
             -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" \
             -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} \
@@ -85,25 +78,36 @@ jobs:
 
         cmake --build build --config Release
 
-    # --- Packaging ---
-    - name: Package Binaries
+    - name: Prepare Artifacts
       shell: bash
       run: |
         mkdir -p dist
-        if [ "${{ runner.os }}" == "Windows" ]; then
-          # Grab the standalone exe
-          find bin -name "ssoc.exe" -exec cp {} dist/ssoc-windows.exe \;
-        else
-          # Grab the standalone linux binary
-          cp bin/ssoc dist/ssoc-linux
-        fi
+        # windows might put is somwhere, also there is .exe which is not on unix
+        find bin -type f -name "ssoc*" -exec cp {} dist/${{ matrix.artifact_name }} \;
 
-    # --- Create/Update Release ---
-    - name: Upload to Release
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: binary-${{ matrix.os }}
+        path: dist/*
+        if-no-files-found: error
+
+  release:
+    name: Create Draft Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: binary-*
+        path: release_dist
+        merge-multiple: true
+
+    - name: Publish Draft Release
       uses: softprops/action-gh-release@v2
       with:
-        files: |
-          dist/ssoc-windows.exe
-          dist/ssoc-linux
+        files: release_dist/*
         draft: true
-
+        generate_release_notes: false
