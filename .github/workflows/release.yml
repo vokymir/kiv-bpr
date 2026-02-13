@@ -44,7 +44,7 @@ jobs:
       with:
         path: ${{ github.workspace }}/build/vcpkg_installed
         key: vcpkg-${{ matrix.os }}-${{ hashFiles('vcpkg.json') }}
-        restore_keys: vcpkg-${{ matrix.os }}-
+        restore-keys: vcpkg-${{ matrix.os }}-
 
     - name: Ensure vcpkg history
       # vcpkg comes pre-installed at $VCPKG_INSTALLATION_ROOT
