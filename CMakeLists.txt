@@ -111,19 +111,53 @@ set_target_properties(sim_soc PROPERTIES
 )
 
 # =====
-# Debug info
+# Strict debug + no optimalizations (down)
 # =====
 
+if(MSVC)
+    target_compile_options(sim_soc PRIVATE
+        $<$<CONFIG:Debug>:
+            /W4                 # Baseline strict
+            /w14242 /w14265     # Specific useful high-level warnings
+            /w14287 /w14296
+            /w14311 /w14826
+            /permissive-        # Standards conformance
+            /WX                 # Warnings as errors (Optional: remove if too annoying)
+        >
+    )
+else()
+    target_compile_options(sim_soc PRIVATE
+        $<$<CONFIG:Debug>:
+            -Wall -Wextra       # Reasonable strictness
+            -Wpedantic          # ISO C++ conformance
+            -Wshadow            # Local variable shadows another
+            -Wnon-virtual-dtor  # Missing virtual destructor
+            -Wold-style-cast    # C-style casts in C++
+            -Wcast-align        # Potential alignment issues
+            -Wunused            # Unused variables/functions
+            -Woverloaded-virtual # Hiding virtual functions
+            -Wconversion        # Implicit type conversions that lose data
+            -Wsign-conversion   # Signed/unsigned comparison/conversion
+            -Wnull-dereference  # Detect potential null pointer usage
+            -Wdouble-promotion  # Float to double promotion
+            -Wformat=2          # Strict printf-style check
+            # -Werror             # Warnings as errors
+        >
+    )
+endif()
+
+# Sanitizers and Debug levels (Linux/macOS)
 if(NOT MSVC)
     target_compile_options(sim_soc PRIVATE
-        $<$<CONFIG:Debug>:-g3>
-        $<$<CONFIG:Debug>:-O0>
-        $<$<CONFIG:Debug>:-fsanitize=address,undefined>
-        $<$<CONFIG:Debug>:-fno-omit-frame-pointer>
+        $<$<CONFIG:Debug>:
+            -g3 -O0
+            -fsanitize=address,undefined,leak
+            -fno-omit-frame-pointer
+            -fstack-protector-all
+        >
     )
-
     target_link_options(sim_soc PRIVATE
-        $<$<CONFIG:Debug>:-fsanitize=address,undefined>
+        $<$<CONFIG:Debug>:-fsanitize=address,undefined,leak>
     )
 endif()
 
