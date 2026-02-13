@@ -47,19 +47,16 @@ jobs:
       shell: bash
       run: |
         mkdir -p "${{ env.VCPKG_DEFAULT_BINARY_CACHE }}"
-        mkdir -p "${{ github.workspace }}/vcpkg_cache"
 
     - name: Restore vcpkg Cache
       uses: actions/cache@v4
       with:
         path: |
           ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          ${{ github.workspace }}/build/vcpkg_installed
-          ${{ github.workspace }}/vcpkg_installed
-        key: vcpkg-${{ matrix.os }}-${{ hashFiles('vcpkg.json') }}
+        key: |
+          vcpkg-${{ matrix.os }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
           vcpkg-${{ matrix.os }}-
-          ${{ matrix.os }}
         save-always: true
 
     - name: Ensure vcpkg history
