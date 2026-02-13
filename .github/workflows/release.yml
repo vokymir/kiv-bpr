@@ -26,11 +26,13 @@ jobs:
               sudo apt-get update
               sudo apt-get install -y \
                 gcc-14 g++-14 gfortran-14 cmake ninja-build pkg-config libgl1-mesa-dev xorg-dev libasound2-dev libpulse-dev autoconf autoconf-archive automake libtool libltdl-dev
+              mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
 
           - os: windows-latest
             triplet: x64-windows-static # static so its single executable
             artifact_name: ssoc-windows.exe
-            install: echo "Nothing to install..."
+            install: |
+              mkdir -p ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
 
     steps:
     - name: Checkout Code
@@ -40,6 +42,7 @@ jobs:
         fetch-depth: 0 # due to igraph (versioning)
 
     - name: Install Dependencies
+      shell: bash
       run: ${{ matrix.install }}
 
     - name: Restore vcpkg Cache
