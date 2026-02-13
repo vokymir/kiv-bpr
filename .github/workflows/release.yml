@@ -53,7 +53,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          ${{ env.VCPKG_DEFAUL_BINARY_CACHE }}
+          ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
           ${{ github.workspace }}/build/vcpkg_installed
           ${{ github.workspace }}/vcpkg_installed
         key: vcpkg-${{ matrix.os }}-${{ hashFiles('vcpkg.json') }}
