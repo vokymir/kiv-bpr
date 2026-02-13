@@ -88,6 +88,7 @@ jobs:
           cmake -B build -G "Visual Studio 17 2022" -A x64 \
             -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" \
             -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} \
+            -DVCPKG_HOST_TRIPLET=${{ matrix.triplet }} \
             -DCMAKE_MSVC_RUNTIME_LIBRARY="MultiThreaded"
         fi
 
