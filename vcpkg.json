@@ -1,8 +1,9 @@
 {
   "name": "ssoc",
-  "version-string": "0.0.1",
+  "version-string": "0.0.2",
   "dependencies": [
     "igraph",
     "sdl3"
-  ]
+  ],
+  "builtin-baseline": "0a434205c521ca43d66921271ae2a1d051e718a5"
 }
