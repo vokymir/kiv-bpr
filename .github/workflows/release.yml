@@ -89,6 +89,29 @@ jobs:
           cp bin/ssoc dist/
           tar -czvf ${{ matrix.asset_name }} -C dist ssoc
         fi
+    - name: Package Binaries
+      shell: bash
+      run: |
+        mkdir -p dist
+        if [ "${{ runner.os }}" == "Windows" ]; then
+          # Look for ssoc.exe in common MSVC output paths
+          if [ -f "bin/Release/ssoc.exe" ]; then
+            cp bin/Release/ssoc.exe dist/
+          elif [ -f "bin/ssoc.exe" ]; then
+            cp bin/ssoc.exe dist/
+          else
+            # Fallback: find it wherever it is and grab the first one
+            find bin -name "ssoc.exe" -exec cp {} dist/ \;
+          fi
+
+          # Copy DLLs from vcpkg
+          cp build/vcpkg_installed/${{ matrix.triplet }}/bin/*.dll dist/ || true
+          cd dist && 7z a ../${{ matrix.asset_name }} *
+        else
+          # Linux packaging (it usually stays in bin/ as expected)
+          cp bin/ssoc dist/
+          tar -czvf ${{ matrix.asset_name }} -C dist ssoc
+        fi
 
     # --- Create/Update Release ---
     - name: Upload to Release
