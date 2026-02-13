@@ -65,7 +65,13 @@ file(GLOB_RECURSE SOURCES
     "${PROJECT_SOURCE_DIR}/src/*.hpp"
 )
 
-add_executable(sim_soc ${SOURCES})
+
+if (WIN32)
+    # make it GUI app (without console) on windows
+    add_executable(sim_soc WIN32 ${SOURCES})
+else()
+    add_executable(sim_soc ${SOURCES})
+endif()
 
 set_target_properties(sim_soc PROPERTIES
     OUTPUT_NAME "ssoc"
