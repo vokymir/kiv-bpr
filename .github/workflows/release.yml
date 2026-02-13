@@ -79,21 +79,6 @@ jobs:
       run: |
         mkdir -p dist
         if [ "${{ runner.os }}" == "Windows" ]; then
-          # Copy exe from your custom bin dir
-          cp bin/ssoc.exe dist/
-          # Copy SDL3.dll and other dependencies from vcpkg install folder
-          cp build/vcpkg_installed/${{ matrix.triplet }}/bin/*.dll dist/ || true
-          cd dist && 7z a ../${{ matrix.asset_name }} *
-        else
-          # Linux packaging
-          cp bin/ssoc dist/
-          tar -czvf ${{ matrix.asset_name }} -C dist ssoc
-        fi
-    - name: Package Binaries
-      shell: bash
-      run: |
-        mkdir -p dist
-        if [ "${{ runner.os }}" == "Windows" ]; then
           # Look for ssoc.exe in common MSVC output paths
           if [ -f "bin/Release/ssoc.exe" ]; then
             cp bin/Release/ssoc.exe dist/
