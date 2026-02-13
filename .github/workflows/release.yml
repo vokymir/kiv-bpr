@@ -2,7 +2,7 @@ name: Draft Release with Executables
 
 on:
   push:
-    branches: ['main']
+    branches: ['master']
     tags: ['v*']
 
 permissions:
