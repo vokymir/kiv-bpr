@@ -19,5 +19,5 @@ date | total time [min] | other times | subject
  | 100 | 15 | migrating to vcpkg for igraph, sdl3; to make github CI easier, failed to release
 13.2.2026 | 75 | 9.15 | getting the github action to work, email
  | 45 | 11.20-12.05 | vibecoding better github action
- | 160 | 13.30 | working on github release to single binary
+ | 250 | 13.30 | working on github release to single binary, fix small ui issues
 
