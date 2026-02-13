@@ -70,6 +70,7 @@ file(GLOB_RECURSE SOURCES
 if (WIN32)
     # make it GUI app (without console) on windows
     add_executable(sim_soc WIN32 ${SOURCES})
+    set_target_properties(sim_soc PROPERTIES LINK_FLAGS "/ENTRY:mainCRTStartup")
 else()
     add_executable(sim_soc ${SOURCES})
 endif()
