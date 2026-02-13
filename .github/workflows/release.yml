@@ -55,20 +55,24 @@ jobs:
       shell: bash
       run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
-          export CC=gcc-14
-          export CXX=g++-14
-          export FC=gfortran-14
+          export CC=gcc-14 CXX=g++-14 FC=gfortran-14
 
+          # We inject the static flags ONLY here.
+          # -static-libstdc++: Includes the C++ runner in the file.
+          # -static-libgcc: Includes the C runner.
           cmake -B build -G Ninja \
             -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" \
             -DCMAKE_BUILD_TYPE=Release \
-            -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }}
+            -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} \
+            -DCMAKE_EXE_LINKER_FLAGS="-static-libstdc++ -static-libgcc"
         else
-          # On Windows, we use the Visual Studio Generator to ensure MSVC is used
-          # This avoids the MinGW/ld.exe errors entirely
+          # On Windows, we use x64-windows-static for vcpkg
+          # AND we inject CMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded (the /MT flag)
+          # This forces MSVC to bake the runtime into the .exe
           cmake -B build -G "Visual Studio 17 2022" -A x64 \
             -DCMAKE_TOOLCHAIN_FILE="$VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake" \
-            -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }}
+            -DVCPKG_TARGET_TRIPLET=${{ matrix.triplet }} \
+            -DCMAKE_MSVC_RUNTIME_LIBRARY="MultiThreaded"
         fi
 
         cmake --build build --config Release
@@ -79,29 +83,19 @@ jobs:
       run: |
         mkdir -p dist
         if [ "${{ runner.os }}" == "Windows" ]; then
-          # Look for ssoc.exe in common MSVC output paths
-          if [ -f "bin/Release/ssoc.exe" ]; then
-            cp bin/Release/ssoc.exe dist/
-          elif [ -f "bin/ssoc.exe" ]; then
-            cp bin/ssoc.exe dist/
-          else
-            # Fallback: find it wherever it is and grab the first one
-            find bin -name "ssoc.exe" -exec cp {} dist/ \;
-          fi
-
-          # Copy DLLs from vcpkg
-          cp build/vcpkg_installed/${{ matrix.triplet }}/bin/*.dll dist/ || true
-          cd dist && 7z a ../${{ matrix.asset_name }} *
+          # Grab the standalone exe
+          find bin -name "ssoc.exe" -exec cp {} dist/ssoc-windows.exe \;
         else
-          # Linux packaging (it usually stays in bin/ as expected)
-          cp bin/ssoc dist/
-          tar -czvf ${{ matrix.asset_name }} -C dist ssoc
+          # Grab the standalone linux binary
+          cp bin/ssoc dist/ssoc-linux
         fi
 
     # --- Create/Update Release ---
     - name: Upload to Release
       uses: softprops/action-gh-release@v2
       with:
-        files: ${{ matrix.asset_name }}
+        files: |
+          dist/ssoc-windows.exe
+          dist/ssoc-linux
         draft: true
-        generate_release_notes: true
+
