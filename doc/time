@@ -20,4 +20,5 @@ date | total time [min] | other times | subject
 13.2.2026 | 75 | 9.15 | getting the github action to work, email
  | 45 | 11.20-12.05 | vibecoding better github action
  | 250 | 13.30 | working on github release to single binary, fix small ui issues
+18.2.2026 | 160 | 8.45 | cleanup + redone UI to be more compatible with immediate mode
 
