@@ -145,6 +145,7 @@ void App::step_over() {
 
 void App::step_run_until_avalanche() {
   running_ = true;
+  last_toppled_ = 0;
   stop_cond_ = [this]() { return last_toppled_ > 1; };
 }
 
