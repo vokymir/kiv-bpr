@@ -22,3 +22,5 @@ date | total time [min] | other times | subject
  | 250 | 13.30 | working on github release to single binary, fix small ui issues
 18.2.2026 | 160 | 8.45 | cleanup + redone UI to be more compatible with immediate mode
  | 165 | 12.30 | robust stepping options
+ | 65 | 15.40 | stats beginning, not doing anything yet
+
