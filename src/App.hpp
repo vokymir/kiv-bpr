@@ -4,6 +4,8 @@
 #include "Sim_Config.hpp"
 #include "Vis_Config.hpp"
 #include "graph/Graph.hpp"
+#include "stat/Simulation_Events.hpp"
+#include "stat/Stats_Collector.hpp"
 #include "ui/Visualizer.hpp"
 #include "ui/Window_Context.hpp"
 #include <cstddef>
@@ -40,10 +42,18 @@ private:
   std::function<bool()> stop_cond_ = []() -> bool { return true; };
   std::queue<size_t> to_topple_{};
 
+  // STATS
+  stat::Simulation_Events events_;
+  stat::Stats_Collector stats_;
+
 public:
+  // hook-up stats gathering machinery
+  App() : stats_(events_) {}
+
   void run();
 
 private:
+  // possible to defer initialization...
   void init();
 
   // set random number to correspond to graph vert count
