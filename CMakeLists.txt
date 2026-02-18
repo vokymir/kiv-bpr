@@ -56,6 +56,36 @@ target_link_libraries(imgui PUBLIC
 # C++ standard for ImGui
 target_compile_features(imgui PUBLIC cxx_std_17)
 
+# --- backwards-cpp
+set(BACKWARD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/backward")
+
+if(NOT EXISTS "${BACKWARD_DIR}")
+    message(FATAL_ERROR
+        "Backward CPP library not found at ${BACKWARD_DIR}.
+        Did you forget git submodules?"
+    )
+endif()
+
+add_library(backward STATIC
+    "${BACKWARD_DIR}/backward.cpp"
+)
+
+target_include_directories(backward SYSTEM PUBLIC "${BACKWARD_DIR}")
+
+# Backward needs specific system libs to read debug symbols
+if(UNIX AND NOT APPLE)
+    # On Linux, libdw provides the best stack traces
+    find_library(LIBDW_LIB dw)
+    if(LIBDW_LIB)
+        target_link_libraries(backward PUBLIC ${LIBDW_LIB})
+        target_compile_definitions(backward PUBLIC BACKWARD_HAS_DW=1)
+    endif()
+    # Link against BFD/Binutils as a fallback if needed, or just use dl
+    target_link_libraries(backward PUBLIC ${CMAKE_DL_LIBS})
+elseif(WIN32)
+    target_link_libraries(backward PUBLIC dbghelp psapi)
+endif()
+
 # =====
 # Main Target (SSOC)
 # =====
@@ -85,6 +115,7 @@ target_include_directories(sim_soc PRIVATE
 target_link_libraries(sim_soc PRIVATE
     imgui
     igraph::igraph
+    backward
 )
 
 # =====

@@ -4,3 +4,6 @@
 [submodule "external/igraph"]
 	path = external/igraph
 	url = https://github.com/igraph/igraph
+[submodule "external/backward"]
+	path = external/backward
+	url = https://github.com/bombela/backward-cpp.git
