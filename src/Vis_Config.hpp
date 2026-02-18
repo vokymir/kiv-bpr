@@ -6,7 +6,7 @@ namespace ssoc {
 // Graph Layout Algorithm
 namespace gla_ {
 
-enum FR2D_Accuracy {
+enum struct FR2D_Accuracy {
   High,
   Low, // uses GRID variant of alg
   Auto // use GRID for LARGE graphs

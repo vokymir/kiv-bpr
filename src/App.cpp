@@ -1,8 +1,10 @@
 #include "App.hpp"
+#include "App_Utils.hpp"
 #include "Sim_Config.hpp"
 #include "Vis_Config.hpp"
 #include "graph/Generator.hpp"
-#include "ui/Ui.hpp"
+#include "ui/Views.hpp"
+#include "ui/Window_Context.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_opengl.h>
 #include <cstddef>
@@ -18,12 +20,13 @@ void App::init() {
     throw std::runtime_error("App double initialization.");
   }
 
-  cfg_.gga = gga_::Square_Lattice_2D{3, 4, false, false};
-  cfg_.visual.gla = gla_::Fruchterman_Reingold_2D{gla_::High};
+  sim_cfg_.gga = gga_::Square_Lattice_2D{3, 4, false, false};
+  vis_cfg_.gla = gla_::Fruchterman_Reingold_2D{gla_::FR2D_Accuracy::High};
 
-  // g_ = graph::generate::igraph_from_config(cfg_);
+  // start with SOME graph
+  g_ = graph::generate::igraph_from_config(sim_cfg_, vis_cfg_);
 
-  ui_ = std::make_unique<ui::UI>();
+  win_context_ = std::make_unique<ui::Window_Context>();
 
   rng_ = std::default_random_engine(rd_());
 
@@ -35,37 +38,63 @@ void App::run() {
     init();
   }
 
-  ui_->init();
+  win_context_->init();
 
   bool should_end = false;
   bool generate_graph = false;
 
   while (!should_end) {
-    ui_->pollevs(should_end);
+    win_context_->pollevs(should_end);
 
     if (generate_graph) {
-      g_ = graph::generate::igraph_from_config(cfg_);
+      g_ = graph::generate::igraph_from_config(sim_cfg_, vis_cfg_);
       set_dist();
       generate_graph = false;
     }
 
-    ui_->begin_frame();
+    win_context_->begin_frame();
     // vvvvv
 
-    ui_->draw_master_window(generate_graph);
-    if (ui_->draw_stepping_control()) {
-      step();
+    master_action(ui::views::draw_master_w(master_state_));
+
+    if (master_state_.show_config_window) {
+      ui::views::draw_config_w(master_state_.show_config_window, sim_cfg_,
+                               vis_cfg_);
     }
-    ui_->draw_config_window(cfg_);
-    if (g_) {
-      ui_->draw_graph(*g_);
+    if (master_state_.show_graph_window) {
+      ui::views::draw_graph_w(master_state_.show_graph_window, vis_, *g_);
+    }
+    if (master_state_.show_control_window) {
+      control_action(
+          ui::views::draw_control_w(master_state_.show_control_window));
     }
 
     // ^^^^^
-    ui_->end_frame();
+    win_context_->end_frame(bg_clr_);
   }
 
-  ui_->clear();
+  win_context_->shutdown();
+}
+
+void App::master_action(Master_Action action) {
+  switch (action) {
+  case Master_Action::None:
+    return;
+  case Master_Action::Generate_Graph:
+    g_ = graph::generate::igraph_from_config(sim_cfg_, vis_cfg_);
+    master_state_.show_graph_window = true;
+    break;
+  }
+}
+
+void App::control_action(Control_Action action) {
+  switch (action) {
+  case Control_Action::None:
+    return;
+  case Control_Action::Step:
+    step();
+    break;
+  }
 }
 
 void App::step() {
@@ -74,10 +103,12 @@ void App::step() {
     return;
   }
 
-  auto idx = dist_(rng_);
+  auto &heights = g_->sand_height(0);
+
+  auto idx = dist_(rng_) % heights.size();
 
   g_->sand_history(0).push_back(idx);
-  g_->sand_height(0)[idx] += 1;
+  heights[idx] += 1;
 
   check_topple(idx);
 }

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Vis_Config.hpp"
 #include <variant>
 namespace ssoc {
 
@@ -28,7 +27,6 @@ using Graph_Generation_Algorithm =
 /* Holds configuration for the simulation. Must be serializable, to save
  * specific config for future reference. */
 struct Sim_Config {
-  struct Vis_Config visual;
   Graph_Generation_Algorithm gga;
 };
 

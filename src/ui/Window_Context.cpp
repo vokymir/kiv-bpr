@@ -1,17 +1,15 @@
-#include "Ui.hpp"
+#include "Window_Context.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_opengl.h>
-#include <cstddef>
 #include <format>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl3.h>
 #include <stdexcept>
-#include <variant>
 
 namespace ssoc::ui {
 
-void UI::init() {
+void Window_Context::init() {
   // Setup SDL
   // [If using SDL_MAIN_USE_CALLBACKS: all code below until the main loop starts
   // would likely be your SDL_AppInit() function]
@@ -115,7 +113,7 @@ void UI::init() {
   gl_context_ = gl_context;
 }
 
-void UI::pollevs(bool &should_end) {
+void Window_Context::pollevs(bool &should_end) {
   // Poll and handle events (inputs, window resize, etc.)
   // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to
   // tell if dear imgui wants to use your inputs.
@@ -138,7 +136,7 @@ void UI::pollevs(bool &should_end) {
   }
 };
 
-void UI::begin_frame() {
+void Window_Context::begin_frame() {
 
   // [If using SDL_MAIN_USE_CALLBACKS: all code below would likely be your
   // SDL_AppIterate() function]
@@ -153,7 +151,7 @@ void UI::begin_frame() {
   ImGui::NewFrame();
 };
 
-void UI::end_frame() {
+void Window_Context::end_frame(const ImVec4 &clear_color) {
 
   ImGuiIO &io = ImGui::GetIO();
   (void)io;
@@ -162,14 +160,14 @@ void UI::end_frame() {
   ImGui::Render();
   glViewport(0, 0, static_cast<int>(io.DisplaySize.x),
              static_cast<int>(io.DisplaySize.y));
-  glClearColor(bg_clr_.x * bg_clr_.w, bg_clr_.y * bg_clr_.w,
-               bg_clr_.z * bg_clr_.w, bg_clr_.w);
+  glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w,
+               clear_color.z * clear_color.w, clear_color.w);
   glClear(GL_COLOR_BUFFER_BIT);
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
   SDL_GL_SwapWindow(window_);
 };
 
-void UI::clear() {
+void Window_Context::shutdown() {
   // Cleanup
   // [If using SDL_MAIN_USE_CALLBACKS: all code below would likely be your
   // SDL_AppQuit() function]
@@ -182,156 +180,4 @@ void UI::clear() {
   window_ = nullptr;
   SDL_Quit();
 }
-
-void UI::draw_graph(const ssoc::graph::Graph &g) {
-  if (show_vis_) {
-    ImGui::SetNextWindowPos(ImVec2(385, 86), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(729, 571), ImGuiCond_FirstUseEver);
-    vis_.show_window(g, show_vis_);
-  }
-}
-
-void UI::draw_master_window(bool &generate_graph) {
-  ImGui::SetNextWindowPos(ImVec2(31, 21), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(249, 189), ImGuiCond_FirstUseEver);
-  ImGui::Begin("Master window", nullptr);
-
-  ImGui::Checkbox("Show graph", &show_vis_);
-  ImGui::Checkbox("Show config", &show_cfg_);
-  ImGui::Checkbox("Show stepping", &show_step_);
-
-  generate_graph = ImGui::Button("Generate graph");
-
-  ImGui::End();
-}
-
-void UI::draw_config_window(Sim_Config &cfg) {
-  if (show_cfg_) {
-    ImGui::SetNextWindowPos(ImVec2(22, 233), ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(352, 459), ImGuiCond_FirstUseEver);
-    ImGui::Begin("Config window", &show_cfg_);
-    draw(cfg);
-    ImGui::End();
-  }
-}
-
-void UI::draw(Sim_Config &cfg) {
-  if (ImGui::CollapsingHeader("General configuration")) {
-    draw(cfg.gga);
-  }
-
-  if (ImGui::CollapsingHeader("Visual configuration")) {
-    draw(cfg.visual);
-  }
-}
-
-void UI::draw(Vis_Config &cfg) { draw(cfg.gla); }
-
-// === sim config
-
-void UI::draw(Graph_Generation_Algorithm &gga) {
-  constexpr const char *labels[] = {
-      "Square Lattice 2D",
-      "Dummy",
-  };
-
-  size_t idx = gga.index();
-
-  for (size_t i = 0; i < std::size(labels); ++i) {
-    if (ImGui::RadioButton(labels[i], idx == i)) {
-      switch (i) {
-      case 0:
-        gga = gga_::Square_Lattice_2D{};
-        break;
-      case 1:
-        gga = gga_::Dummy_GGA{};
-        break;
-
-      default:
-        gga = gga_::Square_Lattice_2D{};
-        break;
-      }
-    }
-  }
-
-  std::visit([this](auto &alg) { draw(alg); }, gga);
-}
-
-void UI::draw(gga_::Square_Lattice_2D &cfg) {
-  ImGui::InputInt("Width", &cfg.width);
-  ImGui::InputInt("Height", &cfg.height);
-  ImGui::Checkbox("Circular on x axis", &cfg.circular_on_x);
-  ImGui::Checkbox("Circular on y axis", &cfg.circular_on_y);
-}
-
-void UI::draw(gga_::Dummy_GGA &cfg) {
-  ImGui::InputInt("Size", &cfg.size);
-  ImGui::Checkbox("Bool", &cfg.boolean);
-  ImGui::InputFloat("FT", &cfg.ft);
-}
-
-// === vis config
-
-void UI::draw(Graph_Layout_Algorithm &gla) {
-  constexpr const char *labels[] = {
-      "Fruchterman Reingold 2D",
-      "Dummy ui",
-  };
-
-  size_t idx = gla.index();
-
-  for (size_t i = 0; i < std::size(labels); ++i) {
-    if (ImGui::RadioButton(labels[i], idx == i)) {
-      switch (i) {
-      case 0:
-        gla = gla_::Fruchterman_Reingold_2D{};
-        break;
-      case 1:
-        gla = gla_::Dummy_GLA{};
-        break;
-
-      default:
-        gla = gla_::Fruchterman_Reingold_2D{};
-        break;
-      }
-    }
-  }
-
-  std::visit([this](auto &alg) { draw(alg); }, gla);
-}
-
-void UI::draw(gla_::Fruchterman_Reingold_2D &cfg) {
-  size_t acc = cfg.accuracy;
-
-  ImGui::Text("Accuracy");
-  if (ImGui::RadioButton("High", acc == 0)) {
-    acc = 0;
-  }
-  if (ImGui::RadioButton("Low", acc == 1)) {
-    acc = 1;
-  }
-  if (ImGui::RadioButton("Auto", acc == 2)) {
-    acc = 2;
-  }
-
-  cfg.accuracy = static_cast<gla_::FR2D_Accuracy>(acc);
-}
-
-void UI::draw(gla_::Dummy_GLA &cfg) { ImGui::InputInt("x", &cfg.x); }
-
-bool UI::draw_stepping_control() {
-  if (!show_step_) {
-    return false;
-  }
-  ImGui::SetNextWindowPos(ImVec2(423, 16), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(175, 54), ImGuiCond_FirstUseEver);
-  ImGui::Begin("Stepping control", &show_step_);
-
-  bool step = ImGui::Button("Step");
-
-  ImGui::End();
-
-  return step;
-}
-
 } // namespace ssoc::ui

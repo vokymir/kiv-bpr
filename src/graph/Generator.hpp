@@ -2,6 +2,7 @@
 
 #include "Graph.hpp"
 #include "Sim_Config.hpp"
+#include "Vis_Config.hpp"
 #include <memory>
 namespace ssoc::graph::generate {
 
@@ -20,6 +21,7 @@ namespace ssoc::graph::generate {
 // 1. generate igraph based on config
 // 2. convert to ssoc::Graph
 // 3. generate layout for that graph
-std::unique_ptr<Graph> igraph_from_config(const ssoc::Sim_Config &cfg);
+std::unique_ptr<Graph> igraph_from_config(const Sim_Config &sim_cfg,
+                                          const Vis_Config &vis_cfg);
 
 } // namespace ssoc::graph::generate

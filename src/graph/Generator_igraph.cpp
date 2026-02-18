@@ -1,5 +1,6 @@
 #include "Converter.hpp"
 #include "Generator.hpp"
+#include "Vis_Config.hpp"
 #include "igraph_lib.hpp"
 #include <format>
 #include <igraph.h>
@@ -11,7 +12,8 @@
 namespace ssoc::graph::generate {
 
 // generate 2D square lattice based on config->gga instruction
-void square_lattice_2d_variant(igraph_t &ig, gga_::Square_Lattice_2D gga) {
+void square_lattice_2d_variant(igraph_t &ig,
+                               const gga_::Square_Lattice_2D &gga) {
   // prepare instructions from gga
   igraph_vector_int_t dimensions;
   igraph_vector_int_init(&dimensions, 2); // always 2D
@@ -41,7 +43,7 @@ void square_lattice_2d_variant(igraph_t &ig, gga_::Square_Lattice_2D gga) {
 
 // generate igraph
 // - delegate the generation to specialized method based on configs' gga
-igraph_::unique_ptr_ generate_igraph(Graph_Generation_Algorithm gga) {
+igraph_::unique_ptr_ generate_igraph(const Graph_Generation_Algorithm &gga) {
   igraph_setup();
 
   igraph_::igraph_Deleter deleter;
@@ -72,19 +74,19 @@ igraph_::unique_ptr_ generate_igraph(Graph_Generation_Algorithm gga) {
 // free in mother function)
 igraph_error_t
 fruchterman_reingold_2d_variant(igraph_t &ig, igraph_matrix_t &layout,
-                                gla_::Fruchterman_Reingold_2D gla) {
+                                const gla_::Fruchterman_Reingold_2D &gla) {
   bool use_seed = false;          // false means random start
   long iteration_count = 500;     // sensible default according to docs
   double start_temperature = 0.1; // longest distance to go in one iteration
   igraph_layout_grid_t grid_usage;
   switch (gla.accuracy) { // decide on whatever was in gla
-  case gla_::High:
+  case gla_::FR2D_Accuracy::High:
     grid_usage = IGRAPH_LAYOUT_NOGRID;
     break;
-  case gla_::Low:
+  case gla_::FR2D_Accuracy::Low:
     grid_usage = IGRAPH_LAYOUT_GRID;
     break;
-  case gla_::Auto:
+  case gla_::FR2D_Accuracy::Auto:
     grid_usage = IGRAPH_LAYOUT_AUTOGRID;
     break;
   }
@@ -119,7 +121,8 @@ void layout_igraph_to_graph(Graph &g, const igraph_matrix_t &layout) {
 // - decide which algorithm to use & delegate the work
 // - save the layout from igraph format to graph
 // - free any igraph remaining memory
-void generate_layout(igraph_t &ig, Graph &g, Graph_Layout_Algorithm gla) {
+void generate_layout(igraph_t &ig, Graph &g,
+                     const Graph_Layout_Algorithm &gla) {
   igraph_matrix_t layout;
   igraph_matrix_init(&layout, 0, 0); // will be resized by functions
 
@@ -148,12 +151,13 @@ void generate_layout(igraph_t &ig, Graph &g, Graph_Layout_Algorithm gla) {
   igraph_matrix_destroy(&layout);
 }
 
-std::unique_ptr<Graph> igraph_from_config(const Sim_Config &cfg) {
-  igraph_::unique_ptr_ igraph_graph = generate_igraph(cfg.gga);
+std::unique_ptr<Graph> igraph_from_config(const Sim_Config &sim_cfg,
+                                          const Vis_Config &vis_cfg) {
+  igraph_::unique_ptr_ igraph_graph = generate_igraph(sim_cfg.gga);
 
   std::unique_ptr<Graph> graph = convert::to_ssoc_graph(*igraph_graph);
 
-  generate_layout(*igraph_graph, *graph, cfg.visual.gla);
+  generate_layout(*igraph_graph, *graph, vis_cfg.gla);
 
   return graph;
 }
