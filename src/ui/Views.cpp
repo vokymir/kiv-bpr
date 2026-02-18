@@ -66,7 +66,7 @@ Control_Action draw_control_w(bool &show) {
   }
 
   ImGui::SameLine();
-  if (ImGui::Button("Run until avalanche")) {
+  if (ImGui::Button("Run right until avalanche happened")) {
     action = Control_Action::Run_Until_Avalanche;
   }
 
