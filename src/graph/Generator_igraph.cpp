@@ -106,9 +106,12 @@ void layout_igraph_to_graph(Graph &g, const igraph_matrix_t &layout) {
   auto num_vertices = g.num_vertices();
 
   positions.resize(num_vertices);
-  for (long v = 0; v < num_vertices; ++v) {
-    double x = MATRIX(layout, v, 0);
-    double y = MATRIX(layout, v, 1);
+  for (size_t v = 0; v < num_vertices; ++v) {
+    const auto row = static_cast<long int>(v);
+
+    double x = MATRIX(layout, row, 0);
+    double y = MATRIX(layout, row, 1);
+
     positions[v] = {x, y};
   }
 }

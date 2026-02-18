@@ -43,7 +43,7 @@ add_library(imgui STATIC
     "${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp"
 )
 
-target_include_directories(imgui PUBLIC
+target_include_directories(imgui SYSTEM PUBLIC
     "${IMGUI_DIR}"
     "${IMGUI_DIR}/backends"
 )

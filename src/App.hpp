@@ -3,6 +3,7 @@
 #include "Sim_Config.hpp"
 #include "graph/Graph.hpp"
 #include "ui/Ui.hpp"
+#include <cstddef>
 #include <memory>
 #include <random>
 namespace ssoc {
@@ -16,7 +17,7 @@ private:
   std::unique_ptr<ui::UI> ui_;
   std::random_device rd_;
   std::default_random_engine rng_;
-  std::uniform_int_distribution<int> dist_;
+  std::uniform_int_distribution<size_t> dist_;
 
 public:
   void run();
@@ -25,13 +26,13 @@ private:
   void init();
 
   void set_dist() {
-    dist_ = std::uniform_int_distribution<int>(0, g_->num_vertices() - 1);
+    dist_ = std::uniform_int_distribution<size_t>(0, g_->num_vertices() - 1);
   }
 
   // if graph exists, do one step
   void step();
 
-  void check_topple(int idx);
+  void check_topple(size_t idx);
 };
 
 } // namespace ssoc

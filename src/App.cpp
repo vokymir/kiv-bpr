@@ -5,6 +5,7 @@
 #include "ui/Ui.hpp"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_opengl.h>
+#include <cstddef>
 #include <memory>
 #include <print>
 #include <random>
@@ -73,7 +74,7 @@ void App::step() {
     return;
   }
 
-  int idx = dist_(rng_);
+  auto idx = dist_(rng_);
 
   g_->sand_history(0).push_back(idx);
   g_->sand_height(0)[idx] += 1;
@@ -81,7 +82,7 @@ void App::step() {
   check_topple(idx);
 }
 
-void App::check_topple(int idx) {
+void App::check_topple(size_t idx) {
   auto &sand = g_->sand_height(0);
 
   if (sand[idx] >= 4) {

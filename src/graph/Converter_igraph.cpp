@@ -1,5 +1,6 @@
 #include "Converter.hpp"
 #include "igraph_lib.hpp"
+#include <cstddef>
 #include <igraph.h>
 
 namespace ssoc::graph::convert {
@@ -27,14 +28,15 @@ void to_ssoc__fill_neighbour_lists(Graph &g, const igraph_t &ig) {
   auto &adj_vertices = g.adj_vertices();
 
   igraph_integer_t idx = 0;
-  for (igraph_integer_t v = 0; v < g.num_vertices(); ++v) {
-    adj_offsets[v] = idx;
+  for (size_t v = 0; v < g.num_vertices(); ++v) {
+    adj_offsets[v] = static_cast<size_t>(idx);
 
     // find neighbours in igraph
     igraph_vector_int_t neighbours;
     igraph_vector_int_init(&neighbours, 0);
 
-    if (igraph_neighbors(&ig, &neighbours, v, IGRAPH_ALL, IGRAPH_NO_LOOPS,
+    if (igraph_neighbors(&ig, &neighbours, static_cast<igraph_integer_t>(v),
+                         IGRAPH_ALL, IGRAPH_NO_LOOPS,
                          IGRAPH_NO_MULTIPLE) != IGRAPH_SUCCESS) {
       igraph_vector_int_destroy(&neighbours);
       throw std::runtime_error("Failed to get neighbors");
@@ -42,7 +44,8 @@ void to_ssoc__fill_neighbour_lists(Graph &g, const igraph_t &ig) {
 
     // copy neighbours from igraph format
     for (long n = 0; n < igraph_vector_int_size(&neighbours); ++n) {
-      adj_vertices[idx++] = VECTOR(neighbours)[n];
+      adj_vertices[static_cast<size_t>(idx++)] =
+          static_cast<size_t>(VECTOR(neighbours)[static_cast<size_t>(n)]);
     }
 
     // memory management
@@ -55,8 +58,8 @@ void to_ssoc__fill_neighbour_lists(Graph &g, const igraph_t &ig) {
 std::unique_ptr<Graph> to_ssoc_graph(const igraph_t &igraph) {
   auto graph = std::make_unique<Graph>();
 
-  graph->num_vertices(igraph_vcount(&igraph));
-  graph->num_edges(igraph_ecount(&igraph));
+  graph->num_vertices(static_cast<size_t>(igraph_vcount(&igraph)));
+  graph->num_edges(static_cast<size_t>(igraph_ecount(&igraph)));
 
   to_ssoc__resize_internal_vectors(*graph);
 

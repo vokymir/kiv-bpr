@@ -7,7 +7,6 @@
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl3.h>
 #include <stdexcept>
-#include <type_traits>
 #include <variant>
 
 namespace ssoc::ui {
@@ -37,9 +36,9 @@ void UI::init() {
   SDL_WindowFlags window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE |
                                  SDL_WINDOW_HIDDEN |
                                  SDL_WINDOW_HIGH_PIXEL_DENSITY;
-  SDL_Window *window = SDL_CreateWindow("Dear ImGui SDL3+OpenGL3 example",
-                                        (int)(1280 * main_scale),
-                                        (int)(800 * main_scale), window_flags);
+  SDL_Window *window = SDL_CreateWindow(
+      "Dear ImGui SDL3+OpenGL3 example", static_cast<int>(1280 * main_scale),
+      static_cast<int>(800 * main_scale), window_flags);
   if (window == nullptr) {
     throw std::runtime_error(
         std::format("Error: SDL_CreateWindow(): {}\n", SDL_GetError()));
@@ -161,7 +160,8 @@ void UI::end_frame() {
 
   // Rendering
   ImGui::Render();
-  glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+  glViewport(0, 0, static_cast<int>(io.DisplaySize.x),
+             static_cast<int>(io.DisplaySize.y));
   glClearColor(bg_clr_.x * bg_clr_.w, bg_clr_.y * bg_clr_.w,
                bg_clr_.z * bg_clr_.w, bg_clr_.w);
   glClear(GL_COLOR_BUFFER_BIT);
@@ -235,9 +235,9 @@ void UI::draw(Graph_Generation_Algorithm &gga) {
       "Dummy",
   };
 
-  std::size_t idx = gga.index();
+  size_t idx = gga.index();
 
-  for (std::size_t i = 0; i < std::size(labels); ++i) {
+  for (size_t i = 0; i < std::size(labels); ++i) {
     if (ImGui::RadioButton(labels[i], idx == i)) {
       switch (i) {
       case 0:
@@ -278,9 +278,9 @@ void UI::draw(Graph_Layout_Algorithm &gla) {
       "Dummy ui",
   };
 
-  std::size_t idx = gla.index();
+  size_t idx = gla.index();
 
-  for (std::size_t i = 0; i < std::size(labels); ++i) {
+  for (size_t i = 0; i < std::size(labels); ++i) {
     if (ImGui::RadioButton(labels[i], idx == i)) {
       switch (i) {
       case 0:
@@ -301,7 +301,7 @@ void UI::draw(Graph_Layout_Algorithm &gla) {
 }
 
 void UI::draw(gla_::Fruchterman_Reingold_2D &cfg) {
-  std::size_t acc = cfg.accuracy;
+  size_t acc = cfg.accuracy;
 
   ImGui::Text("Accuracy");
   if (ImGui::RadioButton("High", acc == 0)) {
