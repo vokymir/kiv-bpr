@@ -19,16 +19,16 @@ void App::init() {
   if (initialized_) {
     throw std::runtime_error("App double initialization.");
   }
+  rng_ = std::default_random_engine(rd_());
 
   sim_cfg_.gga = gga_::Square_Lattice_2D{3, 4, false, false};
   vis_cfg_.gla = gla_::Fruchterman_Reingold_2D{gla_::FR2D_Accuracy::High};
 
   // start with SOME graph
   g_ = graph::generate::igraph_from_config(sim_cfg_, vis_cfg_);
+  set_dist();
 
   win_context_ = std::make_unique<ui::Window_Context>();
-
-  rng_ = std::default_random_engine(rd_());
 
   initialized_ = true;
 }
@@ -41,15 +41,12 @@ void App::run() {
   win_context_->init();
 
   bool should_end = false;
-  bool generate_graph = false;
 
   while (!should_end) {
     win_context_->pollevs(should_end);
 
-    if (generate_graph) {
-      g_ = graph::generate::igraph_from_config(sim_cfg_, vis_cfg_);
-      set_dist();
-      generate_graph = false;
+    if (running_) {
+      periodic_step();
     }
 
     win_context_->begin_frame();
@@ -69,10 +66,6 @@ void App::run() {
           ui::views::draw_control_w(master_state_.show_control_window));
     }
 
-    if (running_) {
-      periodic_step();
-    }
-
     // ^^^^^
     win_context_->end_frame(bg_clr_);
   }
@@ -86,6 +79,7 @@ void App::master_action(Master_Action action) {
     return;
   case Master_Action::Generate_Graph:
     g_ = graph::generate::igraph_from_config(sim_cfg_, vis_cfg_);
+    set_dist();
     master_state_.show_graph_window = true;
     break;
   }
@@ -120,7 +114,7 @@ void App::control_action(Control_Action action) {
 
 size_t App::drop_sand() {
   auto &heights = g_->sand_height(0);
-  auto idx = dist_(rng_) % heights.size();
+  auto idx = dist_(rng_);
 
   g_->sand_history(0).push_back(idx);
   heights[idx] += 1;

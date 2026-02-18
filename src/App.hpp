@@ -46,6 +46,7 @@ public:
 private:
   void init();
 
+  // set random number to correspond to graph vert count
   void set_dist() {
     dist_ = std::uniform_int_distribution<size_t>(0, g_->num_vertices() - 1);
   }
