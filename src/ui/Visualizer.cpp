@@ -3,6 +3,8 @@
 #include <cstdio>
 #include <deque>
 #include <imgui.h>
+#include <ranges>
+#include <unordered_map>
 #include <vector>
 
 namespace ssoc::ui {
@@ -116,16 +118,41 @@ void Visualizer::show_window(
     draw_list->AddText(pos, color_text, buf);
   }
 
-  for (size_t x : checking_topple_vertexes) {
-    if (x == sink_idx) {
+  std::unordered_map<size_t, std::vector<size_t>> grouped;
+
+  for (auto [i, x] : std::views::enumerate(checking_topple_vertexes)) {
+    grouped[x].push_back(static_cast<size_t>(i));
+  }
+
+  for (auto &[vertex, indices] : grouped) {
+    if (vertex == sink_idx)
       continue;
-    }
-    int height = heights[x];
-    auto pos = to_screen(positions[x]);
+
+    auto base_pos = to_screen(positions[vertex]);
+    int height = heights[vertex];
+
     float circle_size = 5.0f * zoom_ / 100.0f * static_cast<float>(height + 1);
 
-    draw_list->AddCircle(pos, circle_size, color_candidate, 0,
+    draw_list->AddCircle(base_pos, circle_size, color_candidate, 0,
                          1.0f * zoom_ / 100.0f);
+
+    float y_offset = 0.0f;
+
+    for (size_t idx : indices) {
+      char buf[32];
+      std::snprintf(buf, sizeof(buf), "%zu", idx + 1);
+
+      auto pos = base_pos;
+      pos.y -= circle_size + y_offset;
+
+      auto text_size = ImGui::CalcTextSize(buf);
+      pos.x -= text_size.x / 2;
+      pos.y -= text_size.y;
+
+      draw_list->AddText(pos, color_candidate, buf);
+
+      y_offset += 12.0f; // vertical stacking
+    }
   }
 
   draw_list->PopClipRect();
