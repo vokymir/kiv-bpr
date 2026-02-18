@@ -32,9 +32,6 @@ private:
    * having it's own vector. */
   std::vector<std::vector<int>> sand_height_{};
 
-  // store where did sand fall in time
-  std::vector<std::vector<size_t>> sand_history_{};
-
   /* Store the x,y coordinates in 2D UI layout. */
   std::vector<std::pair<double, double>> layout_pos_{};
 
@@ -59,7 +56,6 @@ public:
   std::vector<int> &sand_height(size_t idx = 0) {
     if (sand_height_.size() <= idx) {
       sand_height_.resize(idx + 1, std::vector<int>(num_vertices_ + 1, 0));
-      sand_history_.resize(idx + 1, {});
     }
     return sand_height_[idx];
   }
@@ -69,22 +65,6 @@ public:
     }
 
     return sand_height_[idx];
-  }
-
-  // batch index, default = 0
-  std::vector<size_t> &sand_history(size_t idx = 0) {
-    if (sand_history_.size() <= idx) {
-      throw std::out_of_range("sand_history index is too big");
-    }
-
-    return sand_history_[idx];
-  }
-  const std::vector<size_t> &sand_history_const(size_t idx = 0) const {
-    if (sand_history_.size() <= idx) {
-      throw std::out_of_range("sand_history index is too big");
-    }
-
-    return sand_history_[idx];
   }
 
   std::vector<std::pair<double, double>> &layout_pos() { return layout_pos_; }

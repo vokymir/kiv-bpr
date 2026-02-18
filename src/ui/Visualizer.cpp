@@ -1,11 +1,15 @@
 #include "Visualizer.hpp"
 #include <cstddef>
 #include <cstdio>
+#include <deque>
 #include <imgui.h>
+#include <vector>
 
 namespace ssoc::ui {
 
-void Visualizer::show_window(const graph::Graph &g, bool &show) {
+void Visualizer::show_window(
+    const graph::Graph &g, bool &show, size_t last_vertex,
+    const std::deque<size_t> &checking_topple_vertexes) {
   ImGui::Begin("Graph Visualization", &show);
 
   ImGui::Text("zoom: %f", static_cast<double>(zoom_));
@@ -88,13 +92,12 @@ void Visualizer::show_window(const graph::Graph &g, bool &show) {
   // Draw Nodes
   ImU32 color_normal = IM_COL32(200, 50, 50, 255);
   ImU32 color_last = IM_COL32(50, 150, 150, 255);
+  ImU32 color_candidate = IM_COL32(170, 255, 0, 255);
   ImU32 color_text = IM_COL32(255, 255, 255, 255);
-  auto history = g.sand_history_const(0);
-  bool has_last_idx = history.size() > 0;
-  auto last_idx = has_last_idx ? history[history.size() - 1] : 0;
 
+  auto &heights = g.sand_height_const(0);
   for (size_t v = 0; v < real_node_count; ++v) {
-    int height = g.sand_height_const(0)[v];
+    int height = heights[v];
     char buf[32];
     std::snprintf(buf, sizeof(buf), "%i", height);
 
@@ -104,14 +107,25 @@ void Visualizer::show_window(const graph::Graph &g, bool &show) {
     // Or use: 5.0f * (zoom / 200.0f) if you want them to scale
     float circle_size = 5.0f * zoom_ / 100.0f * static_cast<float>(height + 1);
     draw_list->AddCircleFilled(pos, circle_size,
-                               has_last_idx && last_idx == v ? color_last
-                                                             : color_normal);
+                               last_vertex == v ? color_last : color_normal);
 
     auto text_size = ImGui::CalcTextSize(buf);
     pos.x -= text_size.x / 2;
     pos.y -= text_size.y / 2;
 
     draw_list->AddText(pos, color_text, buf);
+  }
+
+  for (size_t x : checking_topple_vertexes) {
+    if (x == sink_idx) {
+      continue;
+    }
+    int height = heights[x];
+    auto pos = to_screen(positions[x]);
+    float circle_size = 5.0f * zoom_ / 100.0f * static_cast<float>(height + 1);
+
+    draw_list->AddCircle(pos, circle_size, color_candidate, 0,
+                         1.0f * zoom_ / 100.0f);
   }
 
   draw_list->PopClipRect();

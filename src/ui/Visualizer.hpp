@@ -1,6 +1,7 @@
 #pragma once
 
 #include "graph/Graph.hpp"
+#include <deque>
 #include <imgui.h>
 namespace ssoc::ui {
 
@@ -11,7 +12,8 @@ private:
   bool is_dragging_ = false;
 
 public:
-  void show_window(const graph::Graph &g, bool &show);
+  void show_window(const graph::Graph &g, bool &show, size_t last_vertex,
+                   const std::deque<size_t> &checking_topple_vertexes);
 };
 
 } // namespace ssoc::ui

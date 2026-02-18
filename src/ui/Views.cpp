@@ -2,8 +2,10 @@
 #include "App_Utils.hpp"
 #include "Vis_Config.hpp"
 #include <cstddef>
+#include <deque>
 #include <imgui.h>
 #include <variant>
+#include <vector>
 namespace ssoc::ui::views {
 
 Master_Action draw_master_w(Master_State &state) {
@@ -42,11 +44,13 @@ void draw_config_w(bool &show, Sim_Config &sim_cfg, Vis_Config &vis_cfg) {
   ImGui::End();
 }
 
-void draw_graph_w(bool &show, Visualizer &vis, const graph::Graph &g) {
+void draw_graph_w(bool &show, Visualizer &vis, const graph::Graph &g,
+                  size_t last_vertex,
+                  const std::deque<size_t> &checking_topple_vertexes) {
   ImGui::SetNextWindowPos(ImVec2(385, 86), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSize(ImVec2(729, 571), ImGuiCond_FirstUseEver);
 
-  vis.show_window(g, show);
+  vis.show_window(g, show, last_vertex, checking_topple_vertexes);
 }
 
 Control_Action draw_control_w(bool &show) {

@@ -9,9 +9,9 @@
 #include "ui/Visualizer.hpp"
 #include "ui/Window_Context.hpp"
 #include <cstddef>
+#include <deque>
 #include <functional>
 #include <memory>
-#include <queue>
 #include <random>
 namespace ssoc {
 
@@ -38,13 +38,16 @@ private:
 
   // CONTROL vars
   bool running_ = false;
-  size_t last_toppled_ = 0;
   std::function<bool()> stop_cond_ = []() -> bool { return true; };
-  std::queue<size_t> to_topple_{};
+  std::deque<size_t> to_topple_{};
 
   // STATS
   stat::Simulation_Events events_;
   stat::Stats_Collector stats_;
+  // transient (temporary) stats
+  size_t current_step_ = 0;
+  size_t current_vertex_;
+  size_t avalanche_topples_ = 0;
 
 public:
   // hook-up stats gathering machinery

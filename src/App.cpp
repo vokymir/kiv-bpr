@@ -60,7 +60,8 @@ void App::run() {
                                vis_cfg_);
     }
     if (master_state_.show_graph_window) {
-      ui::views::draw_graph_w(master_state_.show_graph_window, vis_, *g_);
+      ui::views::draw_graph_w(master_state_.show_graph_window, vis_, *g_,
+                              current_vertex_, to_topple_);
     }
     if (master_state_.show_control_window) {
       control_action(
@@ -117,10 +118,12 @@ size_t App::drop_sand() {
   auto &heights = g_->sand_height(0);
   auto idx = dist_(rng_);
 
-  g_->sand_history(0).push_back(idx);
-  heights[idx] += 1;
+  current_step_++;
+  current_vertex_ = idx;
+  avalanche_topples_ = 0;
 
-  to_topple_.push(idx);
+  heights[idx] += 1;
+  to_topple_.push_back(idx);
 
   return idx;
 }
@@ -145,8 +148,7 @@ void App::step_over() {
 
 void App::step_run_until_avalanche() {
   running_ = true;
-  last_toppled_ = 0;
-  stop_cond_ = [this]() { return last_toppled_ > 1; };
+  stop_cond_ = [this]() { return avalanche_topples_ > 1; };
 }
 
 void App::step_run() {
@@ -164,7 +166,7 @@ void App::periodic_step() {
   if (to_topple_.empty()) {
     drop_sand();
   }
-  last_toppled_ = check_topple(0);
+  check_topple(0);
 }
 
 size_t App::check_topple(int option) {
@@ -182,7 +184,7 @@ size_t App::check_topple(int option) {
     }
 
     const auto idx = to_topple_.front();
-    to_topple_.pop();
+    to_topple_.pop_front();
     checked++;
 
     if (idx == sink_idx) {
@@ -203,8 +205,15 @@ size_t App::check_topple(int option) {
     for (auto i = start; i < end; ++i) {
       auto neighbour = adj_vert[i];
       heights[neighbour] += 1;
-      to_topple_.push(neighbour);
+      to_topple_.push_back(neighbour);
     }
+  }
+
+  avalanche_topples_ += toppled;
+
+  if (to_topple_.empty()) {
+    events_.avalanche.emit(
+        {avalanche_topples_, current_vertex_, current_step_});
   }
 
   return toppled;
