@@ -38,7 +38,7 @@ private:
   bool running_ = false;
   size_t last_toppled_ = 0;
   std::function<bool()> stop_cond_ = []() -> bool { return true; };
-  std::queue<size_t> check_toppling_{};
+  std::queue<size_t> to_topple_{};
 
 public:
   void run();

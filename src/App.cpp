@@ -125,7 +125,7 @@ size_t App::drop_sand() {
   g_->sand_history(0).push_back(idx);
   heights[idx] += 1;
 
-  check_toppling_.push(idx);
+  to_topple_.push(idx);
 
   return idx;
 }
@@ -161,56 +161,50 @@ void App::step_run() {
 void App::periodic_step() {
   if (stop_cond_ && stop_cond_()) {
     running_ = false;
+    stop_cond_ = nullptr;
     return;
   }
-  drop_sand();
+
+  if (to_topple_.empty()) {
+    drop_sand();
+  }
   last_toppled_ = check_topple(0);
 }
 
 size_t App::check_topple(int option) {
-  if (check_toppling_.size() == 0) {
-    return 0;
-  }
   size_t checked = 0, toppled = 0;
-
-  auto should_continue = [&]() -> bool {
-    // don't index inside empty queue
-    if (check_toppling_.size() == 0) {
-      return false;
-    }
-
-    if (option == 0) { // until empty
-      return check_toppling_.size() > 0;
-    } else if (option > 0) { // at most checked times
-      return checked < static_cast<size_t>(option);
-    } else if (option < 0) { // until at most option vertices are toppled
-      return toppled < static_cast<size_t>(-option);
-    }
-
-    return false;
-  };
 
   auto &adj_off = g_->adj_offsets();
   auto &adj_vert = g_->adj_vertices();
   auto &heights = g_->sand_height(0);
-  do {
-    // which one to check
-    auto idx = check_toppling_.front();
-    check_toppling_.pop();
 
-    // check if higher sandpile than neighbour count
-    auto neighbour_count = adj_off[idx + 1] - adj_off[idx];
-    if (heights[idx] >= static_cast<int>(neighbour_count)) {
-      heights[idx] -= static_cast<int>(neighbour_count);
-
-      // sprinkle sand to neighbours
-      auto start = adj_vert[adj_off[idx]];
-      for (auto i = start; i < start + neighbour_count; ++i) {
-        heights[i] += 1;
-      }
+  while (!to_topple_.empty()) {
+    if ((option > 0 && checked >= static_cast<size_t>(option)) ||
+        (option < 0 && toppled >= static_cast<size_t>(-option))) {
+      break;
     }
 
-  } while (should_continue());
+    const auto idx = to_topple_.front();
+    to_topple_.pop();
+    checked++;
+
+    const auto start = adj_off[idx];
+    const auto end = adj_off[idx + 1];
+    const int degree = static_cast<int>(end - start);
+
+    if (heights[idx] < degree) {
+      continue; // NO TOPPLE HERE
+    }
+
+    heights[idx] -= degree;
+    toppled++;
+
+    for (auto i = start; i < end; ++i) {
+      auto neighbour = adj_vert[i];
+      heights[neighbour] += 1;
+      to_topple_.push(neighbour);
+    }
+  }
 
   return toppled;
 }
