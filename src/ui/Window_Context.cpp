@@ -34,9 +34,10 @@ void Window_Context::init() {
   SDL_WindowFlags window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE |
                                  SDL_WINDOW_HIDDEN |
                                  SDL_WINDOW_HIGH_PIXEL_DENSITY;
-  SDL_Window *window = SDL_CreateWindow(
-      "Dear ImGui SDL3+OpenGL3 example", static_cast<int>(1280 * main_scale),
-      static_cast<int>(800 * main_scale), window_flags);
+  SDL_Window *window =
+      SDL_CreateWindow("Simulation of Self-Organized Criticality",
+                       static_cast<int>(1280 * main_scale),
+                       static_cast<int>(800 * main_scale), window_flags);
   if (window == nullptr) {
     throw std::runtime_error(
         std::format("Error: SDL_CreateWindow(): {}\n", SDL_GetError()));
