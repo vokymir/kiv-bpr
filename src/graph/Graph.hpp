@@ -17,7 +17,7 @@ private:
    * == Example:
    * num_vertices_ = 4
    * adj_offsets_ =
-   * [0,2,2,4] <- at which index neighbour starts
+   * [0,2,2,4,6] <- at which index neighbour starts
    * adj_vertices_ =
    *  0 1 2 3 4 5 6   <- indexes
    *  0 0 2 2 3 3 3   <- whose neighbour list is it
@@ -56,7 +56,7 @@ public:
   // batch index, default = 0
   std::vector<int> &sand_height(size_t idx = 0) {
     if (sand_height_.size() <= idx) {
-      sand_height_.resize(idx + 1, std::vector<int>(num_vertices_, 0));
+      sand_height_.resize(idx + 1, std::vector<int>(num_vertices_ + 1, 0));
       sand_history_.resize(idx + 1, {});
     }
     return sand_height_[idx];

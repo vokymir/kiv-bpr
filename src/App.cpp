@@ -69,6 +69,10 @@ void App::run() {
           ui::views::draw_control_w(master_state_.show_control_window));
     }
 
+    if (running_) {
+      periodic_step();
+    }
+
     // ^^^^^
     win_context_->end_frame(bg_clr_);
   }
@@ -88,47 +92,127 @@ void App::master_action(Master_Action action) {
 }
 
 void App::control_action(Control_Action action) {
-  switch (action) {
-  case Control_Action::None:
-    return;
-  case Control_Action::Step:
-    step();
-    break;
-  }
-}
-
-void App::step() {
   if (!g_) {
     std::print("Tried to step on not existing graph.\n");
     return;
   }
 
-  auto &heights = g_->sand_height(0);
+  switch (action) {
+  case Control_Action::None:
+    return;
+  case Control_Action::Step_In:
+    step_in();
+    break;
+  case Control_Action::Step_Over:
+    step_over();
+    break;
+  case Control_Action::Run_Until_Avalanche:
+    step_run_until_avalanche();
+    break;
+  case Control_Action::Run:
+    step_run();
+    break;
+  case Control_Action::Stop:
+    running_ = false;
+    break;
+  }
+}
 
+size_t App::drop_sand() {
+  auto &heights = g_->sand_height(0);
   auto idx = dist_(rng_) % heights.size();
 
   g_->sand_history(0).push_back(idx);
   heights[idx] += 1;
 
-  check_topple(idx);
+  check_toppling_.push(idx);
+
+  return idx;
 }
 
-void App::check_topple(size_t idx) {
-  auto &sand = g_->sand_height(0);
-
-  if (sand[idx] >= 4) {
-    sand[idx] -= 4;
-    auto neigh_start = g_->adj_offsets()[idx];
-    auto neigh_end = g_->adj_offsets()[idx + 1];
-
-    auto adj = g_->adj_vertices();
-
-    for (auto i = neigh_start; i < neigh_end; ++i) {
-      auto idxx = adj[i];
-      sand[idxx] += 1;
-      check_topple(idxx);
-    }
+void App::step_in() {
+  if (check_topple(-1) > 0) {
+    return;
   }
+
+  drop_sand();
+  check_topple(-1);
+}
+
+void App::step_over() {
+  if (check_topple(0) > 0) {
+    return;
+  }
+
+  drop_sand();
+  check_topple(0);
+}
+
+void App::step_run_until_avalanche() {
+  running_ = true;
+  stop_cond_ = [this]() { return last_toppled_ > 1; };
+}
+
+void App::step_run() {
+  running_ = true;
+  stop_cond_ = []() { return false; };
+}
+
+void App::periodic_step() {
+  if (stop_cond_) {
+    running_ = false;
+    return;
+  }
+  drop_sand();
+  last_toppled_ = check_topple(0);
+}
+
+size_t App::check_topple(int option) {
+  if (check_toppling_.size() == 0) {
+    return 0;
+  }
+  size_t checked = 0, toppled = 0;
+
+  auto should_continue = [&]() -> bool {
+    // don't index inside empty queue
+    if (check_toppling_.size() == 0) {
+      return false;
+    }
+
+    if (option == 0) { // until empty
+      return check_toppling_.size() > 0;
+    } else if (option > 0) { // at most checked times
+      return checked < static_cast<size_t>(option);
+    } else if (option < 0) { // until at most option vertices are toppled
+      return toppled < static_cast<size_t>(-option);
+    }
+
+    return false;
+  };
+
+  auto &adj_off = g_->adj_offsets();
+  auto &adj_vert = g_->adj_vertices();
+  auto &heights = g_->sand_height(0);
+  do {
+    // which one to check
+    auto idx = check_toppling_.front();
+    check_toppling_.pop();
+
+    // check if higher sandpile than neighbour count
+    auto neighbour_count = adj_off[idx + 1] - adj_off[idx];
+    if (heights[idx] >= static_cast<int>(neighbour_count)) {
+      heights[idx] -= static_cast<int>(neighbour_count);
+
+      // sprinkle sand to neighbours
+      auto start = adj_vert[adj_off[idx]];
+      for (auto i = start; i < start + neighbour_count; ++i) {
+        heights[i] += 1;
+      }
+    }
+
+  } while (should_continue());
+
+  return toppled;
 }
 
 } // namespace ssoc

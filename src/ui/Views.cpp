@@ -2,6 +2,7 @@
 #include "App_Utils.hpp"
 #include "Vis_Config.hpp"
 #include <cstddef>
+#include <imgui.h>
 #include <variant>
 namespace ssoc::ui::views {
 
@@ -52,11 +53,31 @@ Control_Action draw_control_w(bool &show) {
   Control_Action action = Control_Action::None;
 
   ImGui::SetNextWindowPos(ImVec2(423, 16), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(175, 54), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(463, 54), ImGuiCond_FirstUseEver);
   ImGui::Begin("Stepping control", &show);
 
-  if (ImGui::Button("Step")) {
-    action = Control_Action::Step;
+  if (ImGui::Button("Step In")) {
+    action = Control_Action::Step_In;
+  }
+
+  ImGui::SameLine();
+  if (ImGui::Button("Step Over")) {
+    action = Control_Action::Step_Over;
+  }
+
+  ImGui::SameLine();
+  if (ImGui::Button("Run until avalanche")) {
+    action = Control_Action::Run_Until_Avalanche;
+  }
+
+  ImGui::SameLine();
+  if (ImGui::Button("Run forever")) {
+    action = Control_Action::Run;
+  }
+
+  ImGui::SameLine();
+  if (ImGui::Button("Stop")) {
+    action = Control_Action::Stop;
   }
 
   ImGui::End();

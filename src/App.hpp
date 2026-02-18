@@ -7,7 +7,9 @@
 #include "ui/Visualizer.hpp"
 #include "ui/Window_Context.hpp"
 #include <cstddef>
+#include <functional>
 #include <memory>
+#include <queue>
 #include <random>
 namespace ssoc {
 
@@ -32,6 +34,12 @@ private:
   std::default_random_engine rng_;
   std::uniform_int_distribution<size_t> dist_;
 
+  // CONTROL vars
+  bool running_ = false;
+  size_t last_toppled_ = 0;
+  std::function<bool()> stop_cond_ = []() -> bool { return true; };
+  std::queue<size_t> check_toppling_{};
+
 public:
   void run();
 
@@ -45,10 +53,33 @@ private:
   void master_action(Master_Action action);
   void control_action(Control_Action action);
 
-  // if graph exists, do one step
-  void step();
+  // add one sand to history&heights + in the check_toppling queue
+  // return index
+  size_t drop_sand();
+  // if avalanche is in progress, only proceed one step
+  void step_in();
+  // step over avalanches in one step
+  void step_over();
+  // periodically update graph until avalanches is found
+  void step_run_until_avalanche();
+  // periodically update graph until STOPped
+  void step_run();
+  // do the periodic update
+  void periodic_step();
 
-  void check_topple(size_t idx);
+  // return how many vertices were topled
+  // may add new vertices to check_toppling_
+  // OPTIONS
+  //
+  //  (avalanche)
+  //  0         => topple until the queue is empty
+  //
+  //  (??? = degree(vert))
+  //  1 - N     => check at most N vertices in the queue
+  //
+  //  (step in = -1)
+  //  -1 - N    => topple until at most N vertices were toppled
+  size_t check_topple(int option);
 };
 
 } // namespace ssoc

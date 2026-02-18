@@ -15,7 +15,11 @@ enum struct Master_Action {
 
 enum struct Control_Action {
   None,
-  Step,
+  Step_In,
+  Step_Over,
+  Run_Until_Avalanche,
+  Run,
+  Stop,
 };
 
 } // namespace ssoc
