@@ -48,7 +48,9 @@ private:
 
   // set random number to correspond to graph vert count
   void set_dist() {
-    dist_ = std::uniform_int_distribution<size_t>(0, g_->num_vertices() - 1);
+    // 0-(N-1) is standard convertion
+    // -1 is for the last vertex is a sink = don't want to choose it for sand
+    dist_ = std::uniform_int_distribution<size_t>(0, g_->num_vertices() - 2);
   }
 
   void master_action(Master_Action action);
