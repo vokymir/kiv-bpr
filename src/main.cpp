@@ -1,9 +1,10 @@
 
 #include "App.hpp"
-#include <backward.hpp>
 
-// register this for beautiful error outputs
+#ifdef USE_BACKWARD
+#include <backward.hpp>
 backward::SignalHandling sh;
+#endif
 
 int main(void) {
   ssoc::App app{};
