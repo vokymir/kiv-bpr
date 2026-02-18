@@ -3,20 +3,29 @@
 #include "stat/Simulation_Events.hpp"
 #include "stat/events.hpp"
 #include <cstddef>
+#include <unordered_map>
 #include <vector>
 namespace ssoc::stat {
 
+struct Avalanche_Record {
+  size_t step;
+  size_t size;
+  size_t origin;
+};
+
 class Stats_Collector {
 protected:
-  std::vector<size_t> avalanche_sizes_;
-  std::vector<size_t> avalanche_origins_;
-  std::vector<size_t> avalanche_step_stemps_;
+  std::vector<Avalanche_Record> avalanche_records_;
+  std::unordered_map<size_t, size_t> avalanche_sizes_;
+  std::unordered_map<size_t, size_t> avalanche_origins_;
   std::vector<size_t> grains_counts_;
 
   void handle_avalanche(const Avalanche_Event &e) {
-    avalanche_sizes_.push_back(e.topples_to_stabilize);
-    avalanche_origins_.push_back(e.origin_vertex);
-    avalanche_step_stemps_.push_back(e.step_number);
+    avalanche_sizes_[e.topples_to_stabilize]++;
+    avalanche_origins_[e.origin_vertex]++;
+
+    avalanche_records_.push_back(
+        {e.step_number, e.topples_to_stabilize, e.origin_vertex});
   }
 
   void handle_grains(const Grains_Count_Event &e) {
@@ -30,6 +39,21 @@ public:
     events.grains.subscribe(
         [this](const Grains_Count_Event &e) { handle_grains(e); });
   }
+
+  // === GETTERS ===
+  const std::vector<Avalanche_Record> &avalanche_records() const {
+    return avalanche_records_;
+  }
+
+  const std::unordered_map<size_t, size_t> &avalanche_sizes() const {
+    return avalanche_sizes_;
+  }
+
+  const std::unordered_map<size_t, size_t> &avalanche_origins() const {
+    return avalanche_origins_;
+  }
+
+  const std::vector<size_t> &grains_counts() const { return grains_counts_; }
 };
 
 } // namespace ssoc::stat
