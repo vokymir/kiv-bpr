@@ -3,6 +3,7 @@
 #include "Sim_Config.hpp"
 #include "Vis_Config.hpp"
 #include "graph/Generator.hpp"
+#include "stat/events.hpp"
 #include "ui/Views.hpp"
 #include "ui/Window_Context.hpp"
 #include <SDL3/SDL.h>
@@ -30,6 +31,13 @@ void App::init() {
   set_dist();
 
   win_context_ = std::make_unique<ui::Window_Context>();
+
+  // use events for stopping avalanche in the correct moment
+  events_.avalanche.subscribe([this](const stat::Avalanche_Event &) {
+    if (run_mode_ == Run_Mode::Until_Avalanche && avalanche_topples_ > 1) {
+      running_ = false;
+    }
+  });
 
   initialized_ = true;
 }
@@ -147,22 +155,16 @@ void App::step_over() {
 }
 
 void App::step_run_until_avalanche() {
+  run_mode_ = Run_Mode::Until_Avalanche;
   running_ = true;
-  stop_cond_ = [this]() { return avalanche_topples_ > 1; };
 }
 
 void App::step_run() {
+  run_mode_ = Run_Mode::Forever;
   running_ = true;
-  stop_cond_ = []() { return false; };
 }
 
 void App::periodic_step() {
-  if (stop_cond_ && stop_cond_()) {
-    running_ = false;
-    stop_cond_ = nullptr;
-    return;
-  }
-
   if (to_topple_.empty()) {
     drop_sand();
   }

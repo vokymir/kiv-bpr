@@ -10,10 +10,14 @@
 #include "ui/Window_Context.hpp"
 #include <cstddef>
 #include <deque>
-#include <functional>
 #include <memory>
 #include <random>
 namespace ssoc {
+
+enum class Run_Mode {
+  Until_Avalanche,
+  Forever,
+};
 
 /* Orchestrates everything. */
 class App {
@@ -38,7 +42,7 @@ private:
 
   // CONTROL vars
   bool running_ = false;
-  std::function<bool()> stop_cond_ = []() -> bool { return true; };
+  Run_Mode run_mode_ = Run_Mode::Until_Avalanche;
   std::deque<size_t> to_topple_{};
 
   // STATS
