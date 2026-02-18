@@ -44,6 +44,7 @@ private:
   stat::Simulation_Events events_;
   stat::Stats_Collector stats_;
   // transient (temporary) stats
+  bool periodic_emit_can_ = true;
   size_t current_step_ = 0;
   size_t current_vertex_;
   size_t avalanche_topples_ = 0;
@@ -64,6 +65,9 @@ private:
     // -1 is for the last vertex is a sink = don't want to choose it for sand
     dist_ = std::uniform_int_distribution<size_t>(0, g_->num_vertices() - 2);
   }
+
+  // it requires multiple steps for all other things around
+  void generate_graph_from_cfg();
 
   void master_action(Master_Action action);
   void control_action(Control_Action action);

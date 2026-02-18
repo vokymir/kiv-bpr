@@ -1,6 +1,9 @@
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
+#include <functional>
+#include <ranges>
 #include <stdexcept>
 #include <utility>
 #include <vector>
@@ -70,6 +73,32 @@ public:
   std::vector<std::pair<double, double>> &layout_pos() { return layout_pos_; }
   const std::vector<std::pair<double, double>> &layout_pos() const {
     return layout_pos_;
+  }
+
+  // =====
+  // smarter getters
+public:
+  size_t grains_count(size_t idx) const {
+    if (idx >= sand_height_.size()) {
+      throw std::out_of_range("grains count - wrong batch index");
+    }
+
+    const auto &heights = sand_height_[idx];
+
+    if (heights.empty()) {
+      return 0; // nothing to sum
+    }
+
+    // safe: take all except last element
+    size_t n = heights.size() - 1;
+    if (n == 0) {
+      return 0; // only one element, ignore it
+    }
+
+    auto view = heights | std::views::take(n);
+
+    return static_cast<size_t>(
+        std::ranges::fold_left(view, 0, std::plus<int>()));
   }
 
   // =====

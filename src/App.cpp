@@ -3,6 +3,7 @@
 #include "Sim_Config.hpp"
 #include "Vis_Config.hpp"
 #include "graph/Generator.hpp"
+#include "stat/Stats_Collector.hpp"
 #include "stat/events.hpp"
 #include "ui/Views.hpp"
 #include "ui/Window_Context.hpp"
@@ -27,8 +28,7 @@ void App::init() {
   vis_cfg_.gla = gla_::Fruchterman_Reingold_2D{gla_::FR2D_Accuracy::High};
 
   // start with SOME graph
-  g_ = graph::generate::igraph_from_config(sim_cfg_, vis_cfg_);
-  set_dist();
+  generate_graph_from_cfg();
 
   win_context_ = std::make_unique<ui::Window_Context>();
 
@@ -40,6 +40,17 @@ void App::init() {
   });
 
   initialized_ = true;
+}
+
+void App::generate_graph_from_cfg() {
+  // generate graph
+  g_ = graph::generate::igraph_from_config(sim_cfg_, vis_cfg_);
+  // set random numbers for graph sand dropping
+  set_dist();
+  // reset stats
+  stats_.reset();
+  // show graph window
+  master_state_.show_graph_window = true;
 }
 
 void App::run() {
@@ -56,6 +67,11 @@ void App::run() {
 
     if (running_) {
       periodic_step();
+    }
+
+    if (periodic_emit_can_ && current_step_ % 10 == 0) {
+      periodic_emit_can_ = false;
+      events_.grains.emit({g_->grains_count(0)});
     }
 
     win_context_->begin_frame();
@@ -91,9 +107,7 @@ void App::master_action(Master_Action action) {
   case Master_Action::None:
     return;
   case Master_Action::Generate_Graph:
-    g_ = graph::generate::igraph_from_config(sim_cfg_, vis_cfg_);
-    set_dist();
-    master_state_.show_graph_window = true;
+    generate_graph_from_cfg();
     break;
   }
 }
@@ -132,6 +146,7 @@ size_t App::drop_sand() {
   current_step_++;
   current_vertex_ = idx;
   avalanche_topples_ = 0;
+  periodic_emit_can_ = true;
 
   heights[idx] += 1;
   to_topple_.push_back(idx);

@@ -40,6 +40,13 @@ public:
         [this](const Grains_Count_Event &e) { handle_grains(e); });
   }
 
+  void reset() {
+    avalanche_records_.clear();
+    avalanche_sizes_.clear();
+    avalanche_origins_.clear();
+    grains_counts_.clear();
+  }
+
   // === GETTERS ===
   const std::vector<Avalanche_Record> &avalanche_records() const {
     return avalanche_records_;
