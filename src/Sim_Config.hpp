@@ -14,11 +14,11 @@ struct Square_Lattice_2D {
     All_Once,
   };
 
-  int width;
-  int height;
-  bool circular_on_x;
-  bool circular_on_y;
-  Sink_Rule sink_rule;
+  int width = 3;
+  int height = 4;
+  bool circular_on_x = false;
+  bool circular_on_y = false;
+  Sink_Rule sink_rule = Sink_Rule::Fill_To_Four;
 };
 
 struct Dummy_GGA {

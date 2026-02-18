@@ -13,7 +13,7 @@ enum struct FR2D_Accuracy {
 };
 
 struct Fruchterman_Reingold_2D {
-  FR2D_Accuracy accuracy;
+  FR2D_Accuracy accuracy = FR2D_Accuracy::High;
 };
 
 struct Dummy_GLA {
