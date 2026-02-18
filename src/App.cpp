@@ -159,7 +159,7 @@ void App::step_run() {
 }
 
 void App::periodic_step() {
-  if (stop_cond_) {
+  if (stop_cond_ && stop_cond_()) {
     running_ = false;
     return;
   }
