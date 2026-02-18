@@ -99,9 +99,11 @@ void draw_stats_w(bool &show, const stat::Stats_Collector &sc) {
   size_t total_size = 0;
   for (const auto &rec : sc.avalanche_records())
     total_size += rec.size;
-  float avg_size = sc.avalanche_records().empty()
-                       ? 0.0f
-                       : float(total_size) / sc.avalanche_records().size();
+  double avg_size =
+      sc.avalanche_records().empty()
+          ? 0.0
+          : static_cast<double>(total_size) /
+                static_cast<double>(sc.avalanche_records().size());
   ImGui::Text("Average avalanche size: %.2f", avg_size);
 
   // Max avalanche size
