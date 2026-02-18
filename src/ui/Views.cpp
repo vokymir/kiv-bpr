@@ -53,7 +53,7 @@ Control_Action draw_control_w(bool &show) {
   Control_Action action = Control_Action::None;
 
   ImGui::SetNextWindowPos(ImVec2(423, 16), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(463, 54), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(562, 54), ImGuiCond_FirstUseEver);
   ImGui::Begin("Stepping control", &show);
 
   if (ImGui::Button("Step In")) {
