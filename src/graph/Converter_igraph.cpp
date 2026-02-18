@@ -1,8 +1,6 @@
 #include "Converter.hpp"
-#include "igraph.h"
-#include "igraph_constants.h"
-#include "igraph_interface.h"
 #include "igraph_lib.hpp"
+#include <igraph.h>
 
 namespace ssoc::graph::convert {
 

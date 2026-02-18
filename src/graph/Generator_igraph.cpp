@@ -1,8 +1,8 @@
 #include "Converter.hpp"
 #include "Generator.hpp"
-#include "igraph.h"
 #include "igraph_lib.hpp"
 #include <format>
+#include <igraph.h>
 #include <memory>
 #include <stdexcept>
 #include <type_traits>

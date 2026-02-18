@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Graph.hpp"
-#include "igraph.h"
 #include "igraph_lib.hpp"
+#include <igraph.h>
 #include <memory>
 namespace ssoc::graph::convert {
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../graph/Graph.hpp"
-#include "imgui.h"
+#include "graph/Graph.hpp"
+#include <imgui.h>
 namespace ssoc::ui {
 
 class Visualizer {

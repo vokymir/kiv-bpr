@@ -1,6 +1,6 @@
 #include "Visualizer.hpp"
-#include "imgui.h"
 #include <cstdio>
+#include <imgui.h>
 
 namespace ssoc::ui {
 

@@ -65,7 +65,6 @@ file(GLOB_RECURSE SOURCES
     "${PROJECT_SOURCE_DIR}/src/*.hpp"
 )
 
-
 # add_executable(sim_soc ${SOURCES})
 if (WIN32)
     # make it GUI app (without console) on windows
@@ -79,13 +78,17 @@ set_target_properties(sim_soc PROPERTIES
     OUTPUT_NAME "ssoc"
 )
 
+target_include_directories(sim_soc PRIVATE
+    "${PROJECT_SOURCE_DIR}/src"
+)
+
 target_link_libraries(sim_soc PRIVATE
     imgui
     igraph::igraph
 )
 
 # =====
-# Compiler Settings (Target-Based)
+# Compiler Settings
 # =====
 
 set_target_properties(sim_soc PROPERTIES
@@ -93,13 +96,6 @@ set_target_properties(sim_soc PROPERTIES
     CXX_STANDARD_REQUIRED ON
     CXX_EXTENSIONS OFF
 )
-
-# Enable warnings
-if(MSVC)
-    target_compile_options(sim_soc PRIVATE /W4 /permissive-)
-else()
-    target_compile_options(sim_soc PRIVATE -Wall -Wextra -Wpedantic)
-endif()
 
 # =====
 # Output Directory

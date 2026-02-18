@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Sim_Config.hpp"
 #include "Graph.hpp"
+#include "Sim_Config.hpp"
 #include <memory>
 namespace ssoc::graph::generate {
 

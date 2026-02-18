@@ -1,6 +1,6 @@
 #pragma once
 
-#include "igraph.h"
+#include <igraph.h>
 #include <memory>
 // underscore to make obvious its custom namespace for igraph
 namespace ssoc::graph::igraph_ {

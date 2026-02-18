@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../Sim_Config.hpp"
-#include "../graph/Graph.hpp"
+#include "Sim_Config.hpp"
 #include "Visualizer.hpp"
-#include "imgui.h"
+#include "graph/Graph.hpp"
 #include <SDL3/SDL.h>
+#include <imgui.h>
 namespace ssoc::ui {
 
 class UI {
