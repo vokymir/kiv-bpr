@@ -1,2 +1,0 @@
-# kiv-bpr
-Bachelor project
