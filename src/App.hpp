@@ -14,11 +14,6 @@
 #include <random>
 namespace ssoc {
 
-enum class Run_Mode {
-  Until_Avalanche,
-  Forever,
-};
-
 /* Orchestrates everything. */
 class App {
 private:

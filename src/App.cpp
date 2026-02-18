@@ -75,6 +75,9 @@ void App::run() {
       control_action(
           ui::views::draw_control_w(master_state_.show_control_window));
     }
+    if (master_state_.show_stats_window) {
+      ui::views::draw_stats_w(master_state_.show_stats_window, stats_);
+    }
 
     // ^^^^^
     win_context_->end_frame(bg_clr_);

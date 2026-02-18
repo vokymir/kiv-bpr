@@ -2,10 +2,16 @@
 
 namespace ssoc {
 
+enum class Run_Mode {
+  Until_Avalanche,
+  Forever,
+};
+
 struct Master_State {
   bool show_graph_window = true;
   bool show_config_window = true;
   bool show_control_window = true;
+  bool show_stats_window = true;
 };
 
 enum struct Master_Action {

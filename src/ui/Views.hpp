@@ -4,6 +4,7 @@
 #include "Sim_Config.hpp"
 #include "Vis_Config.hpp"
 #include "graph/Graph.hpp"
+#include "stat/Stats_Collector.hpp"
 #include "ui/Visualizer.hpp"
 #include <cstddef>
 #include <deque>
@@ -19,6 +20,8 @@ void draw_graph_w(bool &show, Visualizer &vis, const graph::Graph &g,
                   const std::deque<size_t> &checking_topple_vertexes = {});
 
 [[nodiscard]] Control_Action draw_control_w(bool &show);
+
+void draw_stats_w(bool &show, const stat::Stats_Collector &sc);
 
 // kinda PRIVATE
 namespace _detail {

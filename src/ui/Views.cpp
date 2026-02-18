@@ -18,6 +18,7 @@ Master_Action draw_master_w(Master_State &state) {
   ImGui::Checkbox("Show graph", &state.show_graph_window);
   ImGui::Checkbox("Show config", &state.show_config_window);
   ImGui::Checkbox("Show stepping", &state.show_control_window);
+  ImGui::Checkbox("Show stats", &state.show_stats_window);
 
   if (ImGui::Button("Generate graph")) {
     action = Master_Action::Generate_Graph;
@@ -87,6 +88,90 @@ Control_Action draw_control_w(bool &show) {
   ImGui::End();
 
   return action;
+}
+
+void draw_stats_w(bool &show, const stat::Stats_Collector &sc) {
+  ImGui::Begin("Stats", &show);
+
+  ImGui::Text("Total avalanches: %zu", sc.avalanche_records().size());
+
+  // Average avalanche size
+  size_t total_size = 0;
+  for (const auto &rec : sc.avalanche_records())
+    total_size += rec.size;
+  float avg_size = sc.avalanche_records().empty()
+                       ? 0.0f
+                       : float(total_size) / sc.avalanche_records().size();
+  ImGui::Text("Average avalanche size: %.2f", avg_size);
+
+  // Max avalanche size
+  size_t max_size = 0;
+  for (const auto &rec : sc.avalanche_records())
+    max_size = std::max(max_size, rec.size);
+  ImGui::Text("Max avalanche size: %zu", max_size);
+
+  ImGui::Separator();
+
+  // 2️⃣ Histogram of avalanche sizes
+  const auto &size_map = sc.avalanche_sizes();
+  if (!size_map.empty()) {
+    std::vector<float> hist_data;
+    std::vector<std::string> labels;
+    hist_data.reserve(size_map.size());
+    labels.reserve(size_map.size());
+
+    for (const auto &[size, count] : size_map) {
+      hist_data.push_back(float(count));
+      labels.push_back(std::to_string(size));
+    }
+
+    ImGui::Text("Avalanche Size Histogram:");
+    ImGui::PlotHistogram("Sizes", hist_data.data(),
+                         static_cast<int>(hist_data.size()),
+                         0,       // offset
+                         nullptr, // overlay text
+                         0.0f,    // min scale
+                         float(*std::max_element(hist_data.begin(),
+                                                 hist_data.end())), // max scale
+                         ImVec2(0, 150)                             // size
+    );
+  }
+
+  ImGui::Separator();
+
+  // 3️⃣ Optional: Histogram of avalanche origins
+  const auto &origin_map = sc.avalanche_origins();
+  if (!origin_map.empty()) {
+    std::vector<float> origin_hist(origin_map.size());
+    std::vector<std::string> origin_labels(origin_map.size());
+    size_t idx = 0;
+    for (const auto &[origin, count] : origin_map) {
+      origin_hist[idx] = float(count);
+      origin_labels[idx] = std::to_string(origin);
+      ++idx;
+    }
+
+    ImGui::Text("Avalanche Origins Histogram:");
+    ImGui::PlotHistogram(
+        "Origins", origin_hist.data(), static_cast<int>(origin_hist.size()), 0,
+        nullptr, 0.0f,
+        float(*std::max_element(origin_hist.begin(), origin_hist.end())),
+        ImVec2(0, 120));
+  }
+
+  // 4️⃣ Optional: recent grains dropped
+  const auto &grains = sc.grains_counts();
+  if (!grains.empty()) {
+    ImGui::Text("Recent grains dropped:");
+    std::vector<float> grains_hist(grains.begin(), grains.end());
+    ImGui::PlotHistogram(
+        "Grains", grains_hist.data(), static_cast<int>(grains_hist.size()), 0,
+        nullptr, 0.0f,
+        float(*std::max_element(grains_hist.begin(), grains_hist.end())),
+        ImVec2(0, 100));
+  }
+
+  ImGui::End();
 }
 
 namespace _detail {
