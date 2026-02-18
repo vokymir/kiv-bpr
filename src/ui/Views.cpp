@@ -118,10 +118,35 @@ void draw_gga_s(Graph_Generation_Algorithm &gga) {
 }
 
 void draw_gga(gga_::Square_Lattice_2D &cfg) {
+  ImGui::SeparatorText("Dimensions");
   ImGui::InputInt("Width", &cfg.width);
   ImGui::InputInt("Height", &cfg.height);
+
+  ImGui::SeparatorText("Boundary Conditions");
   ImGui::Checkbox("Circular on x axis", &cfg.circular_on_x);
   ImGui::Checkbox("Circular on y axis", &cfg.circular_on_y);
+
+  ImGui::SeparatorText("Sandpile Rules");
+
+  const char *rule_names[] = {"Fill To Four", "All Once"};
+  int current_rule = static_cast<int>(cfg.sink_rule);
+
+  if (ImGui::Combo("Sink Rule", &current_rule, rule_names,
+                   IM_ARRAYSIZE(rule_names))) {
+    cfg.sink_rule =
+        static_cast<gga_::Square_Lattice_2D::Sink_Rule>(current_rule);
+  }
+
+  if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
+    ImGui::BeginTooltip();
+    if (cfg.sink_rule == gga_::Square_Lattice_2D::Sink_Rule::Fill_To_Four) {
+      ImGui::Text(
+          "Ensures all nodes have degree 4 by adding edges to the sink.");
+    } else {
+      ImGui::Text("Adds exactly one edge to the sink for every node.");
+    }
+    ImGui::EndTooltip();
+  }
 }
 
 void draw_gga(gga_::Dummy_GGA &cfg) {
