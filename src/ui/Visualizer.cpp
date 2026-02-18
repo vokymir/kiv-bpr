@@ -49,19 +49,38 @@ void Visualizer::show_window(const graph::Graph &g, bool &show) {
                   center.y + pan_.y + static_cast<float>(pos.second) * zoom_);
   };
 
-  auto node_count = g.num_vertices();
+  // total vertices = N real nodes + 1 sink
+  const size_t total_v = g.num_vertices();
+  const size_t sink_idx = total_v - 1;
+  const size_t real_node_count =
+      sink_idx; // e.g., if total is 13, nodes are 0-11, sink is 12
+
   auto &positions = g.layout_pos();
-  auto &neighbour_idxs = g.adj_offsets_const();
+  auto &offsets = g.adj_offsets_const();
   auto &neighbours = g.adj_vertices_const();
 
   // Draw Edges
-  for (size_t v = 0; v < node_count; ++v) {
+  for (size_t v = 0; v < real_node_count; ++v) {
     ImVec2 p1 = to_screen(positions[v]);
-    auto start = neighbour_idxs[v];
-    auto end = (v + 1 < node_count) ? neighbour_idxs[v + 1] : neighbours.size();
 
-    for (auto i = start; i < end; ++i) {
-      draw_list->AddLine(p1, to_screen(positions[neighbours[i]]),
+    // Safely get the range of neighbors for vertex 'v'
+    size_t start = offsets[v];
+    size_t end = offsets[v + 1];
+
+    for (size_t i = start; i < end; ++i) {
+      size_t neighbor_v = neighbours[i];
+
+      // SKIP: Don't draw the edge if the neighbor is the sink
+      if (neighbor_v == sink_idx) {
+        continue;
+      }
+
+      // OPTIONAL: To avoid drawing every edge twice (A->B and B->A),
+      // you can add: if (neighbor_v < v) continue;
+      if (neighbor_v < v)
+        continue;
+
+      draw_list->AddLine(p1, to_screen(positions[neighbor_v]),
                          IM_COL32(150, 150, 150, 255));
     }
   }
@@ -74,7 +93,7 @@ void Visualizer::show_window(const graph::Graph &g, bool &show) {
   bool has_last_idx = history.size() > 0;
   auto last_idx = has_last_idx ? history[history.size() - 1] : 0;
 
-  for (size_t v = 0; v < node_count; ++v) {
+  for (size_t v = 0; v < real_node_count; ++v) {
     int height = g.sand_height_const(0)[v];
     char buf[32];
     std::snprintf(buf, sizeof(buf), "%i", height);

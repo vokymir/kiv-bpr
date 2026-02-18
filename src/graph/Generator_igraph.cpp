@@ -1,5 +1,6 @@
 #include "Converter.hpp"
 #include "Generator.hpp"
+#include "Sim_Config.hpp"
 #include "Vis_Config.hpp"
 #include "igraph_lib.hpp"
 #include <format>
@@ -39,6 +40,50 @@ void square_lattice_2d_variant(igraph_t &ig,
         std::format("External library: igraph: square lattice error: {}",
                     igraph_strerror(err)));
   }
+
+  // SINK RULES
+
+  // = add sink vertex
+  auto num_v = igraph_vcount(&ig);
+  igraph_add_vertices(&ig, 1, nullptr);
+  auto sink_idx = num_v;
+
+  // = get degrees of all vertices
+  igraph_vector_int_t degrees;
+  igraph_vector_int_init(&degrees, 0);
+
+  igraph_degree(&ig, &degrees, igraph_vss_range(0, sink_idx), IGRAPH_ALL,
+                IGRAPH_LOOPS);
+
+  // = prepare all missing edges
+  igraph_vector_int_t edges_to_add;
+  igraph_vector_int_init(&edges_to_add, 0);
+
+  for (igraph_integer_t i = 0; i < sink_idx; ++i) {
+    auto degree = VECTOR(degrees)[i];
+
+    int missing = 0;
+    switch (gga.sink_rule) {
+    case gga_::Square_Lattice_2D::Sink_Rule::All_Once:
+      missing = 1;
+      break;
+    case gga_::Square_Lattice_2D::Sink_Rule::Fill_To_Four:
+      missing = 4 - static_cast<int>(degree);
+      break;
+    }
+
+    for (int m = 0; m < missing; ++m) {
+      igraph_vector_int_push_back(&edges_to_add, i);
+      igraph_vector_int_push_back(&edges_to_add, sink_idx);
+    }
+  }
+
+  // = add all missing edges
+  igraph_add_edges(&ig, &edges_to_add, nullptr);
+
+  // = cleanup
+  igraph_vector_int_destroy(&edges_to_add);
+  igraph_vector_int_destroy(&degrees);
 }
 
 // generate igraph
@@ -106,9 +151,10 @@ fruchterman_reingold_2d_variant(igraph_t &ig, igraph_matrix_t &layout,
 void layout_igraph_to_graph(Graph &g, const igraph_matrix_t &layout) {
   auto &positions = g.layout_pos();
   auto num_vertices = g.num_vertices();
+  auto real_num_vertices = num_vertices - 1; // because of sink vertex
 
   positions.resize(num_vertices);
-  for (size_t v = 0; v < num_vertices; ++v) {
+  for (size_t v = 0; v < real_num_vertices; ++v) {
     const auto row = static_cast<long int>(v);
 
     double x = MATRIX(layout, row, 0);
@@ -116,6 +162,9 @@ void layout_igraph_to_graph(Graph &g, const igraph_matrix_t &layout) {
 
     positions[v] = {x, y};
   }
+
+  // sink vertex is somewhere
+  positions[real_num_vertices] = {0, 0};
 }
 
 // - decide which algorithm to use & delegate the work
@@ -123,22 +172,33 @@ void layout_igraph_to_graph(Graph &g, const igraph_matrix_t &layout) {
 // - free any igraph remaining memory
 void generate_layout(igraph_t &ig, Graph &g,
                      const Graph_Layout_Algorithm &gla) {
+  // subgraph without sink
+  igraph_t layout_view;
+  igraph_vs_t all_but_sink;
+
+  igraph_vs_range(&all_but_sink, 0, igraph_vcount(&ig) - 1);
+  igraph_induced_subgraph(&ig, &layout_view, all_but_sink,
+                          IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH);
+
   igraph_matrix_t layout;
   igraph_matrix_init(&layout, 0, 0); // will be resized by functions
 
   // delegate the work
   igraph_error_t err = IGRAPH_SUCCESS;
   std::visit(
-      [&ig, &layout, &err](auto layout_alg) {
+      [&layout_view, &layout, &err](auto layout_alg) {
         using T = std::decay_t<decltype(layout_alg)>;
         if constexpr (std::is_same_v<T, gla_::Fruchterman_Reingold_2D>) {
-          err = fruchterman_reingold_2d_variant(ig, layout, layout_alg);
+          err =
+              fruchterman_reingold_2d_variant(layout_view, layout, layout_alg);
         } else {
-          igraph_matrix_destroy(&layout);
-          throw std::runtime_error("Unknown graph layout algorithm.");
+          err = IGRAPH_FAILURE;
         }
       },
       gla);
+
+  igraph_vs_destroy(&all_but_sink);
+  igraph_destroy(&layout_view);
 
   if (err != IGRAPH_SUCCESS) {
     igraph_matrix_destroy(&layout);

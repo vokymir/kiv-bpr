@@ -21,7 +21,8 @@ void App::init() {
   }
   rng_ = std::default_random_engine(rd_());
 
-  sim_cfg_.gga = gga_::Square_Lattice_2D{3, 4, false, false};
+  sim_cfg_.gga = gga_::Square_Lattice_2D{
+      3, 4, false, false, gga_::Square_Lattice_2D::Sink_Rule::Fill_To_Four};
   vis_cfg_.gla = gla_::Fruchterman_Reingold_2D{gla_::FR2D_Accuracy::High};
 
   // start with SOME graph
@@ -171,6 +172,7 @@ size_t App::check_topple(int option) {
   auto &adj_off = g_->adj_offsets();
   auto &adj_vert = g_->adj_vertices();
   auto &heights = g_->sand_height(0);
+  auto sink_idx = g_->num_vertices() - 1;
 
   while (!to_topple_.empty()) {
     if ((option > 0 && checked >= static_cast<size_t>(option)) ||
@@ -181,6 +183,10 @@ size_t App::check_topple(int option) {
     const auto idx = to_topple_.front();
     to_topple_.pop();
     checked++;
+
+    if (idx == sink_idx) {
+      continue; // SKIP sink vertex obviously
+    }
 
     const auto start = adj_off[idx];
     const auto end = adj_off[idx + 1];

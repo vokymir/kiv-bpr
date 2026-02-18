@@ -6,7 +6,9 @@
 #include <vector>
 namespace ssoc::graph {
 
-/* Have vertices & edges. Data oriented memory layout for higher efficiency. */
+/* Have vertices & edges. Data oriented memory layout for higher efficiency.
+ * Last vertex is always a sink vertex.
+ * */
 class Graph {
 private:
   size_t num_vertices_;

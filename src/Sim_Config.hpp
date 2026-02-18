@@ -6,11 +6,19 @@ namespace ssoc {
 // Graph Generation Algorithm
 namespace gga_ {
 
+// NOTE: by having Sink_Rule inside the struct, different strategies could have
+// different sink rules and still make sense
 struct Square_Lattice_2D {
+  enum class Sink_Rule {
+    Fill_To_Four,
+    All_Once,
+  };
+
   int width;
   int height;
   bool circular_on_x;
   bool circular_on_y;
+  Sink_Rule sink_rule;
 };
 
 struct Dummy_GGA {

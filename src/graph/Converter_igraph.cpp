@@ -37,7 +37,7 @@ void to_ssoc__fill_neighbour_lists(Graph &g, const igraph_t &ig) {
 
     if (igraph_neighbors(&ig, &neighbours, static_cast<igraph_integer_t>(v),
                          IGRAPH_ALL, IGRAPH_NO_LOOPS,
-                         IGRAPH_NO_MULTIPLE) != IGRAPH_SUCCESS) {
+                         IGRAPH_MULTIPLE) != IGRAPH_SUCCESS) {
       igraph_vector_int_destroy(&neighbours);
       throw std::runtime_error("Failed to get neighbors");
     }
