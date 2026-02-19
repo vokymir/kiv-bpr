@@ -5,6 +5,7 @@
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl3.h>
+#include <implot.h>
 #include <stdexcept>
 
 namespace ssoc::ui {
@@ -56,6 +57,7 @@ void Window_Context::init() {
   // Setup Dear ImGui context
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
+  ImPlot::CreateContext();
   ImGuiIO &io = ImGui::GetIO();
   (void)io;
   io.ConfigFlags |=
@@ -174,6 +176,7 @@ void Window_Context::shutdown() {
   // SDL_AppQuit() function]
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplSDL3_Shutdown();
+  ImPlot::DestroyContext();
   ImGui::DestroyContext();
 
   SDL_GL_DestroyContext(gl_context_);
