@@ -238,20 +238,11 @@ void draw_stats_overview_s(const stat::Stats_Collector &sc) {
   if (records.empty()) {
     ImGui::Text("Waiting for data...");
   } else {
-    // Calculate stats on the fly (or cache them in sc)
-    size_t total_size = 0;
-    size_t max_size = 0;
-    for (const auto &rec : records) {
-      total_size += rec.size;
-      if (rec.size > max_size)
-        max_size = rec.size;
-    }
-
-    double avg_size =
-        static_cast<double>(total_size) / static_cast<double>(records.size());
+    double avg_size = static_cast<double>(sc.avalanche_total_sizes()) /
+                      static_cast<double>(records.size());
 
     ImGui::Text("Average Size: %.2f", avg_size);
-    ImGui::Text("Max Size:     %zu", max_size);
+    ImGui::Text("Max Size:     %zu", sc.avalanche_max_size());
   }
 }
 
