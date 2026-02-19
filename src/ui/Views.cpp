@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <deque>
 #include <imgui.h>
+#include <implot.h>
 #include <map>
 #include <string>
 #include <variant>
@@ -247,58 +248,71 @@ void draw_stats_overview_s(const stat::Stats_Collector &sc) {
 }
 
 void draw_stats_avalanche_sizes_s(const stat::Stats_Collector &sc) {
-  // --- 2. Histogram: Avalanche SIZES ---
-  // Problem: Unordered map is random. Size index can be massive (sparse).
-  // Solution: Sort by size, and clamp display if needed, or show a dense plot.
-
   const auto &size_map = sc.avalanche_sizes();
-  if (!size_map.empty()) {
-    ImGui::Text("Distribution of Sizes (X=Size, Y=Count)");
+  if (size_map.empty())
+    return;
 
-    // 1. Find the actual max size to determine plot range
-    // usage of std::map ensures keys are sorted: 1, 2, 3...
-    std::map<size_t, size_t> sorted_sizes(size_map.begin(), size_map.end());
+  ImGui::Text("Distribution of Sizes (X=Size, Y=Count)");
 
-    size_t max_key = sorted_sizes.rbegin()->first;
-    size_t max_count = 0;
-    for (const auto &pair : sorted_sizes)
-      max_count = std::max(max_count, pair.second);
+  // Ensure sorted order
+  std::map<size_t, size_t> sorted_sizes(size_map.begin(), size_map.end());
 
-    // SAFETY: If max_key is huge (e.g. > 2000), plotting index-by-index is
-    // too heavy for standard ImGui::PlotHistogram.
-    // For accurate stats, we visualize the first N sizes, or we need a proper
-    // log-plot library. Here we cap at 500 for UI performance, or dynamic if
-    // small.
-    static const size_t MAX_PLOT_BARS = 500;
-    size_t plot_range = std::min(max_key + 1, MAX_PLOT_BARS);
+  size_t max_key = sorted_sizes.rbegin()->first;
+  size_t max_count = 0;
+  for (const auto &pair : sorted_sizes)
+    max_count = std::max(max_count, pair.second);
 
-    std::vector<float> hist_data(plot_range, 0.0f);
+  static const size_t MAX_PLOT_BARS = 500;
+  size_t plot_range = std::min(max_key + 1, MAX_PLOT_BARS);
 
-    for (const auto &[size, count] : sorted_sizes) {
-      if (size < plot_range) {
-        hist_data[size] = static_cast<float>(count);
+  std::vector<double> xs;
+  std::vector<double> ys;
+  xs.reserve(plot_range);
+  ys.reserve(plot_range);
+
+  for (size_t i = 0; i < plot_range; ++i) {
+    xs.push_back(static_cast<double>(i));
+    ys.push_back(0.0);
+  }
+
+  for (const auto &[size, count] : sorted_sizes) {
+    if (size < plot_range) {
+      ys[size] = static_cast<double>(count);
+    }
+  }
+
+  if (ImPlot::BeginPlot("##SizeHist", ImVec2(-1, 300))) {
+
+    ImPlot::SetupAxes("Avalanche Size", "Frequency", ImPlotAxisFlags_AutoFit,
+                      ImPlotAxisFlags_AutoFit);
+
+    ImPlot::SetupAxisLimits(ImAxis_X1, 0, static_cast<double>(plot_range),
+                            ImGuiCond_Always);
+    ImPlot::SetupAxisLimits(ImAxis_Y1, 0, static_cast<double>(max_count) * 1.1,
+                            ImGuiCond_Always);
+
+    // Bar width = 1.0 since sizes are discrete integers
+    ImPlot::PlotBars("Sizes", xs.data(), ys.data(), static_cast<int>(xs.size()),
+                     1.0);
+
+    // Optional: better hover readout
+    if (ImPlot::IsPlotHovered()) {
+      ImPlotPoint pt = ImPlot::GetPlotMousePos();
+      int idx = static_cast<int>(pt.x + 0.5);
+      if (idx >= 0 && idx < static_cast<int>(ys.size())) {
+        ImGui::BeginTooltip();
+        ImGui::Text("Size: %d", idx);
+        ImGui::Text("Count: %.0f", ys[idx]);
+        if (max_key >= MAX_PLOT_BARS) {
+          ImGui::TextColored(ImVec4(1, 0.5f, 0, 1),
+                             "Warning: Long tail truncated (Max size: %zu)",
+                             max_key);
+        }
+        ImGui::EndTooltip();
       }
     }
 
-    std::string overlay = "Max Count: " + std::to_string(max_count);
-    ImGui::PlotHistogram("##SizeHist", hist_data.data(),
-                         static_cast<int>(hist_data.size()), 0, overlay.c_str(),
-                         0.0f, static_cast<float>(max_count),
-                         ImVec2(-1, 80) // -1 width = fill window
-    );
-
-    // TOOLTIP: Hover to see exact stats
-    if (ImGui::IsItemHovered()) {
-      ImGui::BeginTooltip();
-      ImGui::Text("X axis = Avalanche Size (capped at %zu)", plot_range);
-      ImGui::Text("Y axis = Frequency");
-      if (max_key >= MAX_PLOT_BARS) {
-        ImGui::TextColored(ImVec4(1, 0.5, 0, 1),
-                           "Warning: Long tail truncated (Max size: %zu)",
-                           max_key);
-      }
-      ImGui::EndTooltip();
-    }
+    ImPlot::EndPlot();
   }
 }
 
