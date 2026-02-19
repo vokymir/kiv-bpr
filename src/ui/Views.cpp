@@ -232,6 +232,7 @@ void draw_stats_overview_s(const stat::Stats_Collector &sc) {
   const auto &records = sc.avalanche_records();
 
   ImGui::TextDisabled("Summary");
+  ImGui::Text("Steps: %zu", records.empty() ? 0 : records.back().step);
   ImGui::Text("Total avalanches: %zu", records.size());
 
   if (records.empty()) {
