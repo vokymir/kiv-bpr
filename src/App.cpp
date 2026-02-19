@@ -231,7 +231,7 @@ size_t App::check_topple(int option) {
 
   avalanche_topples_ += toppled;
 
-  if (to_topple_.empty()) {
+  if (to_topple_.empty() && avalanche_topples_ > 0) {
     events_.avalanche.emit(
         {avalanche_topples_, current_vertex_, current_step_});
   }
