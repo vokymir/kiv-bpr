@@ -56,6 +56,29 @@ target_link_libraries(imgui PUBLIC
 # C++ standard for ImGui
 target_compile_features(imgui PUBLIC cxx_std_17)
 
+# --- ImPlot (Dear ImGui library for plotting) ---
+
+set(IMPLOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/implot")
+
+if(NOT EXISTS "${IMPLOT_DIR}/implot.h")
+    message(FATAL_ERROR
+        "ImPlot not found at ${IMPLOT_DIR}. Did you forget git submodules?"
+    )
+endif()
+
+add_library(implot STATIC
+    "${IMPLOT_DIR}/implot.h"
+    "${IMPLOT_DIR}/implot_internal.h"
+    "${IMPLOT_DIR}/implot.cpp"
+    "${IMPLOT_DIR}/implot_items.cpp"
+)
+
+target_include_directories(implot SYSTEM PUBLIC
+    "${IMPLOT_DIR}"
+)
+
+target_link_libraries(implot PUBLIC imgui)
+
 # --- backwards-cpp --- (DEBUG ONLY)
 
 set(BACKWARD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/backward")
@@ -119,7 +142,7 @@ if(CAN_USE_BACKWARD)
 endif()
 
 target_link_libraries(sim_soc PRIVATE
-    imgui
+    implot
     igraph::igraph
 )
 
