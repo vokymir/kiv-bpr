@@ -38,6 +38,12 @@ void draw_gla_s(Graph_Layout_Algorithm &gla);
 void draw_gla(gla_::Fruchterman_Reingold_2D &cfg);
 void draw_gla(gla_::Dummy_GLA &cfg);
 
+// = stats
+void draw_stats_overview_s(const stat::Stats_Collector &sc);
+void draw_stats_avalanche_sizes_s(const stat::Stats_Collector &sc);
+void draw_stats_avalanche_origins_s(const stat::Stats_Collector &sc);
+void draw_stats_grains_counts_s(const stat::Stats_Collector &sc);
+
 } // namespace _detail
 
 } // namespace ssoc::ui::views
