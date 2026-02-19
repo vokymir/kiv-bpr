@@ -23,4 +23,5 @@ date | total time [min] | other times | subject
 18.2.2026 | 160 | 8.45 | cleanup + redone UI to be more compatible with immediate mode
  | 165 | 12.30 | robust stepping options
  | 210 | 15.40-19.10 | stats beginning - maybe they lie
+19.2.2026 | 50 | 8.15 | implot import
 
