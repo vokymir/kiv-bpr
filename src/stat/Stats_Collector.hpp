@@ -18,6 +18,9 @@ protected:
   std::vector<Avalanche_Record> avalanche_records_;
   std::unordered_map<size_t, size_t> avalanche_sizes_;
   std::unordered_map<size_t, size_t> avalanche_origins_;
+  size_t avalanche_total_sizes_ = 0;
+  size_t avalanche_max_size_ = 0;
+
   std::vector<size_t> grains_counts_;
 
   void handle_avalanche(const Avalanche_Event &e) {
@@ -26,6 +29,11 @@ protected:
 
     avalanche_records_.push_back(
         {e.step_number, e.topples_to_stabilize, e.origin_vertex});
+
+    avalanche_total_sizes_ += e.topples_to_stabilize;
+    avalanche_max_size_ = avalanche_max_size_ >= e.topples_to_stabilize
+                              ? avalanche_max_size_
+                              : e.topples_to_stabilize;
   }
 
   void handle_grains(const Grains_Count_Event &e) {
@@ -55,6 +63,8 @@ public:
   const std::unordered_map<size_t, size_t> &avalanche_sizes() const {
     return avalanche_sizes_;
   }
+  size_t avalanche_max_size() const { return avalanche_max_size_; }
+  size_t avalanche_total_sizes() const { return avalanche_total_sizes_; }
 
   const std::unordered_map<size_t, size_t> &avalanche_origins() const {
     return avalanche_origins_;
