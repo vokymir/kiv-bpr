@@ -53,6 +53,8 @@ public:
     avalanche_sizes_.clear();
     avalanche_origins_.clear();
     grains_counts_.clear();
+    avalanche_total_sizes_ = 0;
+    avalanche_max_size_ = 0;
   }
 
   // === GETTERS ===
