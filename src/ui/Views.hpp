@@ -42,6 +42,8 @@ void draw_gla(gla_::Dummy_GLA &cfg);
 // = stats
 void draw_stats_overview_s(const stat::Stats_Collector &sc);
 
+// == avalanche size
+
 // all neccesarry data taken from sc.avalanche_sizes()
 struct Avalanche_Size_Plot_Data {
   std::vector<double> xs;
@@ -57,7 +59,35 @@ prepare_avalanche_data(const std::unordered_map<size_t, size_t> &size_map);
 void render_avalanche_size_plot(const Avalanche_Size_Plot_Data &data);
 
 void draw_stats_avalanche_sizes_s(const stat::Stats_Collector &sc);
+
+// == avalanche origin
+
+struct Avalanche_Origin_Plot_Data {
+  std::vector<double> hist;
+  size_t max_vertex = 0;
+  double max_freq = 0.0;
+};
+
+std::unique_ptr<Avalanche_Origin_Plot_Data>
+prepare_origin_data(const std::unordered_map<size_t, size_t> &origin_map);
+
+void render_avalanche_origin_plot(const Avalanche_Origin_Plot_Data &data);
+
 void draw_stats_avalanche_origins_s(const stat::Stats_Collector &sc);
+
+// == grains
+
+struct Grains_Count_Plot_Data {
+  std::vector<double> recent_hist;
+  double max_val = 0.0;
+  size_t latest_val = 0;
+};
+
+std::unique_ptr<Grains_Count_Plot_Data>
+prepare_grains_data(const std::vector<size_t> &grains);
+
+void render_grains_count_plot(const Grains_Count_Plot_Data &data);
+
 void draw_stats_grains_counts_s(const stat::Stats_Collector &sc);
 
 } // namespace _detail

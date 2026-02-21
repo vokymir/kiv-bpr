@@ -263,93 +263,45 @@ void draw_stats_avalanche_sizes_s(const stat::Stats_Collector &sc) {
   }
 
   auto plot_data = prepare_avalanche_data(size_map);
-  render_avalanche_size_plot(*plot_data);
+  if (plot_data) {
+    render_avalanche_size_plot(*plot_data);
+  }
 }
 
 void draw_stats_avalanche_origins_s(const stat::Stats_Collector &sc) {
-  // --- 3. Histogram: Avalanche ORIGINS ---
-  // Problem: unordered_map order is undefined.
-  // Solution: Sort by Vertex Index so the graph represents physical space 0..N
-
   const auto &origin_map = sc.avalanche_origins();
-  if (!origin_map.empty()) {
-    ImGui::Text("Avalanche Origins (X=Vertex ID, Y=Count)");
+  if (origin_map.empty()) {
+    return;
+  }
 
-    // Sort by Origin ID (Key)
-    std::map<size_t, size_t> sorted_origins(origin_map.begin(),
-                                            origin_map.end());
+  ImGui::Text("Avalanche Origins");
+  ImGui::SameLine();
+  ImGui::TextDisabled("(?)");
+  if (ImGui::IsItemHovered()) {
+    ImGui::SetTooltip("Distribution of where avalanches start.\n"
+                      "Flat = Uniform distribution.\n"
+                      "Spikes = Critical spots.");
+  }
 
-    if (!sorted_origins.empty()) {
-      size_t max_vertex = sorted_origins.rbegin()->first;
-
-      // Create a dense vector for plotting 0 to MaxVertex
-      // Only practical if vertex count is reasonable (< ~2000).
-      // If you have 1M vertices, you need binning. Assuming < 2000 for display:
-      std::vector<float> origin_hist;
-      size_t safe_size = std::min(max_vertex + 1, (size_t)2000);
-      origin_hist.resize(safe_size, 0.0f);
-
-      float max_freq = 0.0f;
-      for (const auto &[origin, count] : sorted_origins) {
-        if (origin < safe_size) {
-          origin_hist[origin] = static_cast<float>(count);
-          if (static_cast<float>(count) > max_freq)
-            max_freq = static_cast<float>(count);
-        }
-      }
-
-      ImGui::PlotHistogram("##Origins", origin_hist.data(),
-                           static_cast<int>(origin_hist.size()), 0, nullptr,
-                           0.0f, max_freq, ImVec2(-1, 80));
-
-      if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip("Distribution of where avalanches start.\nFlat = "
-                          "Uniform randomness.\nSpikes = Critical spots.");
-      }
-    }
+  auto plot_data = prepare_origin_data(origin_map);
+  if (plot_data) {
+    render_avalanche_origin_plot(*plot_data);
   }
 }
 
 void draw_stats_grains_counts_s(const stat::Stats_Collector &sc) {
-
-  // --- 4. Recent Grains (Time Series) ---
-  // Problem: Vector grows indefinitely.
-  // Solution: Only plot the last N items.
-
   const auto &grains = sc.grains_counts();
-  if (!grains.empty()) {
-    ImGui::Text("Recent Grains Dropped (Last 200 steps)");
+  if (grains.empty())
+    return;
 
-    int count = static_cast<int>(grains.size());
-    int offset = 0;
-    const int max_display = 200;
+  ImGui::Text("Grains Counts (Last 200 steps)");
+  ImGui::SameLine();
+  ImGui::TextColored(ImVec4(0.4f, 0.8f, 0.4f, 1.0f), "  Latest: %zu",
+                     grains.back());
 
-    // Determine start pointer to only show last N
-    const size_t *data_ptr = grains.data();
-    int display_count = count;
-
-    if (count > max_display) {
-      data_ptr += (count - max_display);
-      display_count = max_display;
-    }
-
-    // Convert only the slice to float for ImGui
-    std::vector<float> recent_hist(display_count);
-    float max_val = 0.0f;
-    for (int i = 0; i < display_count; ++i) {
-      recent_hist[i] = static_cast<float>(data_ptr[i]);
-      if (recent_hist[i] > max_val)
-        max_val = recent_hist[i];
-    }
-
-    ImGui::PlotLines("##Grains", recent_hist.data(), display_count, 0, nullptr,
-                     0.0f,
-                     max_val * 1.1f, // Add 10% headroom
-                     ImVec2(-1, 60));
-
-    // Display latest value next to plot
-    ImGui::SameLine();
-    ImGui::Text("%zu", grains.back());
+  auto plot_data = prepare_grains_data(grains);
+  if (plot_data) {
+    render_grains_count_plot(*plot_data);
   }
 }
 
@@ -380,6 +332,56 @@ prepare_avalanche_data(const std::unordered_map<size_t, size_t> &size_map) {
   return std::make_unique<Avalanche_Size_Plot_Data>(xs, ys, max_key, max_count);
 }
 
+std::unique_ptr<Avalanche_Origin_Plot_Data>
+prepare_origin_data(const std::unordered_map<size_t, size_t> &origin_map) {
+  if (origin_map.empty()) {
+    return nullptr;
+  }
+
+  // Find the bounds in O(N)
+  size_t max_vertex = std::ranges::max(origin_map | std::views::keys);
+  size_t safe_size = max_vertex + 1;
+
+  // Generate the dense histogram vector directly
+  auto hist = std::views::iota(0u, safe_size) |
+              std::views::transform([&origin_map](size_t i) {
+                return origin_map.contains(i)
+                           ? static_cast<double>(origin_map.at(i))
+                           : 0.0;
+              }) |
+              std::ranges::to<std::vector<double>>();
+
+  // Find the peak frequency for the Y-axis limit
+  double max_freq =
+      static_cast<double>(std::ranges::max(origin_map | std::views::values));
+
+  return std::make_unique<Avalanche_Origin_Plot_Data>(hist, max_vertex,
+                                                      max_freq);
+}
+
+std::unique_ptr<Grains_Count_Plot_Data>
+prepare_grains_data(const std::vector<size_t> &grains) {
+  if (grains.empty()) {
+    return nullptr;
+  }
+
+  // Calculate how many old elements to ignore
+  size_t max_display = 200;
+  size_t drop_count =
+      grains.size() > max_display ? grains.size() - max_display : 0;
+
+  // drop skips the first N elements, creating a sliding window
+  auto recent_hist = grains | std::views::drop(drop_count) |
+                     std::views::transform(
+                         [](size_t val) { return static_cast<double>(val); }) |
+                     std::ranges::to<std::vector<double>>();
+
+  double max_val = std::ranges::max(recent_hist);
+
+  return std::make_unique<Grains_Count_Plot_Data>(recent_hist, max_val,
+                                                  grains.back());
+}
+
 void render_avalanche_size_plot(const Avalanche_Size_Plot_Data &data) {
   ImPlot::BeginPlot("##SizeHist", ImVec2(-1, 300),
                     ImPlotFlags_NoMouseText | ImPlotFlags_NoLegend);
@@ -402,7 +404,7 @@ void render_avalanche_size_plot(const Avalanche_Size_Plot_Data &data) {
     ImPlotPoint pt = ImPlot::GetPlotMousePos();
     size_t idx = static_cast<size_t>(pt.x + 0.5);
 
-    if (idx >= 0 && idx < data.ys.size()) {
+    if (idx < data.ys.size()) {
       ImGui::BeginTooltip();
       ImGui::Text("Size: %zu", idx);
       ImGui::Text("Count: %.0f", data.ys[idx]);
@@ -410,6 +412,76 @@ void render_avalanche_size_plot(const Avalanche_Size_Plot_Data &data) {
     }
   }
   ImPlot::EndPlot();
+}
+
+void render_avalanche_origin_plot(const Avalanche_Origin_Plot_Data &data) {
+  if (ImPlot::BeginPlot("##OriginsHist", ImVec2(-1, 200),
+                        ImPlotFlags_NoMouseText | ImPlotFlags_NoLegend)) {
+
+    ImPlot::SetupAxes("Vertex ID", "Count", ImPlotAxisFlags_AutoFit,
+                      ImPlotAxisFlags_AutoFit);
+
+    ImPlot::SetupAxisLimits(ImAxis_X1, 0, static_cast<double>(data.hist.size()),
+                            ImGuiCond_Appearing);
+    ImPlot::SetupAxisLimits(ImAxis_Y1, 0,
+                            static_cast<double>(data.max_freq) * 1.1,
+                            ImGuiCond_Appearing);
+
+    ImPlot::PlotBars("Origins", data.hist.data(),
+                     static_cast<int>(data.hist.size()), 1.0);
+
+    if (ImPlot::IsPlotHovered()) {
+      ImPlotPoint pt = ImPlot::GetPlotMousePos();
+      size_t idx = static_cast<size_t>(pt.x + 0.5);
+
+      if (idx < data.hist.size()) {
+        ImGui::BeginTooltip();
+        ImGui::Text("Vertex ID: %zu", idx);
+        ImGui::Text("Count: %.0f", data.hist[idx]);
+        ImGui::EndTooltip();
+      }
+    }
+    ImPlot::EndPlot();
+  }
+}
+
+void render_grains_count_plot(const Grains_Count_Plot_Data &data) {
+  if (ImPlot::BeginPlot("##GrainsLine", ImVec2(-1, 150),
+                        ImPlotFlags_NoMouseText | ImPlotFlags_NoLegend)) {
+
+    ImPlot::SetupAxes("Recent Steps", "Grains", ImPlotAxisFlags_AutoFit,
+                      ImPlotAxisFlags_AutoFit);
+
+    // X-axis represents the sliding window
+    ImPlot::SetupAxisLimits(ImAxis_X1, 0,
+                            static_cast<double>(data.recent_hist.size() - 1),
+                            ImGuiCond_Appearing);
+    ImPlot::SetupAxisLimits(ImAxis_Y1, 0,
+                            static_cast<double>(data.max_val) * 1.1,
+                            ImGuiCond_Appearing);
+
+    // Plot as a continuous line
+    ImPlot::PlotLine("Grains", data.recent_hist.data(),
+                     static_cast<int>(data.recent_hist.size()));
+
+    // Custom hover tooltip for the line graph
+    if (ImPlot::IsPlotHovered()) {
+      ImPlotPoint pt = ImPlot::GetPlotMousePos();
+      size_t idx = static_cast<size_t>(pt.x + 0.5);
+
+      if (idx < data.recent_hist.size()) {
+        ImGui::BeginTooltip();
+        ImGui::Text("Grains on grid: %.0f", data.recent_hist[idx]);
+
+        // how many steps ago this was
+        size_t steps_ago = data.recent_hist.size() - 1 - idx;
+        ImGui::TextDisabled("(%zu steps ago)", steps_ago);
+
+        ImGui::EndTooltip();
+      }
+    }
+    ImPlot::EndPlot();
+  }
 }
 
 } // namespace _detail
