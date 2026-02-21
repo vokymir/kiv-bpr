@@ -79,6 +79,7 @@ void draw_stats_avalanche_origins_s(const stat::Stats_Collector &sc);
 
 struct Grains_Count_Plot_Data {
   std::vector<double> recent_hist;
+  std::vector<double> moving_avg;
   double max_val = 0.0;
   size_t latest_val = 0;
 };

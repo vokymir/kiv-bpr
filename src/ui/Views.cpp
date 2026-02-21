@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <deque>
+#include <functional>
 #include <imgui.h>
 #include <implot.h>
 #include <map>
@@ -294,13 +295,19 @@ void draw_stats_grains_counts_s(const stat::Stats_Collector &sc) {
   if (grains.empty())
     return;
 
-  ImGui::Text("Grains Counts (Last 200 steps)");
+  ImGui::Text("Grains Counts");
   ImGui::SameLine();
   ImGui::TextColored(ImVec4(0.4f, 0.8f, 0.4f, 1.0f), "  Latest: %zu",
                      grains.back());
 
   auto plot_data = prepare_grains_data(grains);
   if (plot_data) {
+    if (plot_data->moving_avg.size() > 0) {
+      ImGui::SameLine();
+      ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "  Trend: %f",
+                         plot_data->moving_avg.back());
+    }
+
     render_grains_count_plot(*plot_data);
   }
 }
@@ -365,21 +372,39 @@ prepare_grains_data(const std::vector<size_t> &grains) {
     return nullptr;
   }
 
-  // Calculate how many old elements to ignore
   size_t max_display = 200;
+  size_t window_size = 20;
   size_t drop_count =
       grains.size() > max_display ? grains.size() - max_display : 0;
 
-  // drop skips the first N elements, creating a sliding window
+  // Prepare raw data slice
   auto recent_hist = grains | std::views::drop(drop_count) |
                      std::views::transform(
                          [](size_t val) { return static_cast<double>(val); }) |
                      std::ranges::to<std::vector<double>>();
 
+  // Prepare Moving Average
+  auto ma_view = grains | std::views::slide(window_size) |
+                 std::views::transform([](auto window) {
+                   double sum =
+                       std::ranges::fold_left(window, 0.0, std::plus<double>());
+                   return sum / static_cast<double>(window.size());
+                 });
+
+  // We need to drop from the MA view to align it with the recent_hist
+  // Note: slide view is shorter than the original by (window_size - 1)
+  size_t ma_total_size =
+      (grains.size() >= window_size) ? (grains.size() - window_size + 1) : 0;
+  size_t ma_drop =
+      ma_total_size > max_display ? ma_total_size - max_display : 0;
+
+  auto moving_avg = ma_view | std::views::drop(ma_drop) |
+                    std::ranges::to<std::vector<double>>();
+
   double max_val = std::ranges::max(recent_hist);
 
-  return std::make_unique<Grains_Count_Plot_Data>(recent_hist, max_val,
-                                                  grains.back());
+  return std::make_unique<Grains_Count_Plot_Data>(
+      std::move(recent_hist), std::move(moving_avg), max_val, grains.back());
 }
 
 void render_avalanche_size_plot(const Avalanche_Size_Plot_Data &data) {
@@ -451,31 +476,45 @@ void render_grains_count_plot(const Grains_Count_Plot_Data &data) {
 
     ImPlot::SetupAxes("Recent Steps", "Grains", ImPlotAxisFlags_AutoFit,
                       ImPlotAxisFlags_AutoFit);
-
-    // X-axis represents the sliding window
     ImPlot::SetupAxisLimits(ImAxis_X1, 0,
                             static_cast<double>(data.recent_hist.size() - 1),
                             ImGuiCond_Appearing);
-    ImPlot::SetupAxisLimits(ImAxis_Y1, 0,
-                            static_cast<double>(data.max_val) * 1.1,
+    ImPlot::SetupAxisLimits(ImAxis_Y1, 0, data.max_val * 1.1,
                             ImGuiCond_Appearing);
 
-    // Plot as a continuous line
+    // Draw raw data
     ImPlot::PlotLine("Grains", data.recent_hist.data(),
                      static_cast<int>(data.recent_hist.size()));
 
-    // Custom hover tooltip for the line graph
+    // Draw Moving Average
+    if (!data.moving_avg.empty()) {
+      // We calculate the X-offset because MA might have fewer points than raw
+      // data if the simulation just started
+      double x_offset = static_cast<double>(data.recent_hist.size()) -
+                        static_cast<double>(data.moving_avg.size());
+
+      ImPlot::PushStyleColor(ImPlotCol_PlotBg, ImVec4(1.0f, 0.4f, 0.4f, 1.0f));
+      ImPlot::PlotLine("Average", data.moving_avg.data(),
+                       static_cast<int>(data.moving_avg.size()), 1.0, x_offset,
+                       ImPlotSpec());
+      ImPlot::PopStyleColor(ImPlotCol_PlotBg);
+    }
+
     if (ImPlot::IsPlotHovered()) {
       ImPlotPoint pt = ImPlot::GetPlotMousePos();
       size_t idx = static_cast<size_t>(pt.x + 0.5);
 
       if (idx < data.recent_hist.size()) {
         ImGui::BeginTooltip();
-        ImGui::Text("Grains on grid: %.0f", data.recent_hist[idx]);
+        ImGui::Text("Grains: %.0f", data.recent_hist[idx]);
 
-        // how many steps ago this was
-        size_t steps_ago = data.recent_hist.size() - 1 - idx;
-        ImGui::TextDisabled("(%zu steps ago)", steps_ago);
+        // Find corresponding MA index
+        size_t ma_idx_offset = data.recent_hist.size() - data.moving_avg.size();
+        if (idx >= ma_idx_offset &&
+            (idx - ma_idx_offset) < data.moving_avg.size()) {
+          ImGui::TextColored(ImVec4(1, 0.4f, 0.4f, 1), "Trend: %.2f",
+                             data.moving_avg[idx - ma_idx_offset]);
+        }
 
         ImGui::EndTooltip();
       }
