@@ -26,4 +26,4 @@ date | total time [min] | other times | subject
 19.2.2026 | 50 | 8.15 | implot import
 21.2.2026 | 120 | 16.15 | use implot, add grains trend
  | 30 | 18.15 | fix github workflow, release
-
+ | 30 | 19.30 | release, email draft
