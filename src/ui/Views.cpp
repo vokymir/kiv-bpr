@@ -37,7 +37,7 @@ Master_Action draw_master_w(Master_State &state) {
 
 void draw_config_w(bool &show, Sim_Config &sim_cfg, Vis_Config &vis_cfg) {
   ImGui::SetNextWindowPos(ImVec2(22, 233), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(352, 459), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(298, 459), ImGuiCond_FirstUseEver);
   ImGui::Begin("Config window", &show);
 
   if (ImGui::CollapsingHeader("General configuration")) {
@@ -54,8 +54,8 @@ void draw_config_w(bool &show, Sim_Config &sim_cfg, Vis_Config &vis_cfg) {
 void draw_graph_w(bool &show, Visualizer &vis, const graph::Graph &g,
                   size_t last_vertex,
                   const std::deque<size_t> &checking_topple_vertexes) {
-  ImGui::SetNextWindowPos(ImVec2(385, 86), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(729, 571), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowPos(ImVec2(336, 79), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(625, 571), ImGuiCond_FirstUseEver);
 
   vis.show_window(g, show, last_vertex, checking_topple_vertexes);
 }
@@ -97,6 +97,8 @@ Control_Action draw_control_w(bool &show) {
 }
 
 void draw_stats_w(bool &show, const ssoc::stat::Stats_Collector &sc) {
+  ImGui::SetNextWindowPos(ImVec2(968, 85), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(311, 610), ImGuiCond_FirstUseEver);
   ImGui::Begin("Stats", &show);
 
   _detail::draw_stats_overview_s(sc);
