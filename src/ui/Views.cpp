@@ -7,6 +7,7 @@
 #include <imgui.h>
 #include <implot.h>
 #include <map>
+#include <memory>
 #include <string>
 #include <variant>
 #include <vector>
@@ -249,71 +250,20 @@ void draw_stats_overview_s(const stat::Stats_Collector &sc) {
 
 void draw_stats_avalanche_sizes_s(const stat::Stats_Collector &sc) {
   const auto &size_map = sc.avalanche_sizes();
-  if (size_map.empty())
+  if (size_map.empty()) {
     return;
-
-  ImGui::Text("Distribution of Sizes (X=Size, Y=Count)");
-
-  // Ensure sorted order
-  std::map<size_t, size_t> sorted_sizes(size_map.begin(), size_map.end());
-
-  size_t max_key = sorted_sizes.rbegin()->first;
-  size_t max_count = 0;
-  for (const auto &pair : sorted_sizes)
-    max_count = std::max(max_count, pair.second);
-
-  static const size_t MAX_PLOT_BARS = 500;
-  size_t plot_range = std::min(max_key + 1, MAX_PLOT_BARS);
-
-  std::vector<double> xs;
-  std::vector<double> ys;
-  xs.reserve(plot_range);
-  ys.reserve(plot_range);
-
-  for (size_t i = 0; i < plot_range; ++i) {
-    xs.push_back(static_cast<double>(i));
-    ys.push_back(0.0);
   }
 
-  for (const auto &[size, count] : sorted_sizes) {
-    if (size < plot_range) {
-      ys[size] = static_cast<double>(count);
-    }
+  // header
+  ImGui::Text("Distribution of Avalanche Sizes");
+  ImGui::SameLine();
+  ImGui::TextDisabled("(?)");
+  if (ImGui::IsItemHovered()) {
+    ImGui::SetTooltip("Avalanche Size = how many vertices were toppled");
   }
 
-  if (ImPlot::BeginPlot("##SizeHist", ImVec2(-1, 300))) {
-
-    ImPlot::SetupAxes("Avalanche Size", "Frequency", ImPlotAxisFlags_AutoFit,
-                      ImPlotAxisFlags_AutoFit);
-
-    ImPlot::SetupAxisLimits(ImAxis_X1, 0, static_cast<double>(plot_range),
-                            ImGuiCond_Always);
-    ImPlot::SetupAxisLimits(ImAxis_Y1, 0, static_cast<double>(max_count) * 1.1,
-                            ImGuiCond_Always);
-
-    // Bar width = 1.0 since sizes are discrete integers
-    ImPlot::PlotBars("Sizes", xs.data(), ys.data(), static_cast<int>(xs.size()),
-                     1.0);
-
-    // Optional: better hover readout
-    if (ImPlot::IsPlotHovered()) {
-      ImPlotPoint pt = ImPlot::GetPlotMousePos();
-      int idx = static_cast<int>(pt.x + 0.5);
-      if (idx >= 0 && idx < static_cast<int>(ys.size())) {
-        ImGui::BeginTooltip();
-        ImGui::Text("Size: %d", idx);
-        ImGui::Text("Count: %.0f", ys[idx]);
-        if (max_key >= MAX_PLOT_BARS) {
-          ImGui::TextColored(ImVec4(1, 0.5f, 0, 1),
-                             "Warning: Long tail truncated (Max size: %zu)",
-                             max_key);
-        }
-        ImGui::EndTooltip();
-      }
-    }
-
-    ImPlot::EndPlot();
-  }
+  auto plot_data = prepare_avalanche_data(size_map);
+  render_avalanche_size_plot(*plot_data);
 }
 
 void draw_stats_avalanche_origins_s(const stat::Stats_Collector &sc) {
@@ -401,6 +351,65 @@ void draw_stats_grains_counts_s(const stat::Stats_Collector &sc) {
     ImGui::SameLine();
     ImGui::Text("%zu", grains.back());
   }
+}
+
+std::unique_ptr<Avalanche_Size_Plot_Data>
+prepare_avalanche_data(const std::unordered_map<size_t, size_t> &size_map) {
+  if (size_map.empty()) {
+    return {};
+  }
+
+  size_t max_key = std::ranges::max(size_map | std::views::keys);
+  size_t max_count = std::ranges::max(size_map | std::views::values);
+  size_t plot_range = max_key + 1;
+
+  // generate XS (0 to plot_range)
+  auto xs =
+      std::views::iota(0u, plot_range) |
+      std::views::transform([](auto i) { return static_cast<double>(i); }) |
+      std::ranges::to<std::vector<double>>();
+
+  // generate YS (look up counts, default to 0.0)
+  auto ys =
+      std::views::iota(0u, plot_range) |
+      std::views::transform([&size_map](size_t i) {
+        return size_map.contains(i) ? static_cast<double>(size_map.at(i)) : 0.0;
+      }) |
+      std::ranges::to<std::vector<double>>();
+
+  return std::make_unique<Avalanche_Size_Plot_Data>(xs, ys, max_key, max_count);
+}
+
+void render_avalanche_size_plot(const Avalanche_Size_Plot_Data &data) {
+  ImPlot::BeginPlot("##SizeHist", ImVec2(-1, 300),
+                    ImPlotFlags_NoMouseText | ImPlotFlags_NoLegend);
+
+  ImPlot::SetupAxes("Avalanche Size", "Count", ImPlotAxisFlags_AutoFit,
+                    ImPlotAxisFlags_AutoFit);
+
+  // Dynamic scaling based on the visible data
+  ImPlot::SetupAxisLimits(ImAxis_X1, 0, static_cast<double>(data.xs.size()),
+                          ImGuiCond_Appearing);
+  ImPlot::SetupAxisLimits(ImAxis_Y1, 0,
+                          static_cast<double>(data.max_count) * 1.1,
+                          ImGuiCond_Appearing);
+
+  ImPlot::PlotBars("Sizes", data.xs.data(), data.ys.data(),
+                   static_cast<int>(data.xs.size()), 1.0);
+
+  // Tooltip
+  if (ImPlot::IsPlotHovered()) {
+    ImPlotPoint pt = ImPlot::GetPlotMousePos();
+    size_t idx = static_cast<size_t>(pt.x + 0.5);
+
+    if (idx >= 0 && idx < data.ys.size()) {
+      ImGui::BeginTooltip();
+      ImGui::Text("Size: %zu", idx);
+      ImGui::Text("Count: %.0f", data.ys[idx]);
+      ImGui::EndTooltip();
+    }
+  }
+  ImPlot::EndPlot();
 }
 
 } // namespace _detail

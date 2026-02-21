@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <deque>
 #include <imgui.h>
+#include <memory>
 namespace ssoc::ui::views {
 
 [[nodiscard]] Master_Action draw_master_w(Master_State &state);
@@ -40,6 +41,21 @@ void draw_gla(gla_::Dummy_GLA &cfg);
 
 // = stats
 void draw_stats_overview_s(const stat::Stats_Collector &sc);
+
+// all neccesarry data taken from sc.avalanche_sizes()
+struct Avalanche_Size_Plot_Data {
+  std::vector<double> xs;
+  std::vector<double> ys;
+  // max key and count are not related
+  size_t max_key = 0;
+  size_t max_count = 0;
+};
+// get the struct from given sc.avalanche_sizes()
+std::unique_ptr<Avalanche_Size_Plot_Data>
+prepare_avalanche_data(const std::unordered_map<size_t, size_t> &size_map);
+// actually render the ImPlot
+void render_avalanche_size_plot(const Avalanche_Size_Plot_Data &data);
+
 void draw_stats_avalanche_sizes_s(const stat::Stats_Collector &sc);
 void draw_stats_avalanche_origins_s(const stat::Stats_Collector &sc);
 void draw_stats_grains_counts_s(const stat::Stats_Collector &sc);
