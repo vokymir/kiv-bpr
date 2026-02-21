@@ -410,35 +410,36 @@ prepare_grains_data(const std::vector<size_t> &grains) {
 }
 
 void render_avalanche_size_plot(const Avalanche_Size_Plot_Data &data) {
-  ImPlot::BeginPlot("##SizeHist", ImVec2(-1, 300),
-                    ImPlotFlags_NoMouseText | ImPlotFlags_NoLegend);
+  if (ImPlot::BeginPlot("##SizeHist", ImVec2(-1, 300),
+                        ImPlotFlags_NoMouseText | ImPlotFlags_NoLegend)) {
 
-  ImPlot::SetupAxes("Avalanche Size", "Count", ImPlotAxisFlags_AutoFit,
-                    ImPlotAxisFlags_AutoFit);
+    ImPlot::SetupAxes("Avalanche Size", "Count", ImPlotAxisFlags_AutoFit,
+                      ImPlotAxisFlags_AutoFit);
 
-  // Dynamic scaling based on the visible data
-  ImPlot::SetupAxisLimits(ImAxis_X1, 0, static_cast<double>(data.xs.size()),
-                          ImGuiCond_Appearing);
-  ImPlot::SetupAxisLimits(ImAxis_Y1, 0,
-                          static_cast<double>(data.max_count) * 1.1,
-                          ImGuiCond_Appearing);
+    // Dynamic scaling based on the visible data
+    ImPlot::SetupAxisLimits(ImAxis_X1, 0, static_cast<double>(data.xs.size()),
+                            ImGuiCond_Appearing);
+    ImPlot::SetupAxisLimits(ImAxis_Y1, 0,
+                            static_cast<double>(data.max_count) * 1.1,
+                            ImGuiCond_Appearing);
 
-  ImPlot::PlotBars("Sizes", data.xs.data(), data.ys.data(),
-                   static_cast<int>(data.xs.size()), 1.0);
+    ImPlot::PlotBars("Sizes", data.xs.data(), data.ys.data(),
+                     static_cast<int>(data.xs.size()), 1.0);
 
-  // Tooltip
-  if (ImPlot::IsPlotHovered()) {
-    ImPlotPoint pt = ImPlot::GetPlotMousePos();
-    size_t idx = static_cast<size_t>(pt.x + 0.5);
+    // Tooltip
+    if (ImPlot::IsPlotHovered()) {
+      ImPlotPoint pt = ImPlot::GetPlotMousePos();
+      size_t idx = static_cast<size_t>(pt.x + 0.5);
 
-    if (idx < data.ys.size()) {
-      ImGui::BeginTooltip();
-      ImGui::Text("Size: %zu", idx);
-      ImGui::Text("Count: %.0f", data.ys[idx]);
-      ImGui::EndTooltip();
+      if (idx < data.ys.size()) {
+        ImGui::BeginTooltip();
+        ImGui::Text("Size: %zu", idx);
+        ImGui::Text("Count: %.0f", data.ys[idx]);
+        ImGui::EndTooltip();
+      }
     }
+    ImPlot::EndPlot();
   }
-  ImPlot::EndPlot();
 }
 
 void render_avalanche_origin_plot(const Avalanche_Origin_Plot_Data &data) {
