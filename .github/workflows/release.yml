@@ -67,13 +67,21 @@ jobs:
         key: vcpkg-${{ matrix.os }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: vcpkg-${{ matrix.os }}-
 
-    - name: Ensure vcpkg history
-      # vcpkg comes pre-installed at $VCPKG_INSTALLATION_ROOT
-      # by default the baseline commit in vcpkg.json might not be available
+    - name: Ensure vcpkg history and update
+      # vcpkg comes pre-installed, but might be too old for our baseline
       shell: bash
       run: |
         if [ -d "$VCPKG_INSTALLATION_ROOT/.git" ]; then
-            git -C "$VCPKG_INSTALLATION_ROOT" fetch --all --tags
+          echo "Updating vcpkg repository..."
+          git -C "$VCPKG_INSTALLATION_ROOT" fetch origin
+          git -C "$VCPKG_INSTALLATION_ROOT" reset --hard origin/master
+
+          echo "Bootstrapping vcpkg..."
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            "$VCPKG_INSTALLATION_ROOT/bootstrap-vcpkg.bat"
+          else
+            "$VCPKG_INSTALLATION_ROOT/bootstrap-vcpkg.sh"
+          fi
         fi
 
     - name: Configure and Build
