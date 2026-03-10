@@ -3,6 +3,7 @@
 #include "Sim_Config.hpp"
 #include "Vis_Config.hpp"
 #include "igraph_lib.hpp"
+#include <algorithm>
 #include <format>
 #include <igraph.h>
 #include <memory>
@@ -68,7 +69,7 @@ void square_lattice_2d_variant(igraph_t &ig,
       missing = 1;
       break;
     case gga_::Square_Lattice_2D::Sink_Rule::Fill_To_Four:
-      missing = 4 - static_cast<int>(degree);
+      missing = std::max(0, 4 - static_cast<int>(degree));
       break;
     }
 
