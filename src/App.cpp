@@ -62,6 +62,7 @@ void App::run() {
 
   bool should_end = false;
 
+  int counter = 0;
   while (!should_end) {
     win_context_->pollevs(should_end);
 
@@ -72,6 +73,12 @@ void App::run() {
     if (periodic_emit_can_ && current_step_ % 10 == 0) {
       periodic_emit_can_ = false;
       events_.grains.emit({g_->grains_count(0)});
+    }
+
+    // tick
+    counter = (counter + 1) % master_state_.draw_every_safe();
+    if (counter != 0) { // only draw every Xth steps
+      continue;
     }
 
     win_context_->begin_frame();

@@ -21,6 +21,13 @@ Master_Action draw_master_w(Master_State &state) {
   ImGui::SetNextWindowSize(ImVec2(249, 189), ImGuiCond_FirstUseEver);
   ImGui::Begin("Master window", nullptr);
 
+  ImGui::PushTextWrapPos(0.0f);
+  ImGui::InputInt("Draw every", &state.draw_every);
+  ImGui::TextDisabled("Draw every Xth frame - can greatly sped simulation up "
+                      "with big numbers. \nNote for myself: 10K is superfast, "
+                      "50K feels laggy, 100K is not really responsive.");
+  ImGui::PopTextWrapPos();
+
   ImGui::Checkbox("Show graph", &state.show_graph_window);
   ImGui::Checkbox("Show config", &state.show_config_window);
   ImGui::Checkbox("Show stepping", &state.show_control_window);

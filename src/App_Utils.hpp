@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+#include <cstdlib>
 namespace ssoc {
 
 enum class Run_Mode {
@@ -12,6 +14,14 @@ struct Master_State {
   bool show_config_window = true;
   bool show_control_window = true;
   bool show_stats_window = true;
+
+  int draw_every = 1; // draw every Xth iteration - can greatly sped up things
+
+  int draw_every_safe() {
+    draw_every = std::max(1, std::abs(draw_every));
+    return draw_every;
+    ;
+  }
 };
 
 enum struct Master_Action {
