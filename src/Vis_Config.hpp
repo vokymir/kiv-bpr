@@ -16,14 +16,12 @@ struct Fruchterman_Reingold_2D {
   FR2D_Accuracy accuracy = FR2D_Accuracy::High;
 };
 
-struct Dummy_GLA {
-  int x;
-};
+struct Empty_GLA {};
 
 } // namespace gla_
 
 using Graph_Layout_Algorithm =
-    std::variant<gla_::Fruchterman_Reingold_2D, gla_::Dummy_GLA>;
+    std::variant<gla_::Fruchterman_Reingold_2D, gla_::Empty_GLA>;
 
 /* Holds configuration for the visualisation of one simulation. Must be
  * serializable, to save specific config for future reference. */

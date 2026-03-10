@@ -189,7 +189,7 @@ void draw_vis_config_s(Vis_Config &cfg) { draw_gla_s(cfg.gla); }
 void draw_gla_s(Graph_Layout_Algorithm &gla) {
   constexpr const char *labels[] = {
       "Fruchterman Reingold 2D",
-      "Dummy ui",
+      "Hidden",
   };
 
   size_t idx = gla.index();
@@ -201,7 +201,7 @@ void draw_gla_s(Graph_Layout_Algorithm &gla) {
         gla = gla_::Fruchterman_Reingold_2D{};
         break;
       case 1:
-        gla = gla_::Dummy_GLA{};
+        gla = gla_::Empty_GLA{};
         break;
 
       default:
@@ -231,7 +231,7 @@ void draw_gla(gla_::Fruchterman_Reingold_2D &cfg) {
   cfg.accuracy = static_cast<gla_::FR2D_Accuracy>(acc);
 }
 
-void draw_gla(gla_::Dummy_GLA &cfg) { ImGui::InputInt("x", &cfg.x); }
+void draw_gla([[maybe_unused]] gla_::Empty_GLA &cfg) {}
 
 void draw_stats_overview_s(const stat::Stats_Collector &sc) {
   const auto &records = sc.avalanche_records();

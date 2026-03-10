@@ -4,6 +4,7 @@
 #include "Vis_Config.hpp"
 #include "igraph_lib.hpp"
 #include <algorithm>
+#include <cstddef>
 #include <format>
 #include <igraph.h>
 #include <memory>
@@ -153,9 +154,10 @@ void layout_igraph_to_graph(Graph &g, const igraph_matrix_t &layout) {
   auto &positions = g.layout_pos();
   auto num_vertices = g.num_vertices();
   auto real_num_vertices = num_vertices - 1; // because of sink vertex
+  auto max_row = static_cast<size_t>(layout.nrow);
 
   positions.resize(num_vertices);
-  for (size_t v = 0; v < real_num_vertices; ++v) {
+  for (size_t v = 0; v < std::min(real_num_vertices, max_row); ++v) {
     const auto row = static_cast<long int>(v);
 
     double x = MATRIX(layout, row, 0);
@@ -192,6 +194,8 @@ void generate_layout(igraph_t &ig, Graph &g,
         if constexpr (std::is_same_v<T, gla_::Fruchterman_Reingold_2D>) {
           err =
               fruchterman_reingold_2d_variant(layout_view, layout, layout_alg);
+        } else if constexpr (std::is_same_v<T, gla_::Empty_GLA>) {
+
         } else {
           err = IGRAPH_FAILURE;
         }
