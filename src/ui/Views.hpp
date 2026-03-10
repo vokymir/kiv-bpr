@@ -37,7 +37,7 @@ void draw_gga(gga_::Watts_Strogatz_2D &cfg);
 void draw_vis_config_s(Vis_Config &cfg);
 void draw_gla_s(Graph_Layout_Algorithm &gla);
 void draw_gla(gla_::Fruchterman_Reingold_2D &cfg);
-void draw_gla(gla_::Empty_GLA &cfg);
+void draw_gla(gla_::Hidden_GLA &cfg);
 
 // = stats
 void draw_stats_overview_s(const stat::Stats_Collector &sc);

@@ -234,7 +234,7 @@ void draw_gla_s(Graph_Layout_Algorithm &gla) {
         gla = gla_::Fruchterman_Reingold_2D{};
         break;
       case 1:
-        gla = gla_::Empty_GLA{};
+        gla = gla_::Hidden_GLA{};
         break;
 
       default:
@@ -264,7 +264,7 @@ void draw_gla(gla_::Fruchterman_Reingold_2D &cfg) {
   cfg.accuracy = static_cast<gla_::FR2D_Accuracy>(acc);
 }
 
-void draw_gla([[maybe_unused]] gla_::Empty_GLA &cfg) {}
+void draw_gla([[maybe_unused]] gla_::Hidden_GLA &cfg) {}
 
 void draw_stats_overview_s(const stat::Stats_Collector &sc) {
   const auto &records = sc.avalanche_records();
