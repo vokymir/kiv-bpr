@@ -85,7 +85,8 @@ struct Grains_Count_Plot_Data {
 };
 
 std::unique_ptr<Grains_Count_Plot_Data>
-prepare_grains_data(const std::vector<size_t> &grains);
+prepare_grains_data(const std::vector<size_t> &grains, int display_grains,
+                    int win_size);
 
 void render_grains_count_plot(const Grains_Count_Plot_Data &data);
 

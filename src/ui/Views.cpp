@@ -342,7 +342,10 @@ void draw_stats_grains_counts_s(const stat::Stats_Collector &sc) {
   ImGui::TextColored(ImVec4(0.4f, 0.8f, 0.4f, 1.0f), "  Latest: %zu",
                      grains.back());
 
-  auto plot_data = prepare_grains_data(grains);
+  static int display_grains = 200;
+  static int win_size = 20; // window for moving average calculations
+
+  auto plot_data = prepare_grains_data(grains, display_grains, win_size);
   if (plot_data) {
     if (plot_data->moving_avg.size() > 0) {
       ImGui::SameLine();
@@ -352,6 +355,9 @@ void draw_stats_grains_counts_s(const stat::Stats_Collector &sc) {
 
     render_grains_count_plot(*plot_data);
   }
+
+  ImGui::InputInt("Last steps shown", &display_grains);
+  ImGui::InputInt("Moving average window size", &win_size);
 }
 
 std::unique_ptr<Avalanche_Size_Plot_Data>
@@ -409,13 +415,14 @@ prepare_origin_data(const std::unordered_map<size_t, size_t> &origin_map) {
 }
 
 std::unique_ptr<Grains_Count_Plot_Data>
-prepare_grains_data(const std::vector<size_t> &grains) {
+prepare_grains_data(const std::vector<size_t> &grains, int max_grains,
+                    int win_size) {
   if (grains.empty()) {
     return nullptr;
   }
 
-  size_t max_display = 200;
-  size_t window_size = 20;
+  size_t max_display = static_cast<size_t>(max_grains);
+  size_t window_size = static_cast<size_t>(win_size);
   size_t drop_count =
       grains.size() > max_display ? grains.size() - max_display : 0;
 
