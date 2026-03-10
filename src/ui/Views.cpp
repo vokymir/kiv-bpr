@@ -121,7 +121,7 @@ void draw_sim_config_s(Sim_Config &cfg) { draw_gga_s(cfg.gga); }
 void draw_gga_s(Graph_Generation_Algorithm &gga) {
   constexpr const char *labels[] = {
       "Square Lattice 2D",
-      "Dummy",
+      "Watts Strogatz 2D",
   };
 
   size_t idx = gga.index();
@@ -133,7 +133,7 @@ void draw_gga_s(Graph_Generation_Algorithm &gga) {
         gga = gga_::Square_Lattice_2D{};
         break;
       case 1:
-        gga = gga_::Dummy_GGA{};
+        gga = gga_::Watts_Strogatz_2D{};
         break;
 
       default:
@@ -165,6 +165,13 @@ void draw_gga(gga_::Square_Lattice_2D &cfg) {
     cfg.sink_rule =
         static_cast<gga_::Square_Lattice_2D::Sink_Rule>(current_rule);
   }
+  if (cfg.sink_rule == gga_::Square_Lattice_2D::Sink_Rule::Fill_To_Four) {
+    ImGui::TextColored(
+        ImVec4(1.f, 0.f, 0.f, 1.f),
+        "Fill To Four in combination with circular on both axis can cause "
+        "program crash. There isn't any vertex connected to the sink resulting "
+        "in infinite grain'pocalypse.");
+  }
 
   if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
     ImGui::BeginTooltip();
@@ -178,10 +185,29 @@ void draw_gga(gga_::Square_Lattice_2D &cfg) {
   }
 }
 
-void draw_gga(gga_::Dummy_GGA &cfg) {
+void draw_gga(gga_::Watts_Strogatz_2D &cfg) {
+  ImGui::SeparatorText("Dimensions");
   ImGui::InputInt("Size", &cfg.size);
-  ImGui::Checkbox("Bool", &cfg.boolean);
-  ImGui::InputFloat("FT", &cfg.ft);
+  ImGui::TextDisabled(
+      "#vertices = Size^2 (for 2D), it's the same number as in square lattice");
+  ImGui::InputInt("Neighbourhood size", &cfg.neighbourhood_size);
+  ImGui::TextDisabled("How many neighbours has each vertex.");
+
+  ImGui::InputDouble("Rewire probability", &cfg.p);
+  ImGui::TextDisabled(
+      "In the probabilistic rewiring from square lattice to random graph this "
+      "parameter determines conversion speed.");
+
+  ImGui::SeparatorText("Sandpile Rules");
+
+  const char *rule_names[] = {"All Once", "As Many As Neighbours"};
+  int current_rule = static_cast<int>(cfg.sink_rule);
+
+  if (ImGui::Combo("Sink Rule", &current_rule, rule_names,
+                   IM_ARRAYSIZE(rule_names))) {
+    cfg.sink_rule =
+        static_cast<gga_::Watts_Strogatz_2D::Sink_Rule>(current_rule);
+  }
 }
 
 void draw_vis_config_s(Vis_Config &cfg) { draw_gla_s(cfg.gla); }

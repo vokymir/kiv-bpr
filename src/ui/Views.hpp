@@ -31,7 +31,7 @@ namespace _detail {
 void draw_sim_config_s(Sim_Config &cfg);
 void draw_gga_s(Graph_Generation_Algorithm &gga);
 void draw_gga(gga_::Square_Lattice_2D &cfg);
-void draw_gga(gga_::Dummy_GGA &cfg);
+void draw_gga(gga_::Watts_Strogatz_2D &cfg);
 
 // = vis config
 void draw_vis_config_s(Vis_Config &cfg);

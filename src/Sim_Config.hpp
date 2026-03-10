@@ -21,16 +21,22 @@ struct Square_Lattice_2D {
   Sink_Rule sink_rule = Sink_Rule::Fill_To_Four;
 };
 
-struct Dummy_GGA {
-  int size;
-  bool boolean;
-  float ft;
+struct Watts_Strogatz_2D {
+  enum class Sink_Rule {
+    All_Once,
+    As_Many_As_Nei,
+  };
+
+  int size = 3; // total vertexes are size*size (for 2D)
+  int neighbourhood_size = 3;
+  double p = 0.5; // rewiring probability
+  Sink_Rule sink_rule = Sink_Rule::All_Once;
 };
 
 } // namespace gga_
 
 using Graph_Generation_Algorithm =
-    std::variant<gga_::Square_Lattice_2D, gga_::Dummy_GGA>;
+    std::variant<gga_::Square_Lattice_2D, gga_::Watts_Strogatz_2D>;
 
 /* Holds configuration for the simulation. Must be serializable, to save
  * specific config for future reference. */

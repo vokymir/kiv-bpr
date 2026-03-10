@@ -88,6 +88,63 @@ void square_lattice_2d_variant(igraph_t &ig,
   igraph_vector_int_destroy(&degrees);
 }
 
+void watts_strogatz_2d_variant(igraph_t &ig,
+                               const gga_::Watts_Strogatz_2D &gga) {
+  // let library generate
+  auto err = igraph_watts_strogatz_game(
+      &ig, 2, gga.size, gga.neighbourhood_size, gga.p, IGRAPH_SIMPLE_SW);
+
+  if (err != IGRAPH_SUCCESS) {
+    throw std::runtime_error(
+        std::format("External library: igraph: watts-strogatz error: {}",
+                    igraph_strerror(err)));
+  }
+
+  // SINK RULES
+
+  // = add sink vertex
+  auto num_v = igraph_vcount(&ig);
+  igraph_add_vertices(&ig, 1, nullptr);
+  auto sink_idx = num_v;
+
+  // = get degrees of all vertices
+  igraph_vector_int_t degrees;
+  igraph_vector_int_init(&degrees, 0);
+
+  igraph_degree(&ig, &degrees, igraph_vss_range(0, sink_idx), IGRAPH_ALL,
+                IGRAPH_LOOPS);
+
+  // = prepare all missing edges
+  igraph_vector_int_t edges_to_add;
+  igraph_vector_int_init(&edges_to_add, 0);
+
+  for (igraph_integer_t i = 0; i < sink_idx; ++i) {
+    auto degree = VECTOR(degrees)[i];
+
+    int missing = 0;
+    switch (gga.sink_rule) {
+    case gga_::Watts_Strogatz_2D::Sink_Rule::All_Once:
+      missing = 1;
+      break;
+    case gga_::Watts_Strogatz_2D::Sink_Rule::As_Many_As_Nei:
+      missing = static_cast<int>(degree);
+      break;
+    }
+
+    for (int m = 0; m < missing; ++m) {
+      igraph_vector_int_push_back(&edges_to_add, i);
+      igraph_vector_int_push_back(&edges_to_add, sink_idx);
+    }
+  }
+
+  // = add all missing edges
+  igraph_add_edges(&ig, &edges_to_add, nullptr);
+
+  // = cleanup
+  igraph_vector_int_destroy(&edges_to_add);
+  igraph_vector_int_destroy(&degrees);
+}
+
 // generate igraph
 // - delegate the generation to specialized method based on configs' gga
 igraph_::unique_ptr_ generate_igraph(const Graph_Generation_Algorithm &gga) {
@@ -102,6 +159,8 @@ igraph_::unique_ptr_ generate_igraph(const Graph_Generation_Algorithm &gga) {
         using T = std::decay_t<decltype(generation_alg)>;
         if constexpr (std::is_same_v<T, gga_::Square_Lattice_2D>) {
           square_lattice_2d_variant(*igp, generation_alg);
+        } else if constexpr (std::is_same_v<T, gga_::Watts_Strogatz_2D>) {
+          watts_strogatz_2d_variant(*igp, generation_alg);
         } else {
           throw std::runtime_error("Unknown graph generation algorithm.\n");
         }
