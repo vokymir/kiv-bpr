@@ -1,10 +1,12 @@
 #include "Visualizer.hpp"
+#include "Vis_Config.hpp"
 #include <cstddef>
 #include <cstdio>
 #include <deque>
 #include <imgui.h>
 #include <ranges>
 #include <unordered_map>
+#include <variant>
 #include <vector>
 
 namespace ssoc::ui {
@@ -13,6 +15,12 @@ void Visualizer::show_window(
     const graph::Graph &g, bool &show, size_t last_vertex,
     const std::deque<size_t> &checking_topple_vertexes) {
   ImGui::Begin("Graph Visualization", &show);
+
+  if (std::holds_alternative<gla_::Hidden_GLA>(g.vis_cfg().gla)) {
+    ImGui::Text("Empty visualization.");
+    ImGui::End();
+    return;
+  }
 
   ImGui::Text("zoom: %f", static_cast<double>(zoom_));
 
