@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Sim_Config.hpp"
+#include "Vis_Config.hpp"
 #include <algorithm>
 #include <cstddef>
 #include <functional>
@@ -38,6 +40,9 @@ private:
   /* Store the x,y coordinates in 2D UI layout. */
   std::vector<std::pair<double, double>> layout_pos_{};
 
+  Sim_Config sim_config_;
+  Vis_Config vis_config_;
+
   // =====
   // get/set
 public:
@@ -74,6 +79,12 @@ public:
   const std::vector<std::pair<double, double>> &layout_pos() const {
     return layout_pos_;
   }
+
+  void sim_cfg(Sim_Config cfg) { sim_config_ = cfg; }
+  const Sim_Config &sim_cfg() const { return sim_config_; }
+
+  void vis_cfg(Vis_Config cfg) { vis_config_ = cfg; }
+  const Vis_Config &vis_cfg() const { return vis_config_; }
 
   // =====
   // smarter getters
