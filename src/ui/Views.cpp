@@ -196,12 +196,14 @@ void draw_gga(gga_::Watts_Strogatz_2D &cfg) {
   ImGui::TextDisabled(
       "#vertices = Size^2 (for 2D), it's the same number as in square lattice");
   ImGui::InputInt("Neighbourhood size", &cfg.neighbourhood_size);
-  ImGui::TextDisabled("How many neighbours has each vertex.");
+  ImGui::TextDisabled("In the process of rewiring from the square lattice, "
+                      "each vertex is connected to all vertices reachable by "
+                      "at most [neighbourhood size] steps from it.");
 
   ImGui::InputDouble("Rewire probability", &cfg.p);
   ImGui::TextDisabled(
       "In the probabilistic rewiring from square lattice to random graph this "
-      "parameter determines conversion speed.");
+      "parameter determines how likely is every individual edge to rewire.");
 
   ImGui::SeparatorText("Sandpile Rules");
 
