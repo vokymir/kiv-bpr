@@ -40,6 +40,8 @@ void draw_config_w(bool &show, Sim_Config &sim_cfg, Vis_Config &vis_cfg) {
   ImGui::SetNextWindowSize(ImVec2(298, 459), ImGuiCond_FirstUseEver);
   ImGui::Begin("Config window", &show);
 
+  ImGui::PushTextWrapPos(0.0f);
+
   if (ImGui::CollapsingHeader("General configuration")) {
     _detail::draw_sim_config_s(sim_cfg);
   }
@@ -47,6 +49,8 @@ void draw_config_w(bool &show, Sim_Config &sim_cfg, Vis_Config &vis_cfg) {
   if (ImGui::CollapsingHeader("Visual configuration")) {
     _detail::draw_vis_config_s(vis_cfg);
   }
+
+  ImGui::PopTextWrapPos();
 
   ImGui::End();
 }
@@ -165,13 +169,6 @@ void draw_gga(gga_::Square_Lattice_2D &cfg) {
     cfg.sink_rule =
         static_cast<gga_::Square_Lattice_2D::Sink_Rule>(current_rule);
   }
-  if (cfg.sink_rule == gga_::Square_Lattice_2D::Sink_Rule::Fill_To_Four) {
-    ImGui::TextColored(
-        ImVec4(1.f, 0.f, 0.f, 1.f),
-        "Fill To Four in combination with circular on both axis can cause "
-        "program crash. There isn't any vertex connected to the sink resulting "
-        "in infinite grain'pocalypse.");
-  }
 
   if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
     ImGui::BeginTooltip();
@@ -182,6 +179,14 @@ void draw_gga(gga_::Square_Lattice_2D &cfg) {
       ImGui::Text("Adds exactly one edge to the sink for every node.");
     }
     ImGui::EndTooltip();
+  }
+
+  if (cfg.sink_rule == gga_::Square_Lattice_2D::Sink_Rule::Fill_To_Four) {
+    ImGui::TextColored(
+        ImVec4(1.f, 0.f, 0.f, 1.f),
+        "Fill To Four in combination with circular on both axis can cause "
+        "program crash. There isn't any vertex connected to the sink resulting "
+        "in infinite grain'pocalypse.");
   }
 }
 
