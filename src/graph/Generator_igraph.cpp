@@ -210,6 +210,10 @@ fruchterman_reingold_2d_variant(igraph_t &ig, igraph_matrix_t &layout,
 
 // convert layout from igraph to graph
 void layout_igraph_to_graph(Graph &g, const igraph_matrix_t &layout) {
+  if (std::holds_alternative<gla_::Hidden_GLA>(g.vis_cfg().gla)) {
+    return;
+  } // don't use valuable RAM space if not possible
+
   auto &positions = g.layout_pos();
   auto num_vertices = g.num_vertices();
   auto real_num_vertices = num_vertices - 1; // because of sink vertex
@@ -253,8 +257,8 @@ void generate_layout(igraph_t &ig, Graph &g,
         if constexpr (std::is_same_v<T, gla_::Fruchterman_Reingold_2D>) {
           err =
               fruchterman_reingold_2d_variant(layout_view, layout, layout_alg);
-        } else if constexpr (std::is_same_v<T, gla_::Empty_GLA>) {
-
+        } else if constexpr (std::is_same_v<T, gla_::Hidden_GLA>) {
+          err = IGRAPH_SUCCESS; // no visualization
         } else {
           err = IGRAPH_FAILURE;
         }
@@ -280,6 +284,10 @@ std::unique_ptr<Graph> igraph_from_config(const Sim_Config &sim_cfg,
   igraph_::unique_ptr_ igraph_graph = generate_igraph(sim_cfg.gga);
 
   std::unique_ptr<Graph> graph = convert::to_ssoc_graph(*igraph_graph);
+
+  // store cfg for later reference
+  graph->sim_cfg(sim_cfg);
+  graph->vis_cfg(vis_cfg);
 
   generate_layout(*igraph_graph, *graph, vis_cfg.gla);
 
