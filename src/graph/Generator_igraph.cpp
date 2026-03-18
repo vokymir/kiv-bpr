@@ -210,7 +210,7 @@ fruchterman_reingold_2d_variant(igraph_t &ig, igraph_matrix_t &layout,
 
 // convert layout from igraph to graph
 void layout_igraph_to_graph(Graph &g, const igraph_matrix_t &layout) {
-  if (std::holds_alternative<gla_::Hidden_GLA>(g.vis_cfg().gla)) {
+  if (std::holds_alternative<gla_::Hidden_GLA>(g.vis_cfg_const().gla)) {
     return;
   } // don't use valuable RAM space if not possible
 

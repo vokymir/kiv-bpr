@@ -76,15 +76,15 @@ public:
   }
 
   std::vector<std::pair<double, double>> &layout_pos() { return layout_pos_; }
-  const std::vector<std::pair<double, double>> &layout_pos() const {
+  const std::vector<std::pair<double, double>> &layout_pos_const() const {
     return layout_pos_;
   }
 
   void sim_cfg(Sim_Config cfg) { sim_config_ = cfg; }
-  const Sim_Config &sim_cfg() const { return sim_config_; }
+  const Sim_Config &sim_cfg_const() const { return sim_config_; }
 
   void vis_cfg(Vis_Config cfg) { vis_config_ = cfg; }
-  const Vis_Config &vis_cfg() const { return vis_config_; }
+  const Vis_Config &vis_cfg_const() const { return vis_config_; }
 
   // =====
   // smarter getters
@@ -110,6 +110,18 @@ public:
 
     return static_cast<size_t>(
         std::ranges::fold_left(view, 0, std::plus<int>()));
+  }
+
+  std::vector<size_t> get_neighbours(size_t vertex_idx) const {
+    size_t start = adj_offsets_[vertex_idx];
+    size_t end = adj_offsets_[vertex_idx + 1];
+
+    std::vector<size_t> result;
+    for (size_t idx = start; idx < end; ++idx) {
+      result.push_back(adj_vertices_[idx]);
+    }
+
+    return result;
   }
 
   // =====
