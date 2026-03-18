@@ -124,6 +124,14 @@ void Visualizer::show_window(
     pos.y -= text_size.y / 2;
 
     draw_list->AddText(pos, color_text, buf);
+
+    char id_buf[32];
+    std::snprintf(id_buf, sizeof(id_buf), "%zu", v);
+    auto id_size = ImGui::CalcTextSize(id_buf);
+    auto pos2 = pos;
+    pos2.y -= id_size.y;
+
+    draw_list->AddText(pos2, color_text, id_buf);
   }
 
   std::unordered_map<size_t, std::vector<size_t>> grouped;
