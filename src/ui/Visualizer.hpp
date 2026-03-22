@@ -39,6 +39,8 @@ private:
 
   // helper to transform to screen coordinates
   ImVec2 to_screen(std::pair<double, double> pos);
+  // and back from screen coordinates back to graph-wise
+  std::pair<double, double> from_screen(const ImVec2 &coord);
   // helper to get vertex circle size
   float circle_size(int height);
 
@@ -55,9 +57,12 @@ private:
   // draw info about vertexes which might be toppled in this avalanche
   void draw_topple_vertexes(ImDrawList *draw_list, const graph::Graph &g,
                             const std::deque<size_t> &maybe_toppling);
+  // if user drag a vertex, change it's position
+  void move_vertex(graph::Graph &g);
 
 public:
-  void show_window(const graph::Graph &g, bool &show, size_t last_vertex,
+  // show window - and allow user to move vertices
+  void show_window(graph::Graph &g, bool &show, size_t last_vertex,
                    const std::deque<size_t> &checking_topple_vertexes);
 };
 

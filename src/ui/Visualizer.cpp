@@ -2,6 +2,7 @@
 #include "Vis_Config.hpp"
 #include "graph/Graph.hpp"
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <cstdio>
 #include <deque>
@@ -59,6 +60,11 @@ void Visualizer::zoom() {
 ImVec2 Visualizer::to_screen(std::pair<double, double> pos) {
   return ImVec2(center_.x + pan_.x + static_cast<float>(pos.first) * zoom_,
                 center_.y + pan_.y + static_cast<float>(pos.second) * zoom_);
+}
+
+std::pair<double, double> Visualizer::from_screen(const ImVec2 &coord) {
+  return {(coord.x - center_.x - pan_.x) / zoom_,
+          (coord.y - center_.y - pan_.y) / zoom_};
 }
 
 float Visualizer::circle_size(int height) {
@@ -178,8 +184,36 @@ void Visualizer::draw_topple_vertexes(
   }
 }
 
+void Visualizer::move_vertex(graph::Graph &g) {
+  if (!ImGui::IsMouseDragging(ImGuiMouseButton_Right) ||
+      !ImGui::IsMousePosValid()) {
+    return;
+  }
+
+  const auto mouse_pos = ImGui::GetMousePos();
+  auto &positions = g.layout_pos();
+
+  // find nearest vertex (should be moving)
+  size_t nearest_vertex = 0;
+  float nearest_dst = INFINITY;
+  for (size_t i = 0; i < positions.size(); ++i) {
+    const auto pos = to_screen(positions[i]);
+
+    const float dst = std::sqrt((mouse_pos.x - pos.x) * (mouse_pos.x - pos.x) +
+                                (mouse_pos.y - pos.y) * (mouse_pos.y - pos.y));
+
+    if (dst < nearest_dst) {
+      nearest_dst = dst;
+      nearest_vertex = i;
+    }
+  }
+
+  // jump-move vertex to mouse position
+  positions[nearest_vertex] = from_screen(mouse_pos);
+}
+
 void Visualizer::show_window(
-    const graph::Graph &g, bool &show, size_t last_vertex,
+    graph::Graph &g, bool &show, size_t last_vertex,
     const std::deque<size_t> &checking_topple_vertexes) {
   ImGui::Begin("Graph Visualization", &show);
 
@@ -202,6 +236,7 @@ void Visualizer::show_window(
   draw_list->PushClipRect(origin_, footer_, true);
 
   draw(draw_list, g, last_vertex, checking_topple_vertexes);
+  move_vertex(g); // this one line allows moving vertices
 
   draw_list->PopClipRect();
   ImGui::End();

@@ -62,7 +62,7 @@ void draw_config_w(bool &show, Sim_Config &sim_cfg, Vis_Config &vis_cfg) {
   ImGui::End();
 }
 
-void draw_graph_w(bool &show, Visualizer &vis, const graph::Graph &g,
+void draw_graph_w(bool &show, Visualizer &vis, graph::Graph &g,
                   size_t last_vertex,
                   const std::deque<size_t> &checking_topple_vertexes) {
   ImGui::SetNextWindowPos(ImVec2(336, 79), ImGuiCond_FirstUseEver);
