@@ -3,5 +3,6 @@ build/
 compile_commands.json
 .cache/
 external/
+vcpkg/
 *.ini
 vcpkg_installed/
