@@ -188,7 +188,8 @@ void draw_gga(gga_::Square_Lattice_2D &cfg) {
     ImGui::EndTooltip();
   }
 
-  if (cfg.sink_rule == gga_::Square_Lattice_2D::Sink_Rule::Fill_To_Four) {
+  if (cfg.circular_on_x && cfg.circular_on_y &&
+      cfg.sink_rule == gga_::Square_Lattice_2D::Sink_Rule::Fill_To_Four) {
     ImGui::TextColored(
         ImVec4(1.f, 0.f, 0.f, 1.f),
         "Fill To Four in combination with circular on both axis can cause "
