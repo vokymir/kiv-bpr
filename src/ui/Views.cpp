@@ -198,19 +198,21 @@ void draw_gga(gga_::Square_Lattice_2D &cfg) {
 }
 
 void draw_gga(gga_::Watts_Strogatz_2D &cfg) {
+  ImGui::Text("This model is constructed in two steps: \
+1. build square lattice (N vertices) circular on both X and Y axis (have K neighbours) \
+2. for every vertex, examine all it's rightmost edges (K/2) and with "
+              "probability (B) rewire them to any random vertex \
+* more info on wikipedia: https://en.wikipedia.org/wiki/Watts%E2%80%93Strogatz_model#Algorithm");
   ImGui::SeparatorText("Dimensions");
-  ImGui::InputInt("Size", &cfg.size);
-  ImGui::TextDisabled(
-      "#vertices = Size^2 (for 2D), it's the same number as in square lattice");
-  ImGui::InputInt("Neighbourhood size", &cfg.neighbourhood_size);
-  ImGui::TextDisabled("In the process of rewiring from the square lattice, "
-                      "each vertex is connected to all vertices reachable by "
-                      "at most [neighbourhood size] steps from it.");
+  ImGui::InputInt("sqrt(N)", &cfg.size);
+  ImGui::TextDisabled("#vertices = N ( = sqrt(N)^2 for 2D ), it's the same "
+                      "number as in square lattice");
+  ImGui::InputInt("K", &cfg.neighbourhood_size);
+  ImGui::TextDisabled("Vertex mean degree K, should be even integer.");
 
-  ImGui::InputDouble("Rewire probability", &cfg.p);
-  ImGui::TextDisabled(
-      "In the probabilistic rewiring from square lattice to random graph this "
-      "parameter determines how likely is every individual edge to rewire.");
+  ImGui::InputDouble("B (beta)", &cfg.p);
+  ImGui::TextDisabled("Rewiring probability (if B=0 it's just square lattice "
+                      "circular on both axis).");
 
   ImGui::SeparatorText("Sandpile Rules");
 
