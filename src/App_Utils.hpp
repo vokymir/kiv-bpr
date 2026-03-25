@@ -20,7 +20,6 @@ struct Master_State {
   int draw_every_safe() {
     draw_every = std::max(1, std::abs(draw_every));
     return draw_every;
-    ;
   }
 };
 

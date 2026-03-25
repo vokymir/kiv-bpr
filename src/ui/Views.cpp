@@ -22,10 +22,10 @@ Master_Action draw_master_w(Master_State &state) {
   ImGui::Begin("Master window", nullptr);
 
   ImGui::PushTextWrapPos(0.0f);
-  ImGui::InputInt("Draw every", &state.draw_every);
-  ImGui::TextDisabled("Draw every Xth frame - can greatly sped simulation up "
-                      "with big numbers. \nNote for myself: 10K is superfast, "
-                      "50K feels laggy, 100K is not really responsive.");
+  ImGui::InputInt("Render frequency", &state.draw_every);
+  ImGui::TextDisabled(
+      "Skipping render can greatly increase simulation speed at the cost of "
+      "not responsibility. Use with precaution.");
   ImGui::PopTextWrapPos();
 
   ImGui::Checkbox("Show graph", &state.show_graph_window);
