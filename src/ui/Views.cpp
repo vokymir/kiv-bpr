@@ -199,11 +199,13 @@ void draw_gga(gga_::Square_Lattice_2D &cfg) {
 }
 
 void draw_gga(gga_::Watts_Strogatz_2D &cfg) {
-  ImGui::Text("This model is constructed in two steps: \
-1. build square lattice (N vertices) circular on both X and Y axis (have K neighbours) \
-2. for every vertex, examine all it's rightmost edges (K/2) and with "
-              "probability (B) rewire them to any random vertex \
-* more info on wikipedia: https://en.wikipedia.org/wiki/Watts%E2%80%93Strogatz_model#Algorithm");
+  ImGui::TextUnformatted(
+      "This model is constructed in two steps:\n1. build square lattice (N "
+      "vertices) circular on both X and Y axis (have K neighbours)\n2. for "
+      "every vertex, examine all it's rightmost edges (K/2) and with "
+      "probability (B) rewire them to any random vertex\n* more info on "
+      "wikipedia: "
+      "https://en.wikipedia.org/wiki/Watts%E2%80%93Strogatz_model#Algorithm");
   ImGui::SeparatorText("Dimensions");
   ImGui::InputInt("sqrt(N)", &cfg.size);
   ImGui::TextDisabled("#vertices = N ( = sqrt(N)^2 for 2D ), it's the same "
