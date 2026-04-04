@@ -72,7 +72,7 @@ void App::run() {
 
     if (periodic_emit_can_ && current_step_ % 10 == 0) {
       periodic_emit_can_ = false;
-      events_.grains.emit({g_->grains_count(0)});
+      events_.grains.emit({g_->grains_count()});
     }
 
     // tick
@@ -91,8 +91,8 @@ void App::run() {
                                vis_cfg_);
     }
     if (master_state_.show_graph_window) {
-      ui::views::draw_graph_w(master_state_.show_graph_window, vis_, *g_,
-                              current_vertex_, to_topple_);
+      ui::views::draw_graph_w(master_state_.show_graph_window, vis_cfg_, vis_,
+                              *g_, current_vertex_, to_topple_);
     }
     if (master_state_.show_control_window) {
       control_action(
@@ -147,8 +147,16 @@ void App::control_action(Control_Action action) {
 }
 
 size_t App::drop_sand() {
-  auto &heights = g_->sand_height(0);
-  auto idx = dist_(rng_);
+  auto &heights = g_->sand_height();
+
+  // where to drop sand?
+  size_t idx;
+  if (sim_cfg_.random_sand_distribution) {
+    idx = dist_(rng_);
+  } else {
+    // also prevent overflow
+    idx = sim_cfg_.specific_vertex_to_distribute % g_->num_vertices();
+  }
 
   current_step_++;
   current_vertex_ = idx;
@@ -199,9 +207,7 @@ void App::periodic_step() {
 size_t App::check_topple(int option) {
   size_t checked = 0, toppled = 0;
 
-  auto &adj_off = g_->adj_offsets();
-  auto &adj_vert = g_->adj_vertices();
-  auto &heights = g_->sand_height(0);
+  auto &heights = g_->sand_height();
   auto sink_idx = g_->num_vertices() - 1;
 
   while (!to_topple_.empty()) {
@@ -218,9 +224,8 @@ size_t App::check_topple(int option) {
       continue; // SKIP sink vertex obviously
     }
 
-    const auto start = adj_off[idx];
-    const auto end = adj_off[idx + 1];
-    const int degree = static_cast<int>(end - start);
+    const int degree = g_->vertex_degree(idx);
+    auto nei = g_->get_neighbours(idx);
 
     if (heights[idx] < degree) {
       continue; // NO TOPPLE HERE
@@ -229,8 +234,7 @@ size_t App::check_topple(int option) {
     heights[idx] -= degree;
     toppled++;
 
-    for (auto i = start; i < end; ++i) {
-      auto neighbour = adj_vert[i];
+    for (auto neighbour : nei) {
       heights[neighbour] += 1;
       to_topple_.push_back(neighbour);
     }

@@ -19,7 +19,7 @@ void to_ssoc__resize_internal_vectors(Graph &g) {
 
   // initialize sand with 0 on every node
   // sand_height[0] because we only have one when converting from igraph
-  g.sand_height(0).resize(g.num_vertices(), 0);
+  g.sand_height().resize(g.num_vertices(), 0);
 }
 
 void to_ssoc__fill_neighbour_lists(Graph &g, const igraph_t &ig) {

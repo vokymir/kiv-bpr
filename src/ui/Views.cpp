@@ -62,13 +62,13 @@ void draw_config_w(bool &show, Sim_Config &sim_cfg, Vis_Config &vis_cfg) {
   ImGui::End();
 }
 
-void draw_graph_w(bool &show, Visualizer &vis, graph::Graph &g,
-                  size_t last_vertex,
+void draw_graph_w(bool &show, const Vis_Config &vis_cfg, Visualizer &vis,
+                  graph::Graph &g, size_t last_vertex,
                   const std::deque<size_t> &checking_topple_vertexes) {
   ImGui::SetNextWindowPos(ImVec2(336, 79), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSize(ImVec2(625, 571), ImGuiCond_FirstUseEver);
 
-  vis.show_window(g, show, last_vertex, checking_topple_vertexes);
+  vis.show_window(g, show, last_vertex, checking_topple_vertexes, vis_cfg);
 }
 
 Control_Action draw_control_w(bool &show) {
@@ -127,7 +127,18 @@ void draw_stats_w(bool &show, const ssoc::stat::Stats_Collector &sc) {
 
 namespace _detail {
 
-void draw_sim_config_s(Sim_Config &cfg) { draw_gga_s(cfg.gga); }
+void draw_sim_config_s(Sim_Config &cfg) {
+  ImGui::Checkbox("Use random sand distribution.",
+                  &cfg.random_sand_distribution);
+  if (!cfg.random_sand_distribution) {
+    ImGui::InputScalar("Which vertex to distribute sand to", ImGuiDataType_U64,
+                       &cfg.specific_vertex_to_distribute);
+  }
+
+  ImGui::Separator();
+
+  draw_gga_s(cfg.gga);
+}
 
 void draw_gga_s(Graph_Generation_Algorithm &gga) {
   constexpr const char *labels[] = {
@@ -229,7 +240,13 @@ void draw_gga(gga_::Watts_Strogatz_2D &cfg) {
   }
 }
 
-void draw_vis_config_s(Vis_Config &cfg) { draw_gla_s(cfg.gla); }
+void draw_vis_config_s(Vis_Config &cfg) {
+
+  ImGui::Checkbox("Show sand count as size (or as colour)", &cfg.show_as_size);
+  ImGui::Checkbox("Show numbers in visualization.", &cfg.show_numbers);
+
+  draw_gla_s(cfg.gla);
+}
 
 void draw_gla_s(Graph_Layout_Algorithm &gla) {
   constexpr const char *labels[] = {

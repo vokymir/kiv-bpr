@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stddef.h>
 #include <variant>
 namespace ssoc {
 
@@ -42,6 +43,11 @@ using Graph_Generation_Algorithm =
  * specific config for future reference. */
 struct Sim_Config {
   Graph_Generation_Algorithm gga;
+
+  // is the sand-fall random? if not, specify which vertex should be sand thrown
+  // at - modulo is used to prevent overflow
+  bool random_sand_distribution = true;
+  size_t specific_vertex_to_distribute = 0;
 };
 
 } // namespace ssoc

@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <deque>
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <ranges>
 #include <unordered_map>
 #include <utility>
@@ -67,16 +68,21 @@ std::pair<double, double> Visualizer::from_screen(const ImVec2 &coord) {
           (coord.y - center_.y - pan_.y) / zoom_};
 }
 
-float Visualizer::circle_size(int height) {
-  return vertex_base_size_ * static_cast<float>(height + 1) * zoom_ / 100.0f;
+float Visualizer::circle_size(int height, bool use_height) {
+  if (use_height) {
+    return vertex_base_size_ * static_cast<float>(height + 1) * zoom_ / 100.0f;
+  } else {
+    return vertex_base_size_ * 1.0f * zoom_ / 100.0f;
+  }
 }
 
 void Visualizer::draw(ImDrawList *draw_list, const graph::Graph &g,
                       size_t last_vertex,
-                      const std::deque<size_t> &maybe_toppling) {
+                      const std::deque<size_t> &maybe_toppling,
+                      const Vis_Config &cfg) {
   draw_edges(draw_list, g);
-  draw_vertexes(draw_list, g, last_vertex);
-  draw_topple_vertexes(draw_list, g, maybe_toppling);
+  draw_vertexes(draw_list, g, last_vertex, cfg);
+  draw_topple_vertexes(draw_list, g, maybe_toppling, cfg);
 }
 
 void Visualizer::draw_edges(ImDrawList *draw_list, const graph::Graph &g) {
@@ -107,44 +113,70 @@ void Visualizer::draw_edges(ImDrawList *draw_list, const graph::Graph &g) {
 }
 
 void Visualizer::draw_vertexes(ImDrawList *draw_list, const graph::Graph &g,
-                               size_t last_vertex) {
+                               size_t last_vertex, const Vis_Config &cfg) {
   const size_t vert_count = g.num_vertices() - 1;
 
   const auto &positions = g.layout_pos_const();
-  const auto &heights = g.sand_height_const(0);
+  const auto &heights = g.sand_height_const();
 
+  // used as color for normal vertexes, or as upper bound in color-mode
   const ImU32 color_normal = IM_COL32(200, 50, 50, 255);
+  // use only in color-mode as lesser bound
+  const ImU32 color_normal_less = IM_COL32(0, 250, 250, 255);
+  // color of vertex where last sand was dropped
   const ImU32 color_last = IM_COL32(50, 150, 150, 255);
-  const ImU32 color_text_H = IM_COL32(255, 255, 255, 255); // height
-  const ImU32 color_text_I = IM_COL32(3, 252, 57, 255);    // id
+  // text: height
+  const ImU32 color_text_H = IM_COL32(255, 255, 255, 255);
+  // text: id
+  const ImU32 color_text_I = IM_COL32(3, 252, 57, 255);
 
   for (size_t v = 0; v < vert_count; ++v) {
     int height = heights[v];
     auto pos = to_screen(positions[v]);
 
-    draw_list->AddCircleFilled(pos, circle_size(height),
-                               last_vertex == v ? color_last : color_normal);
+    // determine the color
+    ImU32 color;
+    if (cfg.show_as_size) {
+      color = last_vertex == v ? color_last : color_normal;
 
-    char buf[32];
-    std::snprintf(buf, sizeof(buf), "%i", height);
-    auto text_size = ImGui::CalcTextSize(buf);
-    pos.x -= text_size.x / 2;
+    } else {
+      auto current_sand = g.vertex_sand(v);
+      auto max_sand = g.vertex_degree(v);
+      float ratio =
+          static_cast<float>(current_sand) / static_cast<float>(max_sand);
+      ImVec4 c1 = ImGui::ColorConvertU32ToFloat4(color_normal_less);
+      ImVec4 c2 = ImGui::ColorConvertU32ToFloat4(color_normal);
+      ImVec4 c = ImLerp(c1, c2, ratio);
 
-    draw_list->AddText(pos, color_text_H, buf);
-    pos.x += text_size.x / 2; // revert to base pos
+      color = ImGui::ColorConvertFloat4ToU32(c);
+    }
 
-    std::snprintf(buf, sizeof(buf), "%zu", v);
-    text_size = ImGui::CalcTextSize(buf);
-    pos.x -= text_size.x / 2;
-    pos.y -= text_size.y;
+    draw_list->AddCircleFilled(pos, circle_size(height, cfg.show_as_size),
+                               color);
 
-    draw_list->AddText(pos, color_text_I, buf);
+    if (cfg.show_numbers) {
+      char buf[32];
+      std::snprintf(buf, sizeof(buf), "%i", height);
+      auto text_size = ImGui::CalcTextSize(buf);
+      pos.x -= text_size.x / 2;
+
+      draw_list->AddText(pos, color_text_H, buf);
+      pos.x += text_size.x / 2; // revert to base pos
+
+      std::snprintf(buf, sizeof(buf), "%zu", v);
+      text_size = ImGui::CalcTextSize(buf);
+      pos.x -= text_size.x / 2;
+      pos.y -= text_size.y;
+
+      draw_list->AddText(pos, color_text_I, buf);
+    }
   }
 }
 
-void Visualizer::draw_topple_vertexes(
-    ImDrawList *draw_list, const graph::Graph &g,
-    const std::deque<size_t> &maybe_toppling) {
+void Visualizer::draw_topple_vertexes(ImDrawList *draw_list,
+                                      const graph::Graph &g,
+                                      const std::deque<size_t> &maybe_toppling,
+                                      const Vis_Config &cfg) {
   const size_t sink = g.num_vertices() - 1;
   const auto &positions = g.layout_pos_const();
   const auto &heights = g.sand_height_const();
@@ -167,20 +199,22 @@ void Visualizer::draw_topple_vertexes(
     int height = heights[vertex];
 
     float line_thickness = 1.0f * zoom_ / 100.0f;
-    draw_list->AddCircle(pos, circle_size(height), color_candidate, 0,
-                         line_thickness);
+    draw_list->AddCircle(pos, circle_size(height, cfg.show_as_size),
+                         color_candidate, 0, line_thickness);
 
-    size_t min_order =
-        *std::min_element(checking_order.begin(), checking_order.end());
+    if (cfg.show_numbers) {
+      size_t min_order =
+          *std::min_element(checking_order.begin(), checking_order.end());
 
-    char buf[32];
-    // shift by 1 to be 1-indexed (more human readable)
-    std::snprintf(buf, sizeof(buf), "%zu", min_order + 1);
-    auto text_size = ImGui::CalcTextSize(buf);
-    pos.x -= circle_size(height) + text_size.x;
-    pos.y -= text_size.y / 2;
+      char buf[32];
+      // shift by 1 to be 1-indexed (more human readable)
+      std::snprintf(buf, sizeof(buf), "%zu", min_order + 1);
+      auto text_size = ImGui::CalcTextSize(buf);
+      pos.x -= circle_size(height, cfg.show_as_size) + text_size.x;
+      pos.y -= text_size.y / 2;
 
-    draw_list->AddText(pos, color_candidate, buf);
+      draw_list->AddText(pos, color_candidate, buf);
+    }
   }
 }
 
@@ -212,9 +246,9 @@ void Visualizer::move_vertex(graph::Graph &g) {
   positions[nearest_vertex] = from_screen(mouse_pos);
 }
 
-void Visualizer::show_window(
-    graph::Graph &g, bool &show, size_t last_vertex,
-    const std::deque<size_t> &checking_topple_vertexes) {
+void Visualizer::show_window(graph::Graph &g, bool &show, size_t last_vertex,
+                             const std::deque<size_t> &checking_topple_vertexes,
+                             const Vis_Config &cfg) {
   ImGui::Begin("Graph Visualization", &show);
 
   if (std::holds_alternative<gla_::Hidden_GLA>(g.vis_cfg_const().gla)) {
@@ -225,7 +259,7 @@ void Visualizer::show_window(
 
   ImGui::Text("zoom: %f", static_cast<double>(zoom_));
   ImGui::SliderFloat("Zoom speed", &zoom_speed_, 0.001f, 1.0f);
-  ImGui::SliderFloat("Vertex base size", &vertex_base_size_, 0.001f, 10.0f);
+  ImGui::SliderFloat("Vertex base size", &vertex_base_size_, 0.001f, 100.0f);
 
   setup_canvas();
   ImGui::InvisibleButton("##canvas", size_);
@@ -235,7 +269,7 @@ void Visualizer::show_window(
   ImDrawList *draw_list = ImGui::GetWindowDrawList();
   draw_list->PushClipRect(origin_, footer_, true);
 
-  draw(draw_list, g, last_vertex, checking_topple_vertexes);
+  draw(draw_list, g, last_vertex, checking_topple_vertexes, cfg);
   move_vertex(g); // this one line allows moving vertices
 
   draw_list->PopClipRect();

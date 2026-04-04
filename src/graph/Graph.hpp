@@ -33,9 +33,8 @@ private:
   std::vector<size_t> adj_offsets_{};
   std::vector<size_t> adj_vertices_{};
 
-  /* Sand count for every node. It's vectorized for batch runs, every run
-   * having it's own vector. */
-  std::vector<std::vector<int>> sand_height_{};
+  /* Sand count for every node.  */
+  std::vector<int> sand_height_{};
 
   /* Store the x,y coordinates in 2D UI layout. */
   std::vector<std::pair<double, double>> layout_pos_{};
@@ -60,20 +59,8 @@ public:
     return adj_vertices_;
   }
 
-  // batch index, default = 0
-  std::vector<int> &sand_height(size_t idx = 0) {
-    if (sand_height_.size() <= idx) {
-      sand_height_.resize(idx + 1, std::vector<int>(num_vertices_ + 1, 0));
-    }
-    return sand_height_[idx];
-  }
-  const std::vector<int> &sand_height_const(size_t idx = 0) const {
-    if (idx >= sand_height_.size()) {
-      throw std::out_of_range("sand_height bad index");
-    }
-
-    return sand_height_[idx];
-  }
+  std::vector<int> &sand_height() { return sand_height_; }
+  const std::vector<int> &sand_height_const() const { return sand_height_; }
 
   std::vector<std::pair<double, double>> &layout_pos() { return layout_pos_; }
   const std::vector<std::pair<double, double>> &layout_pos_const() const {
@@ -89,12 +76,29 @@ public:
   // =====
   // smarter getters
 public:
-  size_t grains_count(size_t idx) const {
-    if (idx >= sand_height_.size()) {
-      throw std::out_of_range("grains count - wrong batch index");
+  // how many sand grains must be on the vertex for it to topple?
+  int vertex_degree(size_t idx) const {
+    if (idx >= adj_offsets_.size()) {
+      throw std::out_of_range("vertex degree - wrong index");
     }
 
-    const auto &heights = sand_height_[idx];
+    const auto start = adj_offsets_[idx];
+    const auto end = adj_offsets_[idx + 1];
+    const int degree = static_cast<int>(end - start);
+
+    return degree;
+  }
+
+  // how much sand is on vertex?
+  int vertex_sand(size_t idx) const {
+    if (idx >= sand_height_.size()) {
+      throw std::out_of_range("vertex sand - wrong index");
+    }
+    return sand_height_[idx];
+  }
+
+  size_t grains_count() const {
+    const auto &heights = sand_height_;
 
     if (heights.empty()) {
       return 0; // nothing to sum

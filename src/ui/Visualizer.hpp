@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Vis_Config.hpp"
 #include "graph/Graph.hpp"
 #include <cstddef>
 #include <deque>
@@ -42,28 +43,30 @@ private:
   // and back from screen coordinates back to graph-wise
   std::pair<double, double> from_screen(const ImVec2 &coord);
   // helper to get vertex circle size
-  float circle_size(int height);
+  float circle_size(int height, bool use_height);
 
   // === RENDERING
 
   // draw everything onto the drawing list
   void draw(ImDrawList *draw_list, const graph::Graph &g, size_t last_vertex,
-            const std::deque<size_t> &maybe_toppling);
+            const std::deque<size_t> &maybe_toppling, const Vis_Config &cfg);
   // draw all edges (except to sink)
   void draw_edges(ImDrawList *draw_list, const graph::Graph &g);
   // draw all vertexes (except sink), their grain height & id
   void draw_vertexes(ImDrawList *draw_list, const graph::Graph &g,
-                     size_t last_vertex);
+                     size_t last_vertex, const Vis_Config &cfg);
   // draw info about vertexes which might be toppled in this avalanche
   void draw_topple_vertexes(ImDrawList *draw_list, const graph::Graph &g,
-                            const std::deque<size_t> &maybe_toppling);
+                            const std::deque<size_t> &maybe_toppling,
+                            const Vis_Config &cfg);
   // if user drag a vertex, change it's position
   void move_vertex(graph::Graph &g);
 
 public:
   // show window - and allow user to move vertices
   void show_window(graph::Graph &g, bool &show, size_t last_vertex,
-                   const std::deque<size_t> &checking_topple_vertexes);
+                   const std::deque<size_t> &checking_topple_vertexes,
+                   const Vis_Config &cfg);
 };
 
 } // namespace ssoc::ui
