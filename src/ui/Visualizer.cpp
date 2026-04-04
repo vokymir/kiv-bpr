@@ -121,8 +121,17 @@ void Visualizer::draw_vertexes(ImDrawList *draw_list, const graph::Graph &g,
 
   // used as color for normal vertexes, or as upper bound in color-mode
   const ImU32 color_normal = IM_COL32(200, 50, 50, 255);
-  // use only in color-mode as lesser bound
-  const ImU32 color_normal_less = IM_COL32(0, 250, 250, 255);
+  // used in the color mode
+  const ImVec4 color_mode_1 =
+      ImGui::ColorConvertU32ToFloat4(IM_COL32(68, 1, 84, 255));
+  const ImVec4 color_mode_2 =
+      ImGui::ColorConvertU32ToFloat4(IM_COL32(59, 82, 139, 255));
+  const ImVec4 color_mode_3 =
+      ImGui::ColorConvertU32ToFloat4(IM_COL32(33, 145, 140, 255));
+  const ImVec4 color_mode_4 =
+      ImGui::ColorConvertU32ToFloat4(IM_COL32(94, 201, 98, 255));
+  const ImVec4 color_mode_5 =
+      ImGui::ColorConvertU32ToFloat4(IM_COL32(253, 231, 37, 255));
   // color of vertex where last sand was dropped
   const ImU32 color_last = IM_COL32(50, 150, 150, 255);
   // text: height
@@ -144,9 +153,21 @@ void Visualizer::draw_vertexes(ImDrawList *draw_list, const graph::Graph &g,
       auto max_sand = g.vertex_degree(v);
       float ratio =
           static_cast<float>(current_sand) / static_cast<float>(max_sand);
-      ImVec4 c1 = ImGui::ColorConvertU32ToFloat4(color_normal_less);
-      ImVec4 c2 = ImGui::ColorConvertU32ToFloat4(color_normal);
-      ImVec4 c = ImLerp(c1, c2, ratio);
+
+      ImVec4 c;
+      if (ratio < 0.25f) {
+        ratio = ratio / 0.25f;
+        c = ImLerp(color_mode_1, color_mode_2, ratio);
+      } else if (ratio < 0.5f) {
+        ratio = (ratio - 0.25f) / 0.25f;
+        c = ImLerp(color_mode_2, color_mode_3, ratio);
+      } else if (ratio < 0.75f) {
+        ratio = (ratio - 0.4f) / 0.25f;
+        c = ImLerp(color_mode_3, color_mode_4, ratio);
+      } else {
+        ratio = (ratio - 0.75f) / 0.25f;
+        c = ImLerp(color_mode_4, color_mode_5, ratio);
+      }
 
       color = ImGui::ColorConvertFloat4ToU32(c);
     }
