@@ -59,7 +59,9 @@ underlying graph for the sandpile model.
 TODO: define avalanche
 
 TODO: sink is needed for the model to not end-up in infinite loop - dissipation
+
 TODO: what is dissipation and why is it needed (as before)
+
 TODO: at least one vertex connected to sink needed (or on random graph one
 connection to the sink for every vertex is needed)
 
@@ -82,6 +84,9 @@ of shortest paths between any two vertexes in a graph.
 TODO: small-world network properties (the previous needed for that)
 
 = Model Definition
+
+TODO: how can the model be extended, rules and graphs. foundation for it is in
+@h:sandpile_model_general
 
 == Dissipation Rules
 
@@ -112,12 +117,27 @@ neigbouring vertices, therefore emphasizing how many connections it has.
 Every rule represents a different approach and not all can be applied to all
 types of graph topology.
 
-== Underlaying Graphs
+== Underlying Graphs
 
+Standard choice for graph in sandpile model is square lattice with arbitrary
+size.
+
+TODO: square lattice - properties
+
+TODO: ER graph - we don't have
+
+TODO: WS graph - we have
 
 = Observed Behaviour
 
 TODO: how did it work for different types of graphs and dissipation rules? also
 the graph configurations (eg $beta$ for WS)
+
+TODO: metrics, how it changed criticality? origin distribution, avalanche size
+(max, avg)
+
+= Technical Documentation
+
+TODO
 
 #bibliography("refs.bib")
