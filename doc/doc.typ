@@ -46,7 +46,7 @@ distribution. If the number of grains on any square reach four, the sandpile
 topples and the four grains fall on adjoint squares, possibly causing additional
 squares to topple. In case the square does not have four adjacent squares (ie it
 is on the edge of chessboard) the remaining grains fall off the board and are
-therefore removed from the model.
+therefore removed from the model. (TODO dissipation here???)
 
 This model can be expressed as an undirected graph, a square lattice of the size
 $8 times 8$. This however is not a correct representation until an additional
@@ -56,7 +56,12 @@ edge of the square lattice (twice to corner vertices) the graph representation
 becomes valid. This is foundational observation, for it allows us to use any
 underlying graph for the sandpile model.
 
-TODO: sink is needed for the model to not end-up in infinite loop
+TODO: define avalanche
+
+TODO: sink is needed for the model to not end-up in infinite loop - dissipation
+TODO: what is dissipation and why is it needed (as before)
+TODO: at least one vertex connected to sink needed (or on random graph one
+connection to the sink for every vertex is needed)
 
 == Self-Organized Criticality
 TODO: critical state, power-law
@@ -78,9 +83,41 @@ TODO: small-world network properties (the previous needed for that)
 
 = Model Definition
 
-== Sandpile on Graphs
+== Dissipation Rules
 
 As discussed in @h:sandpile_model_general the existence of a sink vertex is
-necessary for any graph representation of a sandpile model.
+necessary for any graph representation of a sandpile model. However there are
+various rules by which you can determine if a given vertex should be connected
+to a sink vertex and how many times if so.
+
+For example the original model uses a rule (named by me as) _Fill to Four_. This
+rule states that the degree of vertex must be exactly four. The sink vertex is
+connected to all vertices as many times is needed to fulfill that rule. For the
+square lattice, only vertices on the edge are connected (exactly once except for
+corner vertices, which are connected twice). This rule precisely reproduces the
+original chessboard idea.
+
+For an arbitrary graph though, the rule is unsufficient. It doesn't ensure
+dissipation which can lead to graph supersaturation and never ending avalanche. 
+This rule doesn't reflect on the vertex degree if that is higher than four.
+
+One possible rule which guarantee dissipation on any graph may be _All Once_.
+The rule is fair in a sense that all vertices have connection to the sink and is
+uniform because every vertex, no matter its degree, is connected exactly once.
+
+Finally another rule which assure dissipation is _As Many As Neighbours_. This
+rule connects every vertex to sink proportionally to the number of its
+neigbouring vertices, therefore emphasizing how many connections it has.
+
+Every rule represents a different approach and not all can be applied to all
+types of graph topology.
+
+== Underlaying Graphs
+
+
+= Observed Behaviour
+
+TODO: how did it work for different types of graphs and dissipation rules? also
+the graph configurations (eg $beta$ for WS)
 
 #bibliography("refs.bib")
