@@ -165,14 +165,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Add Documentation
-      run: |
-        mkdir -p "${{ env.RELEASE_DIR }}"
-        cp doc/doc.pdf "${{ env.RELEASE_DIR }}/doc.pdf"
-
     - name: Publish Draft Release
       uses: softprops/action-gh-release@v2
       with:
-        files: ${{ env.RELEASE_DIR }}/*
+        files: |
+          ${{ env.RELEASE_DIR }}/*
+          doc/doc.pdf
         draft: true
         generate_release_notes: false
