@@ -162,6 +162,13 @@ jobs:
         path: ${{ env.RELEASE_DIR }}
         merge-multiple: true
 
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Add Documentation
+      run: |
+        cp doc/doc.pdf "${{ env.RELEASE_DIR }}/doc.pdf"
+
     - name: Publish Draft Release
       uses: softprops/action-gh-release@v2
       with:
