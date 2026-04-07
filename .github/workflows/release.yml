@@ -167,6 +167,7 @@ jobs:
 
     - name: Add Documentation
       run: |
+        mkdir -p "${{ env.RELEASE_DIR }}"
         cp doc/doc.pdf "${{ env.RELEASE_DIR }}/doc.pdf"
 
     - name: Publish Draft Release
