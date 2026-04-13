@@ -95,12 +95,12 @@ $
 
 The neighbourhood of a vertex is a set of vertices connected to it via an edge.
 $
-  #text[nei] (v_i) = {v_j | {v_i, v_j} in E},
+  "nei" (v_i) = {v_j | {v_i, v_j} in E},
 $
 
 The vertex degree is defined as the size of vertex neighbourhood.
 $
-  d(v_i) = abs(#text[nei] (v_i))
+  d(v_i) = abs("nei" (v_i))
 $
 
 Path between two vertices $v_i$ and $v_j$ is a sequence of vertices beginning in
@@ -110,13 +110,29 @@ $
   P = (v_1, v_2, ..., v_k), quad v_1 = v_i, quad v_k = v_j, \
   quad {v_l, v_(l+1)} in E quad forall l in {1, ..., l-1}
 $
+If there exist no such path, let $P = ()$.
 
-_Path length_ describes the distance between two vertices for a given path. The
-path length is equal to the number of vertices in between the first and last
-vertex on a path. The _shortest path length_ refers to a distance between two
-vertices such as any other path between them produces at least the same path
-length. It is useful to also define an _average shortest path length_, an
-average of shortest paths between any two vertices in a graph.
+Similarily, path length is the number of _steps_ (edges) needed to walk the
+path. If path doesn't exist we define its legth as zero.
+$
+  "len"(P) = cases(
+    abs(P) - 1 quad & abs(P) >= 2,
+    0 quad & "else"
+  )
+$
+
+The shortest path between vertices $v_i$ and $v_j$ is the path with minimal
+length among all paths connecting these vertices. Let $PP(v_i, v_j)$ be the set
+of all paths between $v_i$ and $v_j$:
+$
+  P^*_(i j) = min_(P in PP(v_i, v_j)) "len"(P)
+$
+
+A graph has an average (shortest) path length $"len"(G)$. Let $PP^*$ be the set
+of all shortest paths:
+$
+  "len"(G) = 1/n(n-1) Sigma_(i != j) "len"(P^*_(i j))
+$
 
 TODO: small-world network properties (the previous needed for that)
 
