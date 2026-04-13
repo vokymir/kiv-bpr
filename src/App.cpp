@@ -86,21 +86,34 @@ void App::run() {
 
     ui::views::draw_menu(master_state_);
 
-    if (master_state_.show_builder_window) {
-      master_action(ui::views::draw_graph_builder_windows(
-          master_state_.show_builder_window, sim_cfg_, vis_cfg_));
-    }
+    // order of drawing:
+    // - HELP must be last (on top)
+    // - BUILDER must be prelast (also on top)
+
     if (master_state_.show_visualization_window) {
       ui::views::draw_graph_visualization_window(
           master_state_.show_visualization_window, vis_cfg_, vis_, *g_,
           current_vertex_, to_topple_);
     }
+    if (master_state_.show_visualization_config_window) {
+      ui::views::draw_graph_control_window(
+          master_state_.show_visualization_config_window,
+          vis_cfg_.visualizer_config);
+    }
     if (master_state_.show_simulation_control_window) {
       control_action(ui::views::draw_simulation_control_window(
-          master_state_.show_simulation_control_window, master_state_));
+          master_state_.show_simulation_control_window, master_state_,
+          sim_cfg_));
     }
     if (master_state_.show_stats_window) {
       ui::views::draw_stats_window(master_state_.show_stats_window, stats_);
+    }
+    if (master_state_.show_builder_window) { // BUILDER must be prelast
+      master_action(ui::views::draw_graph_builder_windows(
+          master_state_.show_builder_window, sim_cfg_, vis_cfg_));
+    }
+    if (master_state_.show_help_window) { // HELP must be last
+      ui::views::draw_welcome_help_window(master_state_.show_help_window);
     }
 
     // ^^^^^

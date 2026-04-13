@@ -20,12 +20,15 @@ void draw_menu(Master_State &state) {
 
     if (ImGui::BeginMenu("Windows")) {
 
+      ImGui::MenuItem("Show help", nullptr, &state.show_help_window);
+      ImGui::MenuItem("Show graph builder", nullptr,
+                      &state.show_builder_window);
+
       ImGui::MenuItem("Show graph visualization", nullptr,
                       &state.show_visualization_window);
       ImGui::MenuItem("Show graph visualization configuration", nullptr,
                       &state.show_visualization_config_window);
-      ImGui::MenuItem("Show graph builder", nullptr,
-                      &state.show_builder_window);
+
       ImGui::MenuItem("Show simulation control", nullptr,
                       &state.show_simulation_control_window);
       ImGui::MenuItem("Show stats", nullptr, &state.show_stats_window);
@@ -37,32 +40,65 @@ void draw_menu(Master_State &state) {
   }
 }
 
+void draw_welcome_help_window(bool &show) {
+  ImGui::SetNextWindowPos(ImVec2(22, 233), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(298, 459), ImGuiCond_FirstUseEver);
+  ImGui::Begin("Welcome | Help", &show);
+
+  ImGui::End();
+}
+
 Master_Action draw_graph_builder_windows(bool &show, Sim_Config &sim_cfg,
                                          Vis_Config &vis_cfg) {
   Master_Action state = Master_Action::None;
 
   ImGui::SetNextWindowPos(ImVec2(22, 233), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(298, 459), ImGuiCond_FirstUseEver);
-  ImGui::Begin("Config window", &show);
+  ImGui::SetNextWindowSize(ImVec2(420, 520), ImGuiCond_FirstUseEver);
+  ImGui::Begin("Graph Builder", &show);
 
-  ImGui::PushTextWrapPos(0.0f);
+  ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(10, 8));
+  ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(10, 10));
 
-  if (ImGui::CollapsingHeader("General configuration")) {
+  if (ImGui::BeginTable("config_table", 2,
+                        ImGuiTableFlags_Resizable |
+                            ImGuiTableFlags_SizingStretchSame |
+                            ImGuiTableFlags_BordersInnerV)) {
+
+    // Left column
+    ImGui::TableNextColumn();
+    ImGui::Text("Simulation configuration");
+    ImGui::Separator();
+    ImGui::Spacing();
     _detail::draw_sim_config_s(sim_cfg);
-  }
 
-  if (ImGui::CollapsingHeader("Visual configuration")) {
+    // Right column
+    ImGui::TableNextColumn();
+    ImGui::Text("Visualization configuration");
+    ImGui::Separator();
+    ImGui::Spacing();
     _detail::draw_vis_config_s(vis_cfg);
+
+    ImGui::EndTable();
   }
 
-  ImGui::PopTextWrapPos();
+  ImGui::PopStyleVar(2);
 
-  if (ImGui::Button("Generate graph")) {
+  ImGui::Spacing();
+  ImGui::Spacing();
+
+  // centered big button
+  float button_width = 200.0f;
+  float avail = ImGui::GetContentRegionAvail().x;
+  float offset = (avail - button_width) * 0.5f;
+
+  if (offset > 0)
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
+
+  if (ImGui::Button("Generate Graph", ImVec2(button_width, 40))) {
     state = Master_Action::Generate_Graph;
   }
 
   ImGui::End();
-
   return state;
 }
 
@@ -75,7 +111,16 @@ void draw_graph_visualization_window(
   vis.show_window(g, show, last_vertex, checking_topple_vertices, vis_cfg);
 }
 
-Control_Action draw_simulation_control_window(bool &show, Master_State &state) {
+void draw_graph_control_window(bool &show, Visualizer_Config &cfg) {
+  ImGui::SetNextWindowPos(ImVec2(423, 16), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(562, 54), ImGuiCond_FirstUseEver);
+  ImGui::Begin("Visualization Control", &show);
+
+  ImGui::End();
+}
+
+Control_Action draw_simulation_control_window(bool &show, Master_State &state,
+                                              Sim_Config &cfg) {
   Control_Action action = Control_Action::None;
 
   ImGui::SetNextWindowPos(ImVec2(423, 16), ImGuiCond_FirstUseEver);
@@ -108,6 +153,15 @@ Control_Action draw_simulation_control_window(bool &show, Master_State &state) {
 
   ImGui::InputInt("Rendering frequency", &state.draw_every);
 
+  ImGui::Checkbox("Use random sand distribution.",
+                  &cfg.random_sand_distribution);
+  if (!cfg.random_sand_distribution) {
+    ImGui::InputScalar("Which vertex to distribute sand to", ImGuiDataType_U64,
+                       &cfg.specific_vertex_to_distribute);
+  }
+
+  ImGui::Separator();
+
   ImGui::End();
 
   return action;
@@ -133,18 +187,7 @@ void draw_stats_window(bool &show, const ssoc::stat::Stats_Collector &sc) {
 
 namespace _detail {
 
-void draw_sim_config_s(Sim_Config &cfg) {
-  ImGui::Checkbox("Use random sand distribution.",
-                  &cfg.random_sand_distribution);
-  if (!cfg.random_sand_distribution) {
-    ImGui::InputScalar("Which vertex to distribute sand to", ImGuiDataType_U64,
-                       &cfg.specific_vertex_to_distribute);
-  }
-
-  ImGui::Separator();
-
-  draw_gga_s(cfg.gga);
-}
+void draw_sim_config_s(Sim_Config &cfg) { draw_gga_s(cfg.gga); }
 
 void draw_gga_s(Graph_Generation_Algorithm &gga) {
   constexpr const char *labels[] = {

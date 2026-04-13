@@ -34,8 +34,9 @@ void draw_graph_visualization_window(
 void draw_graph_control_window(bool &show, Visualizer_Config &cfg);
 
 // allow for controlling the simulation (stepping, rendering, etc.) via UI
-[[nodiscard]] Control_Action
-draw_simulation_control_window(bool &show, Master_State &state);
+[[nodiscard]] Control_Action draw_simulation_control_window(bool &show,
+                                                            Master_State &state,
+                                                            Sim_Config &cfg);
 
 // show all wonderful statistics
 void draw_stats_window(bool &show, const stat::Stats_Collector &sc);
