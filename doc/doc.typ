@@ -30,7 +30,7 @@ values far from it are very impropable. The probability density function of
 normal distribution is described in @eq:normal_distribution
 
 $
-        f(x) & = 1 / sqrt(2 pi sigma^2) exp (- (x - mu)^2 / (2 sigma^2)) \
+        f(x) & = 1 / sqrt(2 pi sigma^2) e^(- (x - mu)^2 \/ (2 sigma^2)) \
   mu #h(1mm) & ... #text[mean] \
      sigma^2 & ... #text[variance]
 $ <eq:normal_distribution>
