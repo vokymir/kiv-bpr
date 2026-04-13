@@ -39,6 +39,8 @@ enum struct Control_Action {
   Run_Until_Avalanche,
   Run,
   Stop,
+  Generate_The_Same_Graph,
+  Launch_Builder,
 };
 
 } // namespace ssoc

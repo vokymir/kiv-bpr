@@ -45,6 +45,13 @@ void draw_welcome_help_window(bool &show) {
   ImGui::SetNextWindowSize(ImVec2(298, 459), ImGuiCond_FirstUseEver);
   ImGui::Begin("Welcome | Help", &show);
 
+  ImGui::Text(
+      "Here will be briefly explained what this program is for, general info "
+      "about SOC/sandpile model. Another section would be for help - "
+      "explaining how to use it and what means things. Lastly, short 'About' "
+      "section with link to github repo where this programs source code and "
+      "documentation (thesis) is freely available.");
+
   ImGui::End();
 }
 
@@ -132,7 +139,7 @@ Control_Action draw_simulation_control_window(bool &show, Master_State &state,
 
   ImGui::SetNextWindowPos(ImVec2(423, 16), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSize(ImVec2(562, 54), ImGuiCond_FirstUseEver);
-  ImGui::Begin("Stepping control", &show);
+  ImGui::Begin("Simulation Control", &show);
 
   if (ImGui::Button("Step In")) {
     action = Control_Action::Step_In;
@@ -167,6 +174,13 @@ Control_Action draw_simulation_control_window(bool &show, Master_State &state,
                        &cfg.specific_vertex_to_distribute);
   }
 
+  if (ImGui::Button("Generate the same graph")) {
+    action = Control_Action::Generate_The_Same_Graph;
+  }
+  if (ImGui::Button("Generate different graph")) {
+    action = Control_Action::Launch_Builder;
+  }
+
   ImGui::Separator();
 
   ImGui::End();
@@ -177,7 +191,7 @@ Control_Action draw_simulation_control_window(bool &show, Master_State &state,
 void draw_stats_window(bool &show, const ssoc::stat::Stats_Collector &sc) {
   ImGui::SetNextWindowPos(ImVec2(968, 85), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSize(ImVec2(311, 610), ImGuiCond_FirstUseEver);
-  ImGui::Begin("Stats", &show);
+  ImGui::Begin("Statistics", &show);
 
   _detail::draw_stats_overview_s(sc);
   ImGui::Separator();

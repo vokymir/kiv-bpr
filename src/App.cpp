@@ -157,6 +157,13 @@ void App::control_action(Control_Action action) {
   case Control_Action::Stop:
     running_ = false;
     break;
+
+  case Control_Action::Generate_The_Same_Graph:
+    generate_graph_from_cfg();
+    break;
+  case Control_Action::Launch_Builder:
+    master_state_.show_builder_window = true;
+    break;
   }
 }
 
