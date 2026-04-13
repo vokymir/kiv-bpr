@@ -62,23 +62,26 @@ critical pressure at which the critical point of a system is defined. While the
 system is in the critical state, the water is in not in any one state.
 
 Systems in critical state are most responsive to input and behaves unpredictable.
+This is the case for phase transition and forest fires. Although, there is a
+significant difference. Criticality can be reached in many systems by
+fine-tuning certain parameters. In the case of phase transition the parameters
+were pressure and temperature. However, systems exist which reach criticality
+independently of parameters.
 
+TODO NOTE?: usually high degree of freedom systems
 
-Natural systems with high degree of freedom such as earthquakes often exhibit a
-tendency to reach a critical state. This phenomenon is called self-organized
-criticality (SOC). These systems most famously need no fine-tuning in order to reach
-the critical state, rather it is their inherent property. Systems in a
-critical state are very sensitive to inputs and this leads to its
-unpredictability.
+The phenomenon of systems reaching criticality by themselves is called
+_self-organized criticality (SOC)_. The concept of SOC was first discovered in
+1987 by Bak, Tang and Wiesenfeld and its properties were demonstrated on a
+sandpile model @1987PhRvL..59..381B. This model and its properties is the main
+focus of this thesis.
 
-The concept of SOC was first discovered in 1987 by Bak, Tang and Wiesenfeld and
-its properties were demonstrated on a sandpile model @1987PhRvL..59..381B. This
-model was later generalized from square lattice to arbitrary graph
-@Holroyd_2008. That generalization is important because it allows us to study
-the model's behaviour for different graph topologies.
+TODO: talk about the idea of putting it on random graphs, not just general?
 
-= Self-Organized Criticality
-TODO: critical state, power-law
+The original sandpile model was a cellular automaton on a sqare and cubic
+lattice. However, the idea is to use another underlying graph structures for the
+automaton. Before this generalization we introduce few needed concepts from
+graph theory.
 
 = Graph Theory
 
@@ -96,6 +99,12 @@ of shortest paths between any two vertices in a graph.
 TODO: small-world network properties (the previous needed for that)
 
 = Sandpile Model <h:sandpile_model_general>
+
+TODO: where to put
+
+This model was later generalized from square lattice to arbitrary graph
+@Holroyd_2008. That generalization is important because it allows us to study
+the model's behaviour for different graph topologies.
 
 The original sandpile model presents a simple chessboard and falling sand
 grains. Each grain falls on a chess square determined by a random
