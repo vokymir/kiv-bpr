@@ -85,11 +85,31 @@ graph theory.
 
 = Graph Theory
 
-An undirected graph $G = (V,E)$ is composed of set of elements (vertices) $V$
-and $E$ is a set of unordered pairs ${v_1, v_2}, quad v_i in V$ called edges.
+An undirected graph is defined as a pair, containing set of vertices and set
+of edges. The graph has $n$ vertices and $m$ edges.
+$
+  G & = (V,E) \
+  V & = {v_1, v_2, ..., v_n} \
+  E & subset.eq { {u, v} | u, v in V, u != v }, quad abs(E) = m
+$
 
-The _vertex degree_ $d(v_i)$ is defined as the number of vertices connected to
-$v_i$ via an edge.
+The neighbourhood of a vertex is a set of vertices connected to it via an edge.
+$
+  #text[nei] (v_i) = {v_j | {v_i, v_j} in E},
+$
+
+The vertex degree is defined as the size of vertex neighbourhood.
+$
+  d(v_i) = abs(#text[nei] (v_i))
+$
+
+Path between two vertices $v_i$ and $v_j$ is a sequence of vertices beginning in
+the first and ending in the second where every two vertices in path must be
+directly connected.
+$
+  P = (v_1, v_2, ..., v_k), quad v_1 = v_i, quad v_k = v_j, \
+  quad {v_l, v_(l+1)} in E quad forall l in {1, ..., l-1}
+$
 
 _Path length_ describes the distance between two vertices for a given path. The
 path length is equal to the number of vertices in between the first and last
