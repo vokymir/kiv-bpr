@@ -132,7 +132,7 @@ void Visualizer::draw_vertexes(ImDrawList *draw_list, const graph::Graph &g,
       ImGui::ColorConvertU32ToFloat4(IM_COL32(94, 201, 98, 255));
   const ImVec4 color_mode_5 =
       ImGui::ColorConvertU32ToFloat4(IM_COL32(253, 231, 37, 255));
-  // color of vertex where last sand was dropped
+  // color of vertex highlight where last sand was dropped
   const ImU32 color_last = IM_COL32(50, 150, 150, 255);
   // text: height
   const ImU32 color_text_H = IM_COL32(255, 255, 255, 255);
@@ -146,7 +146,7 @@ void Visualizer::draw_vertexes(ImDrawList *draw_list, const graph::Graph &g,
     // determine the color
     ImU32 color;
     if (cfg.show_as_size) {
-      color = last_vertex == v ? color_last : color_normal;
+      color = color_normal;
 
     } else {
       auto current_sand = g.vertex_sand(v);
@@ -174,6 +174,11 @@ void Visualizer::draw_vertexes(ImDrawList *draw_list, const graph::Graph &g,
 
     draw_list->AddCircleFilled(pos, circle_size(height, cfg.show_as_size),
                                color);
+
+    if (v == last_vertex) {
+      draw_list->AddCircle(pos, circle_size(height, cfg.show_as_size) + 6,
+                           color_last, 0, 3.0f);
+    }
 
     if (cfg.show_numbers) {
       char buf[32];
