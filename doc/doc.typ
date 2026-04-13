@@ -12,17 +12,17 @@
 
 = Introduction
 
-Almost everything in nature tends to cluster around a center value.
-An example might be the height of humans. This is described by a
-normal distribution which itself got its name because this pattern is so often
-observed not only in nature but in human-made systems as well.
+Almost everything in nature tends to cluster around a center value. An example
+might be the height of humans. This is described by a normal distribution which
+itself got its name because this pattern is so often observed not only in nature
+but in human-made systems as well.
 
 Contrary to this, there are systems which could not be described by normal
-distribution. One example are the forest fire sizes. If they were
-to adhere to normal distribution, there would be known an _average forest fire
-size_. Even though most of forest fires are small, there is nothing limiting the
-potential size. This is one of key properties of systems better described by
-power-law, scale-invariance.
+distribution. One example are the forest fire sizes. If they were to adhere to
+normal distribution, there would be known an _average forest fire size_. Even
+though most of forest fires are small, there is nothing limiting the potential
+size. This is one of key properties of systems better described by power-law,
+scale-invariance.
 
 Normal distribution is _heavy tailed_, meaning that most of values are
 distributed within small range around the center (mean) and
@@ -37,15 +37,15 @@ $ <eq:normal_distribution>
 
 TODO: plot normal dist?
 
-As opposed to this, power-law  #footnote[Power-law on $(0, infinity)$ cannot
-  be a probability distribution, because the areas near 0 and under the tail
-  are infinite. However, with simple restrictions: $f(x) = a x^(-k), quad
-  k > 1, quad x > x_(min)$ it is a valid distribution.] is _long tailed_. Its
-exponential character described in @eq:power-law result in majority of
-the values being very far. That corresponds with the scale-invariance: Any
-(forest fire) size is realistically possible, even though smaller sizes are more
-likely. Power-law exhibit linear relationship between $log f(x)$ and $log x$. In
-a `log-log plot` it forms a straight line.
+As opposed to this, power-law  #footnote[Power-law on $(0, infinity)$ cannot be
+  a probability distribution, because the areas near 0 and under the tail are
+  infinite. However, with simple restrictions: $f(x) = a x^(-k), quad k > 1, quad
+  x > x_(min)$ it is a valid distribution.] is _long tailed_. Its exponential
+character described in @eq:power-law result in majority of the values being very
+far. That corresponds with the scale-invariance: Any (forest fire) size is
+realistically possible, even though smaller sizes are more likely. Power-law
+exhibit linear relationship between $log f(x)$ and $log x$. In a `log-log plot`
+it forms a straight line.
 
 $
        f(x) & = a x^(-k) \
@@ -61,9 +61,9 @@ distinctly separate. The boundary terminates at some critical temperature and
 critical pressure at which the critical point of a system is defined. While the
 system is in the critical state, the water is in not in any one state.
 
-Systems in critical state are most responsive to input and behaves unpredictable.
-This is the case for phase transition and forest fires. Although, there is a
-significant difference. Criticality can be reached in many systems by
+Systems in critical state are most responsive to input and behaves
+unpredictable. This is the case for phase transition and forest fires. Although,
+there is a significant difference. Criticality can be reached in many systems by
 fine-tuning certain parameters. In the case of phase transition the parameters
 were pressure and temperature. However, systems exist which reach criticality
 independently of parameters.
@@ -73,8 +73,8 @@ TODO NOTE?: usually high degree of freedom systems
 The phenomenon of systems reaching criticality by themselves is called
 _self-organized criticality (SOC)_. The concept of SOC was first discovered in
 1987 by Bak, Tang and Wiesenfeld and its properties were demonstrated on a
-sandpile model @1987PhRvL..59..381B. This model and its properties is the main
-focus of this thesis.
+sandpile model @1987PhRvL..59..381B. This model and its properties is the
+main focus of this thesis.
 
 TODO: talk about the idea of putting it on random graphs, not just general?
 
@@ -85,16 +85,18 @@ graph theory.
 
 = Graph Theory
 
-In order to explore the behaviour of the sandpile model on a graph, we introduce
-basic concepts. The _vertex degree_ $d(v_i)$ is defined as the number of
-vertices connected to $v_i$ via an edge.
+An undirected graph $G = (V,E)$ is composed of set of elements (vertices) $V$
+and $E$ is a set of unordered pairs ${v_1, v_2}, quad v_i in V$ called edges.
+
+The _vertex degree_ $d(v_i)$ is defined as the number of vertices connected to
+$v_i$ via an edge.
 
 _Path length_ describes the distance between two vertices for a given path. The
 path length is equal to the number of vertices in between the first and last
 vertex on a path. The _shortest path length_ refers to a distance between two
 vertices such as any other path between them produces at least the same path
-length. It is useful to also define an _average shortest path length_, an average
-of shortest paths between any two vertices in a graph.
+length. It is useful to also define an _average shortest path length_, an
+average of shortest paths between any two vertices in a graph.
 
 TODO: small-world network properties (the previous needed for that)
 
@@ -107,12 +109,12 @@ This model was later generalized from square lattice to arbitrary graph
 the model's behaviour for different graph topologies.
 
 The original sandpile model presents a simple chessboard and falling sand
-grains. Each grain falls on a chess square determined by a random
-distribution. If the number of grains on any square reaches four, the sandpile
-topples and the four grains fall on adjacent squares, possibly causing
-additional squares to topple. In case the square does not have four adjacent
-squares (i.e. it is on the edge of chessboard) the remaining grains fall off the
-board and are therefore removed from the model.
+grains. Each grain falls on a chess square determined by a random distribution.
+If the number of grains on any square reaches four, the sandpile topples and the
+four grains fall on adjacent squares, possibly causing additional squares to
+topple. In case the square does not have four adjacent squares (i.e. it is on
+the edge of chessboard) the remaining grains fall off the board and are
+therefore removed from the model.
 
 The topology of this model can be expressed as an undirected graph, a square
 lattice of the size $8 times 8$. However, it is not a correct representation
