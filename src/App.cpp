@@ -43,6 +43,8 @@ void App::init() {
 }
 
 void App::generate_graph_from_cfg() {
+  // stop the simulation upon new graph creation
+  running_ = false;
   // generate graph
   g_ = graph::generate::igraph_from_config(sim_cfg_, vis_cfg_);
   // set random numbers for graph sand dropping
@@ -170,6 +172,10 @@ void App::control_action(Control_Action action) {
     generate_graph_from_cfg();
     break;
   case Control_Action::Launch_Builder:
+    // stop the simulation
+    running_ = false;
+
+    // change the workspace
     master_state_.show_builder_window = true;
 
     master_state_.show_visualization_window = false;
