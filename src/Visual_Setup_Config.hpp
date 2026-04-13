@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Visualizer_Config.hpp"
 #include <variant>
 namespace ssoc {
 
@@ -27,12 +28,7 @@ using Graph_Layout_Algorithm =
  * serializable, to save specific config for future reference. */
 struct Vis_Config {
   Graph_Layout_Algorithm gla;
-
-  // if false, will show as colour
-  bool show_as_size = true;
-
-  // catch-all for all types of numbers
-  bool show_numbers = true;
+  Visualizer_Config visualizer_config;
 };
 
 } // namespace ssoc

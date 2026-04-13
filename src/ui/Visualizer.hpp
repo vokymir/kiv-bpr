@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Vis_Config.hpp"
+#include "Visual_Setup_Config.hpp"
 #include "graph/Graph.hpp"
 #include <cstddef>
 #include <deque>
@@ -11,8 +11,8 @@ namespace ssoc::ui {
 class Visualizer {
 private:
   // editable in UI
-  float zoom_speed_ = 0.01f;
-  float vertex_base_size_ = 5.0f;
+  Visualizer_Config default_cfg_;
+  Visualizer_Config &cfg_ = default_cfg_;
 
   // editable via mouse
   float zoom_ = 100.0f;
@@ -49,16 +49,15 @@ private:
 
   // draw everything onto the drawing list
   void draw(ImDrawList *draw_list, const graph::Graph &g, size_t last_vertex,
-            const std::deque<size_t> &maybe_toppling, const Vis_Config &cfg);
+            const std::deque<size_t> &maybe_toppling);
   // draw all edges (except to sink)
   void draw_edges(ImDrawList *draw_list, const graph::Graph &g);
   // draw all vertices (except sink), their grain height & id
   void draw_vertices(ImDrawList *draw_list, const graph::Graph &g,
-                     size_t last_vertex, const Vis_Config &cfg);
+                     size_t last_vertex);
   // draw info about vertices which might be toppled in this avalanche
   void draw_topple_vertices(ImDrawList *draw_list, const graph::Graph &g,
-                            const std::deque<size_t> &maybe_toppling,
-                            const Vis_Config &cfg);
+                            const std::deque<size_t> &maybe_toppling);
   // if user drag a vertex, change it's position
   void move_vertex(graph::Graph &g);
 
@@ -66,7 +65,7 @@ public:
   // show window - and allow user to move vertices
   void show_window(graph::Graph &g, bool &show, size_t last_vertex,
                    const std::deque<size_t> &checking_topple_vertices,
-                   const Vis_Config &cfg);
+                   Vis_Config &cfg);
 };
 
 } // namespace ssoc::ui

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Graph.hpp"
-#include "Sim_Config.hpp"
-#include "Vis_Config.hpp"
+#include "Simulation_Setup_Config.hpp"
+#include "Visual_Setup_Config.hpp"
 #include <memory>
 namespace ssoc::graph::generate {
 

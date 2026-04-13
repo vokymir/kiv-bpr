@@ -1,8 +1,8 @@
 #pragma once
 
 #include "App_Utils.hpp"
-#include "Sim_Config.hpp"
-#include "Vis_Config.hpp"
+#include "Simulation_Setup_Config.hpp"
+#include "Visual_Setup_Config.hpp"
 #include "graph/Graph.hpp"
 #include "stat/Stats_Collector.hpp"
 #include "ui/Visualizer.hpp"
@@ -17,7 +17,7 @@ namespace ssoc::ui::views {
 void draw_config_w(bool &show, Sim_Config &sim_cfg, Vis_Config &vis_cfg);
 
 // graph is modifiable (user using mouse to move vertices)
-void draw_graph_w(bool &show, const Vis_Config &vis_cfg, Visualizer &vis,
+void draw_graph_w(bool &show, Vis_Config &vis_cfg, Visualizer &vis,
                   graph::Graph &g, size_t last_vertex = 0,
                   const std::deque<size_t> &checking_topple_vertices = {});
 

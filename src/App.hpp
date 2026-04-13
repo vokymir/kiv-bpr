@@ -1,8 +1,8 @@
 #pragma once
 
 #include "App_Utils.hpp"
-#include "Sim_Config.hpp"
-#include "Vis_Config.hpp"
+#include "Simulation_Setup_Config.hpp"
+#include "Visual_Setup_Config.hpp"
 #include "graph/Graph.hpp"
 #include "stat/Simulation_Events.hpp"
 #include "stat/Stats_Collector.hpp"

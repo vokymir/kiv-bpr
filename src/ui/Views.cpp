@@ -1,6 +1,6 @@
 #include "ui/Views.hpp"
 #include "App_Utils.hpp"
-#include "Vis_Config.hpp"
+#include "Visual_Setup_Config.hpp"
 #include <algorithm>
 #include <cstddef>
 #include <deque>
@@ -62,7 +62,7 @@ void draw_config_w(bool &show, Sim_Config &sim_cfg, Vis_Config &vis_cfg) {
   ImGui::End();
 }
 
-void draw_graph_w(bool &show, const Vis_Config &vis_cfg, Visualizer &vis,
+void draw_graph_w(bool &show, Vis_Config &vis_cfg, Visualizer &vis,
                   graph::Graph &g, size_t last_vertex,
                   const std::deque<size_t> &checking_topple_vertices) {
   ImGui::SetNextWindowPos(ImVec2(336, 79), ImGuiCond_FirstUseEver);
@@ -242,8 +242,10 @@ void draw_gga(gga_::Watts_Strogatz_2D &cfg) {
 
 void draw_vis_config_s(Vis_Config &cfg) {
 
-  ImGui::Checkbox("Show sand count as size (or as colour)", &cfg.show_as_size);
-  ImGui::Checkbox("Show numbers in visualization.", &cfg.show_numbers);
+  ImGui::Checkbox("Show sand count as size (or as colour)",
+                  &cfg.visualizer_config.show_as_size);
+  ImGui::Checkbox("Show numbers in visualization.",
+                  &cfg.visualizer_config.show_numbers);
 
   draw_gla_s(cfg.gla);
 }

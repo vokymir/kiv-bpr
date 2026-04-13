@@ -1,7 +1,7 @@
 #include "Converter.hpp"
 #include "Generator.hpp"
-#include "Sim_Config.hpp"
-#include "Vis_Config.hpp"
+#include "Simulation_Setup_Config.hpp"
+#include "Visual_Setup_Config.hpp"
 #include "igraph_lib.hpp"
 #include <algorithm>
 #include <cstddef>

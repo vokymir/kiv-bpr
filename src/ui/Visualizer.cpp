@@ -1,5 +1,5 @@
 #include "Visualizer.hpp"
-#include "Vis_Config.hpp"
+#include "Visual_Setup_Config.hpp"
 #include "graph/Graph.hpp"
 #include <algorithm>
 #include <cmath>
@@ -45,7 +45,7 @@ void Visualizer::zoom() {
   }
 
   float old_zoom = zoom_;
-  zoom_ *= 1.f + (io.MouseWheel > 0 ? zoom_speed_ : -zoom_speed_);
+  zoom_ *= 1.f + (io.MouseWheel > 0 ? cfg_.zoom_speed : -cfg_.zoom_speed);
 
   // have zoom treshold - not to stay on zero
   if (zoom_ < 0.001f) {
@@ -70,19 +70,19 @@ std::pair<double, double> Visualizer::from_screen(const ImVec2 &coord) {
 
 float Visualizer::circle_size(int height, bool use_height) {
   if (use_height) {
-    return vertex_base_size_ * static_cast<float>(height + 1) * zoom_ / 100.0f;
+    return cfg_.vertex_base_size * static_cast<float>(height + 1) * zoom_ /
+           100.0f;
   } else {
-    return vertex_base_size_ * 1.0f * zoom_ / 100.0f;
+    return cfg_.vertex_base_size * 1.0f * zoom_ / 100.0f;
   }
 }
 
 void Visualizer::draw(ImDrawList *draw_list, const graph::Graph &g,
                       size_t last_vertex,
-                      const std::deque<size_t> &maybe_toppling,
-                      const Vis_Config &cfg) {
+                      const std::deque<size_t> &maybe_toppling) {
   draw_edges(draw_list, g);
-  draw_vertices(draw_list, g, last_vertex, cfg);
-  draw_topple_vertices(draw_list, g, maybe_toppling, cfg);
+  draw_vertices(draw_list, g, last_vertex);
+  draw_topple_vertices(draw_list, g, maybe_toppling);
 }
 
 void Visualizer::draw_edges(ImDrawList *draw_list, const graph::Graph &g) {
@@ -113,7 +113,7 @@ void Visualizer::draw_edges(ImDrawList *draw_list, const graph::Graph &g) {
 }
 
 void Visualizer::draw_vertices(ImDrawList *draw_list, const graph::Graph &g,
-                               size_t last_vertex, const Vis_Config &cfg) {
+                               size_t last_vertex) {
   const size_t vert_count = g.num_vertices() - 1;
 
   const auto &positions = g.layout_pos_const();
@@ -147,7 +147,7 @@ void Visualizer::draw_vertices(ImDrawList *draw_list, const graph::Graph &g,
 
     // determine the color
     ImU32 color;
-    if (cfg.show_as_size) {
+    if (cfg_.show_as_size) {
       color = color_normal;
 
     } else {
@@ -174,15 +174,15 @@ void Visualizer::draw_vertices(ImDrawList *draw_list, const graph::Graph &g,
       color = ImGui::ColorConvertFloat4ToU32(c);
     }
 
-    draw_list->AddCircleFilled(pos, circle_size(height, cfg.show_as_size),
-                               color);
+    auto cs = circle_size(height, cfg_.show_as_size);
+
+    draw_list->AddCircleFilled(pos, cs, color);
 
     if (v == last_vertex) {
-      draw_list->AddCircle(pos, circle_size(height, cfg.show_as_size) + 6,
-                           color_last, 0, 3.0f);
+      draw_list->AddCircle(pos, cs + 6, color_last, 0, 3.0f);
     }
 
-    if (cfg.show_numbers) {
+    if (cfg_.show_numbers) {
       char buf[32];
       std::snprintf(buf, sizeof(buf), "%i", height);
       auto text_size = ImGui::CalcTextSize(buf);
@@ -201,10 +201,9 @@ void Visualizer::draw_vertices(ImDrawList *draw_list, const graph::Graph &g,
   }
 }
 
-void Visualizer::draw_topple_vertices(ImDrawList *draw_list,
-                                      const graph::Graph &g,
-                                      const std::deque<size_t> &maybe_toppling,
-                                      const Vis_Config &cfg) {
+void Visualizer::draw_topple_vertices(
+    ImDrawList *draw_list, const graph::Graph &g,
+    const std::deque<size_t> &maybe_toppling) {
   const size_t sink = g.num_vertices() - 1;
   const auto &positions = g.layout_pos_const();
   const auto &heights = g.sand_height_const();
@@ -227,10 +226,10 @@ void Visualizer::draw_topple_vertices(ImDrawList *draw_list,
     int height = heights[vertex];
 
     float line_thickness = 1.0f * zoom_ / 100.0f;
-    draw_list->AddCircle(pos, circle_size(height, cfg.show_as_size),
-                         color_candidate, 0, line_thickness);
+    auto cs = circle_size(height, cfg_.show_as_size);
+    draw_list->AddCircle(pos, cs, color_candidate, 0, line_thickness);
 
-    if (cfg.show_numbers) {
+    if (cfg_.show_numbers) {
       size_t min_order =
           *std::min_element(checking_order.begin(), checking_order.end());
 
@@ -238,7 +237,7 @@ void Visualizer::draw_topple_vertices(ImDrawList *draw_list,
       // shift by 1 to be 1-indexed (more human readable)
       std::snprintf(buf, sizeof(buf), "%zu", min_order + 1);
       auto text_size = ImGui::CalcTextSize(buf);
-      pos.x -= circle_size(height, cfg.show_as_size) + text_size.x;
+      pos.x -= cs + text_size.x;
       pos.y -= text_size.y / 2;
 
       draw_list->AddText(pos, color_candidate, buf);
@@ -276,7 +275,10 @@ void Visualizer::move_vertex(graph::Graph &g) {
 
 void Visualizer::show_window(graph::Graph &g, bool &show, size_t last_vertex,
                              const std::deque<size_t> &checking_topple_vertices,
-                             const Vis_Config &cfg) {
+                             Vis_Config &cfg) {
+  // update reference to visualizer config
+  cfg_ = cfg.visualizer_config;
+
   ImGui::Begin("Graph Visualization", &show);
 
   if (std::holds_alternative<gla_::Hidden_GLA>(g.vis_cfg_const().gla)) {
@@ -286,8 +288,9 @@ void Visualizer::show_window(graph::Graph &g, bool &show, size_t last_vertex,
   }
 
   ImGui::Text("zoom: %f", static_cast<double>(zoom_));
-  ImGui::SliderFloat("Zoom speed", &zoom_speed_, 0.001f, 1.0f);
-  ImGui::SliderFloat("Vertex base size", &vertex_base_size_, 0.001f, 100.0f);
+  ImGui::SliderFloat("Zoom speed", &cfg_.zoom_speed, 0.001f, 1.0f);
+  ImGui::SliderFloat("Vertex base size", &cfg_.vertex_base_size, 0.001f,
+                     100.0f);
 
   setup_canvas();
   ImGui::InvisibleButton("##canvas", size_);
@@ -297,7 +300,7 @@ void Visualizer::show_window(graph::Graph &g, bool &show, size_t last_vertex,
   ImDrawList *draw_list = ImGui::GetWindowDrawList();
   draw_list->PushClipRect(origin_, footer_, true);
 
-  draw(draw_list, g, last_vertex, checking_topple_vertices, cfg);
+  draw(draw_list, g, last_vertex, checking_topple_vertices);
   move_vertex(g); // this one line allows moving vertices
 
   draw_list->PopClipRect();
