@@ -44,6 +44,26 @@ void draw_stats_window(bool &show, const stat::Stats_Collector &sc);
 // kinda PRIVATE
 namespace _detail {
 
+// = help window
+struct HelpLayoutState {
+  float split_x = 0.5f;
+  float split_y = 0.5f;
+};
+
+void draw_help_title();
+
+// welcome
+void draw_help_top_left(float left_w);
+// what is SOC
+void draw_help_top_right();
+void draw_help_top(HelpLayoutState &s, float h, float w);
+
+// how to use
+void draw_help_bottom_left(float left_w);
+// about
+void draw_help_bottom_right();
+void draw_help_bottom(HelpLayoutState &s, float h, float w);
+
 // = sim config
 void draw_sim_config_s(Sim_Config &cfg);
 void draw_gga_s(Graph_Generation_Algorithm &gga);
