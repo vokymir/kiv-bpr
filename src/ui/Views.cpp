@@ -96,6 +96,7 @@ Master_Action draw_graph_builder_windows(bool &show, Sim_Config &sim_cfg,
 
   if (ImGui::Button("Generate Graph", ImVec2(button_width, 40))) {
     state = Master_Action::Generate_Graph;
+    show = false; // after generating, hide itself
   }
 
   ImGui::End();
@@ -115,6 +116,12 @@ void draw_graph_control_window(bool &show, Visualizer_Config &cfg) {
   ImGui::SetNextWindowPos(ImVec2(423, 16), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSize(ImVec2(562, 54), ImGuiCond_FirstUseEver);
   ImGui::Begin("Visualization Control", &show);
+
+  ImGui::SliderFloat("Zoom speed", &cfg.zoom_speed, 0.001f, 1.0f);
+  ImGui::SliderFloat("Vertex base size", &cfg.vertex_base_size, 0.001f, 100.0f);
+
+  ImGui::Checkbox("Show sand count as size (or as colour)", &cfg.show_as_size);
+  ImGui::Checkbox("Show numbers in visualization.", &cfg.show_numbers);
 
   ImGui::End();
 }
@@ -289,15 +296,7 @@ void draw_gga(gga_::Watts_Strogatz_2D &cfg) {
   }
 }
 
-void draw_vis_config_s(Vis_Config &cfg) {
-
-  ImGui::Checkbox("Show sand count as size (or as colour)",
-                  &cfg.visualizer_config.show_as_size);
-  ImGui::Checkbox("Show numbers in visualization.",
-                  &cfg.visualizer_config.show_numbers);
-
-  draw_gla_s(cfg.gla);
-}
+void draw_vis_config_s(Vis_Config &cfg) { draw_gla_s(cfg.gla); }
 
 void draw_gla_s(Graph_Layout_Algorithm &gla) {
   constexpr const char *labels[] = {

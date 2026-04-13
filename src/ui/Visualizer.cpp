@@ -287,11 +287,6 @@ void Visualizer::show_window(graph::Graph &g, bool &show, size_t last_vertex,
     return;
   }
 
-  ImGui::Text("zoom: %f", static_cast<double>(zoom_));
-  ImGui::SliderFloat("Zoom speed", &cfg_.zoom_speed, 0.001f, 1.0f);
-  ImGui::SliderFloat("Vertex base size", &cfg_.vertex_base_size, 0.001f,
-                     100.0f);
-
   setup_canvas();
   ImGui::InvisibleButton("##canvas", size_);
   pan();
