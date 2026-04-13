@@ -1,13 +1,68 @@
 #set text(lang: "en")
 #set heading(numbering: "1.")
-#set math.equation(numbering: "1.")
+#set math.equation(numbering: "(1)")
+
+// highlight all TODOs, which is WOW, easy yet not
+#show regex("TODO(.*)"): it => text(fill: red, weight: "bold")[#it]
 
 #title([
-Self-Organized Criticality: Sandpile Model on Undirected Graph, Influence of
+  Self-Organized Criticality: Sandpile Model on Undirected Graph, Influence of
   Topology and Dissipation Rules on Avalanches
 ])
 
-= Introduction TODO: longer
+= Introduction
+
+Almost everything in nature tends to cluster around a center value.
+An example might be the height of humans. This is described by a
+normal distribution which itself got its name because this pattern is so often
+observed not only in nature but in human-made systems as well.
+
+Contrary to this, there are systems which could not be described by normal
+distribution. One example are the forest fire sizes. If they were
+to adhere to normal distribution, there would be known an _average forest fire
+size_. Even though most of forest fires are small, there is nothing limiting the
+potential size. This is one of key properties of systems better described by
+power-law, scale-invariance.
+
+Normal distribution is _heavy tailed_, meaning that most of values are
+distributed within small range around the center (mean) and
+values far from it are very impropable. The probability density function of
+normal distribution is described in @eq:normal_distribution
+
+$
+        f(x) & = 1 / sqrt(2 pi sigma^2) exp (- (x - mu)^2 / (2 sigma^2)) \
+  mu #h(1mm) & ... #text[mean] \
+     sigma^2 & ... #text[variance]
+$ <eq:normal_distribution>
+
+TODO: plot normal dist?
+
+As opposed to this, power-law  #footnote[Power-law on $(0, infinity)$ cannot
+  be a probability distribution, because the areas near 0 and under the tail
+  are infinite. However, with simple restrictions: $f(x) = a x^(-k), quad
+  k > 1, quad x > x_(min)$ it is a valid distribution.] is _long tailed_. Its
+exponential character described in @eq:power-law result in majority of
+the values being very far. That corresponds with the scale-invariance: Any
+(forest fire) size is realistically possible, even though smaller sizes are more
+likely. Power-law exhibit linear relationship between $log f(x)$ and $log x$. In
+a `log-log plot` it forms a straight line.
+
+$
+       f(x) & = a x^(-k) \
+  k #h(1mm) & ... #text[constant exponent]
+$ <eq:power-law>
+
+TODO: plot power-law? in normal and log-log plot
+
+The emergence of power-law distribution is often connected to systems critical
+state. Consider phase transition of water from liquid to vapor. At the
+liquid-vapour boundary curve, both liquid and vapour can coexist but are
+distinctly separate. The boundary terminates at some critical temperature and
+critical pressure at which the critical point of a system is defined. While the
+system is in the critical state, the water is in not in any one state.
+
+Systems in critical state are most responsive to input and behaves unpredictable.
+
 
 Natural systems with high degree of freedom such as earthquakes often exhibit a
 tendency to reach a critical state. This phenomenon is called self-organized
@@ -22,9 +77,25 @@ model was later generalized from square lattice to arbitrary graph
 @Holroyd_2008. That generalization is important because it allows us to study
 the model's behaviour for different graph topologies.
 
-= Background
+= Self-Organized Criticality
+TODO: critical state, power-law
 
-== Sandpile Model <h:sandpile_model_general>
+= Graph Theory
+
+In order to explore the behaviour of the sandpile model on a graph, we introduce
+basic concepts. The _vertex degree_ $d(v_i)$ is defined as the number of
+vertices connected to $v_i$ via an edge.
+
+_Path length_ describes the distance between two vertices for a given path. The
+path length is equal to the number of vertices in between the first and last
+vertex on a path. The _shortest path length_ refers to a distance between two
+vertices such as any other path between them produces at least the same path
+length. It is useful to also define an _average shortest path length_, an average
+of shortest paths between any two vertices in a graph.
+
+TODO: small-world network properties (the previous needed for that)
+
+= Sandpile Model <h:sandpile_model_general>
 
 The original sandpile model presents a simple chessboard and falling sand
 grains. Each grain falls on a chess square determined by a random
@@ -32,7 +103,7 @@ distribution. If the number of grains on any square reaches four, the sandpile
 topples and the four grains fall on adjacent squares, possibly causing
 additional squares to topple. In case the square does not have four adjacent
 squares (i.e. it is on the edge of chessboard) the remaining grains fall off the
-board and are therefore removed from the model. 
+board and are therefore removed from the model.
 
 The topology of this model can be expressed as an undirected graph, a square
 lattice of the size $8 times 8$. However, it is not a correct representation
@@ -67,25 +138,6 @@ every pair of vertices exist at least one path from one to another) to dissipate
 at least one vertex connected to a sink is necessary. For any arbitrary graph
 the requirement heighten to every vertex being connected to a sink.
 
-== Self-Organized Criticality
-TODO: critical state, power-law
-
-== Graph Theory
-
-In order to explore the behaviour of the sandpile model on a graph, we introduce
-basic concepts. The _vertex degree_ $d(v_i)$ is defined as the number of
-vertices connected to $v_i$ via an edge.
-
-_Path length_ describes the distance between two vertices for a given path. The
-path length is equal to the number of vertices in between the first and last
-vertex on a path. The _shortest path length_ refers to a distance between two
-vertices such as any other path between them produces at least the same path
-length. It is useful to also define an _average shortest path length_, an average
-of shortest paths between any two vertices in a graph.
-
-TODO: small-world network properties (the previous needed for that)
-
-= Model Definition
 
 TODO: how can the model be extended, rules and graphs. foundation for it is in
 @h:sandpile_model_general
