@@ -12,14 +12,23 @@
 #include <memory>
 namespace ssoc::ui::views {
 
-[[nodiscard]] Master_Action draw_master_w(Master_State &state);
+// menu uses Master State to allow user manually opening/closing individual
+// windows
+void draw_menu(Master_State &state);
 
-void draw_config_w(bool &show, Sim_Config &sim_cfg, Vis_Config &vis_cfg);
+// allow user build their own graph, return if user clicked CREATE button
+[[nodiscard]] Master_Action draw_graph_builder_windows(bool &show,
+                                                       Sim_Config &sim_cfg,
+                                                       Vis_Config &vis_cfg);
 
 // graph is modifiable (user using mouse to move vertices)
-void draw_graph_w(bool &show, Vis_Config &vis_cfg, Visualizer &vis,
-                  graph::Graph &g, size_t last_vertex = 0,
-                  const std::deque<size_t> &checking_topple_vertices = {});
+void draw_graph_visualization_window(
+    bool &show, Vis_Config &vis_cfg, Visualizer &vis, graph::Graph &g,
+    size_t last_vertex = 0,
+    const std::deque<size_t> &checking_topple_vertices = {});
+
+// allow user to control visualization via UI
+void draw_graph_control_window(bool &show, Visualizer_Config &cfg);
 
 [[nodiscard]] Control_Action draw_control_w(bool &show);
 

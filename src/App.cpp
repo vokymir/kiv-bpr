@@ -50,7 +50,7 @@ void App::generate_graph_from_cfg() {
   // reset stats
   stats_.reset();
   // show graph window
-  master_state_.show_graph_window = true;
+  master_state_.show_visualization_window = true;
 }
 
 void App::run() {
@@ -84,19 +84,20 @@ void App::run() {
     win_context_->begin_frame();
     // vvvvv
 
-    master_action(ui::views::draw_master_w(master_state_));
+    ui::views::draw_menu(master_state_);
 
-    if (master_state_.show_config_window) {
-      ui::views::draw_config_w(master_state_.show_config_window, sim_cfg_,
-                               vis_cfg_);
+    if (master_state_.show_builder_window) {
+      master_action(ui::views::draw_graph_builder_windows(
+          master_state_.show_builder_window, sim_cfg_, vis_cfg_));
     }
-    if (master_state_.show_graph_window) {
-      ui::views::draw_graph_w(master_state_.show_graph_window, vis_cfg_, vis_,
-                              *g_, current_vertex_, to_topple_);
+    if (master_state_.show_visualization_window) {
+      ui::views::draw_graph_visualization_window(
+          master_state_.show_visualization_window, vis_cfg_, vis_, *g_,
+          current_vertex_, to_topple_);
     }
-    if (master_state_.show_control_window) {
-      control_action(
-          ui::views::draw_control_w(master_state_.show_control_window));
+    if (master_state_.show_simulation_control_window) {
+      control_action(ui::views::draw_control_w(
+          master_state_.show_simulation_control_window));
     }
     if (master_state_.show_stats_window) {
       ui::views::draw_stats_w(master_state_.show_stats_window, stats_);

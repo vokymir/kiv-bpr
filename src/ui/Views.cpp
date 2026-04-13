@@ -14,35 +14,33 @@
 #include <vector>
 namespace ssoc::ui::views {
 
-Master_Action draw_master_w(Master_State &state) {
-  Master_Action action = Master_Action::None;
+void draw_menu(Master_State &state) {
 
-  ImGui::SetNextWindowPos(ImVec2(31, 21), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(249, 189), ImGuiCond_FirstUseEver);
-  ImGui::Begin("Master window", nullptr);
+  if (ImGui::BeginMainMenuBar()) {
 
-  ImGui::PushTextWrapPos(0.0f);
-  ImGui::InputInt("Render frequency", &state.draw_every);
-  ImGui::TextDisabled(
-      "Skipping render can greatly increase simulation speed at the cost of "
-      "not responsibility. Use with precaution.");
-  ImGui::PopTextWrapPos();
+    if (ImGui::BeginMenu("Windows")) {
 
-  ImGui::Checkbox("Show graph", &state.show_graph_window);
-  ImGui::Checkbox("Show config", &state.show_config_window);
-  ImGui::Checkbox("Show stepping", &state.show_control_window);
-  ImGui::Checkbox("Show stats", &state.show_stats_window);
+      ImGui::MenuItem("Show graph visualization", nullptr,
+                      &state.show_visualization_window);
+      ImGui::MenuItem("Show graph visualization config", nullptr,
+                      &state.show_visualization_config_window);
+      ImGui::MenuItem("Show graph builder", nullptr,
+                      &state.show_builder_window);
+      ImGui::MenuItem("Show simulation control", nullptr,
+                      &state.show_simulation_control_window);
+      ImGui::MenuItem("Show stats", nullptr, &state.show_stats_window);
 
-  if (ImGui::Button("Generate graph")) {
-    action = Master_Action::Generate_Graph;
+      ImGui::EndMenu();
+    }
+
+    ImGui::EndMainMenuBar();
   }
-
-  ImGui::End();
-
-  return action;
 }
 
-void draw_config_w(bool &show, Sim_Config &sim_cfg, Vis_Config &vis_cfg) {
+Master_Action draw_graph_builder_windows(bool &show, Sim_Config &sim_cfg,
+                                         Vis_Config &vis_cfg) {
+  Master_Action state = Master_Action::None;
+
   ImGui::SetNextWindowPos(ImVec2(22, 233), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSize(ImVec2(298, 459), ImGuiCond_FirstUseEver);
   ImGui::Begin("Config window", &show);
@@ -59,12 +57,18 @@ void draw_config_w(bool &show, Sim_Config &sim_cfg, Vis_Config &vis_cfg) {
 
   ImGui::PopTextWrapPos();
 
+  if (ImGui::Button("Generate graph")) {
+    state = Master_Action::Generate_Graph;
+  }
+
   ImGui::End();
+
+  return state;
 }
 
-void draw_graph_w(bool &show, Vis_Config &vis_cfg, Visualizer &vis,
-                  graph::Graph &g, size_t last_vertex,
-                  const std::deque<size_t> &checking_topple_vertices) {
+void draw_graph_visualization_window(
+    bool &show, Vis_Config &vis_cfg, Visualizer &vis, graph::Graph &g,
+    size_t last_vertex, const std::deque<size_t> &checking_topple_vertices) {
   ImGui::SetNextWindowPos(ImVec2(336, 79), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSize(ImVec2(625, 571), ImGuiCond_FirstUseEver);
 

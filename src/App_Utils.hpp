@@ -10,9 +10,10 @@ enum class Run_Mode {
 };
 
 struct Master_State {
-  bool show_graph_window = true;
-  bool show_config_window = true;
-  bool show_control_window = true;
+  bool show_visualization_window = true;
+  bool show_visualization_config_window = true;
+  bool show_builder_window = true;
+  bool show_simulation_control_window = true;
   bool show_stats_window = true;
 
   int draw_every = 1; // draw every Xth iteration - can greatly sped up things
