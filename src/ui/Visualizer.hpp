@@ -52,11 +52,11 @@ private:
             const std::deque<size_t> &maybe_toppling, const Vis_Config &cfg);
   // draw all edges (except to sink)
   void draw_edges(ImDrawList *draw_list, const graph::Graph &g);
-  // draw all vertexes (except sink), their grain height & id
-  void draw_vertexes(ImDrawList *draw_list, const graph::Graph &g,
+  // draw all vertices (except sink), their grain height & id
+  void draw_vertices(ImDrawList *draw_list, const graph::Graph &g,
                      size_t last_vertex, const Vis_Config &cfg);
-  // draw info about vertexes which might be toppled in this avalanche
-  void draw_topple_vertexes(ImDrawList *draw_list, const graph::Graph &g,
+  // draw info about vertices which might be toppled in this avalanche
+  void draw_topple_vertices(ImDrawList *draw_list, const graph::Graph &g,
                             const std::deque<size_t> &maybe_toppling,
                             const Vis_Config &cfg);
   // if user drag a vertex, change it's position
@@ -65,7 +65,7 @@ private:
 public:
   // show window - and allow user to move vertices
   void show_window(graph::Graph &g, bool &show, size_t last_vertex,
-                   const std::deque<size_t> &checking_topple_vertexes,
+                   const std::deque<size_t> &checking_topple_vertices,
                    const Vis_Config &cfg);
 };
 

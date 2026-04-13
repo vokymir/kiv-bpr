@@ -81,8 +81,8 @@ void Visualizer::draw(ImDrawList *draw_list, const graph::Graph &g,
                       const std::deque<size_t> &maybe_toppling,
                       const Vis_Config &cfg) {
   draw_edges(draw_list, g);
-  draw_vertexes(draw_list, g, last_vertex, cfg);
-  draw_topple_vertexes(draw_list, g, maybe_toppling, cfg);
+  draw_vertices(draw_list, g, last_vertex, cfg);
+  draw_topple_vertices(draw_list, g, maybe_toppling, cfg);
 }
 
 void Visualizer::draw_edges(ImDrawList *draw_list, const graph::Graph &g) {
@@ -112,15 +112,16 @@ void Visualizer::draw_edges(ImDrawList *draw_list, const graph::Graph &g) {
   }
 }
 
-void Visualizer::draw_vertexes(ImDrawList *draw_list, const graph::Graph &g,
+void Visualizer::draw_vertices(ImDrawList *draw_list, const graph::Graph &g,
                                size_t last_vertex, const Vis_Config &cfg) {
   const size_t vert_count = g.num_vertices() - 1;
 
   const auto &positions = g.layout_pos_const();
   const auto &heights = g.sand_height_const();
 
-  // used as color for normal vertexes, or as upper bound in color-mode
+  // used as color for normal vertices
   const ImU32 color_normal = IM_COL32(200, 50, 50, 255);
+
   // used in the color mode
   const ImVec4 color_mode_1 =
       ImGui::ColorConvertU32ToFloat4(IM_COL32(68, 1, 84, 255));
@@ -132,6 +133,7 @@ void Visualizer::draw_vertexes(ImDrawList *draw_list, const graph::Graph &g,
       ImGui::ColorConvertU32ToFloat4(IM_COL32(94, 201, 98, 255));
   const ImVec4 color_mode_5 =
       ImGui::ColorConvertU32ToFloat4(IM_COL32(253, 231, 37, 255));
+
   // color of vertex highlight where last sand was dropped
   const ImU32 color_last = IM_COL32(50, 150, 150, 255);
   // text: height
@@ -199,7 +201,7 @@ void Visualizer::draw_vertexes(ImDrawList *draw_list, const graph::Graph &g,
   }
 }
 
-void Visualizer::draw_topple_vertexes(ImDrawList *draw_list,
+void Visualizer::draw_topple_vertices(ImDrawList *draw_list,
                                       const graph::Graph &g,
                                       const std::deque<size_t> &maybe_toppling,
                                       const Vis_Config &cfg) {
@@ -273,7 +275,7 @@ void Visualizer::move_vertex(graph::Graph &g) {
 }
 
 void Visualizer::show_window(graph::Graph &g, bool &show, size_t last_vertex,
-                             const std::deque<size_t> &checking_topple_vertexes,
+                             const std::deque<size_t> &checking_topple_vertices,
                              const Vis_Config &cfg) {
   ImGui::Begin("Graph Visualization", &show);
 
@@ -295,7 +297,7 @@ void Visualizer::show_window(graph::Graph &g, bool &show, size_t last_vertex,
   ImDrawList *draw_list = ImGui::GetWindowDrawList();
   draw_list->PushClipRect(origin_, footer_, true);
 
-  draw(draw_list, g, last_vertex, checking_topple_vertexes, cfg);
+  draw(draw_list, g, last_vertex, checking_topple_vertices, cfg);
   move_vertex(g); // this one line allows moving vertices
 
   draw_list->PopClipRect();

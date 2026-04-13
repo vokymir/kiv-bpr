@@ -28,7 +28,7 @@ struct Watts_Strogatz_2D {
     As_Many_As_Nei,
   };
 
-  int size = 3; // total vertexes are size*size (for 2D)
+  int size = 3; // total vertices are size*size (for 2D)
   int neighbourhood_size = 3;
   double p = 0.5; // rewiring probability
   Sink_Rule sink_rule = Sink_Rule::All_Once;

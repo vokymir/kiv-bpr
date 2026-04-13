@@ -64,11 +64,11 @@ void draw_config_w(bool &show, Sim_Config &sim_cfg, Vis_Config &vis_cfg) {
 
 void draw_graph_w(bool &show, const Vis_Config &vis_cfg, Visualizer &vis,
                   graph::Graph &g, size_t last_vertex,
-                  const std::deque<size_t> &checking_topple_vertexes) {
+                  const std::deque<size_t> &checking_topple_vertices) {
   ImGui::SetNextWindowPos(ImVec2(336, 79), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSize(ImVec2(625, 571), ImGuiCond_FirstUseEver);
 
-  vis.show_window(g, show, last_vertex, checking_topple_vertexes, vis_cfg);
+  vis.show_window(g, show, last_vertex, checking_topple_vertices, vis_cfg);
 }
 
 Control_Action draw_control_w(bool &show) {
