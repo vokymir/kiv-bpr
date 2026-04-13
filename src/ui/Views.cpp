@@ -746,9 +746,17 @@ void draw_help_top_left(float left_w) {
 
   ImGui::Text("Welcome");
   ImGui::Separator();
+  ImGui::Spacing();
 
-  ImGui::TextWrapped("Interactive SOC simulation.\n\n"
-                     "Local rules → emergent avalanche dynamics.");
+  ImGui::TextWrapped("TODO: here will be some short onboarding, info for who "
+                     "this app is.\n");
+
+  ImGui::Spacing();
+
+  ImGui::TextWrapped("You can close this window using shortcut: [CTRL-q]");
+
+  ImGui::TextDisabled(
+      "Tip: You can reopen this window from the main menu at [Windows].");
 
   ImGui::EndChild();
 }
@@ -760,8 +768,7 @@ void draw_help_top_right() {
   ImGui::Separator();
 
   ImGui::TextWrapped(
-      "Self-organized criticality describes systems that naturally evolve "
-      "into a critical state with scale-free response distributions.");
+      "TODO: here short description of SOC & its relation to sandpile");
 
   ImGui::EndChild();
 }
@@ -793,10 +800,8 @@ void draw_help_bottom_left(float left_w) {
   ImGui::Text("How to use");
   ImGui::Separator();
 
-  ImGui::BulletText("Run or step simulation");
-  ImGui::BulletText("Tune parameters in control panels");
-  ImGui::BulletText("Observe avalanche behaviour");
-  ImGui::BulletText("Experiment with graph topology");
+  ImGui::TextWrapped(
+      "TODO: detail explanation of individual functionalities in app");
 
   ImGui::EndChild();
 }
@@ -807,9 +812,7 @@ void draw_help_bottom_right() {
   ImGui::Text("About");
   ImGui::Separator();
 
-  ImGui::TextWrapped(
-      "Thesis project exploring sandpile dynamics, graph topology, and "
-      "self-organized criticality.");
+  ImGui::TextWrapped("TODO: Why this app was created. all info on GH:");
 
   ImGui::Spacing();
 
