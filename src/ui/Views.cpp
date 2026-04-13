@@ -41,8 +41,8 @@ void draw_menu(Master_State &state) {
 }
 
 void draw_welcome_help_window(bool &show) {
-  ImGui::SetNextWindowPos(ImVec2(22, 233), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(298, 459), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowPos(ImVec2(50, 50), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(1200, 700), ImGuiCond_FirstUseEver);
   ImGui::Begin("Welcome | Help", &show);
 
   ImGui::Text(
@@ -59,8 +59,8 @@ Master_Action draw_graph_builder_windows(bool &show, Sim_Config &sim_cfg,
                                          Vis_Config &vis_cfg) {
   Master_Action state = Master_Action::None;
 
-  ImGui::SetNextWindowPos(ImVec2(22, 233), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(420, 520), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowPos(ImVec2(200, 150), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(900, 500), ImGuiCond_FirstUseEver);
   ImGui::Begin("Graph Builder", &show);
 
   ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(10, 8));
@@ -113,23 +113,39 @@ Master_Action draw_graph_builder_windows(bool &show, Sim_Config &sim_cfg,
 void draw_graph_visualization_window(
     bool &show, Vis_Config &vis_cfg, Visualizer &vis, graph::Graph &g,
     size_t last_vertex, const std::deque<size_t> &checking_topple_vertices) {
-  ImGui::SetNextWindowPos(ImVec2(336, 79), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(625, 571), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowPos(ImVec2(5, 300), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(790, 480), ImGuiCond_FirstUseEver);
 
   vis.show_window(g, show, last_vertex, checking_topple_vertices, vis_cfg);
 }
 
 void draw_graph_control_window(bool &show, Visualizer_Config &cfg) {
-  ImGui::SetNextWindowPos(ImVec2(423, 16), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(562, 54), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowPos(ImVec2(5, 25), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(290, 270), ImGuiCond_FirstUseEver);
   ImGui::Begin("Visualization Control", &show);
 
-  ImGui::SliderFloat("Zoom speed", &cfg.zoom_speed, 0.001f, 1.0f);
-  ImGui::SliderFloat("Vertex base size", &cfg.vertex_base_size, 0.001f, 100.0f);
+  ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8, 10));
+  ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(6, 4));
 
-  ImGui::Checkbox("Show sand count as size (or as colour)", &cfg.show_as_size);
-  ImGui::Checkbox("Show numbers in visualization.", &cfg.show_numbers);
+  ImGui::Text("View");
+  ImGui::Separator();
+  ImGui::Spacing();
 
+  ImGui::SliderFloat("Zoom speed", &cfg.zoom_speed, 0.001f, 1.0f, "%.3f",
+                     ImGuiSliderFlags_Logarithmic);
+
+  ImGui::SliderFloat("Vertex size", &cfg.vertex_base_size, 0.1f, 100.0f);
+
+  ImGui::Spacing();
+
+  ImGui::Text("Display");
+  ImGui::Separator();
+  ImGui::Spacing();
+
+  ImGui::Checkbox("Scale nodes by sand count", &cfg.show_as_size);
+  ImGui::Checkbox("Show vertex labels", &cfg.show_numbers);
+
+  ImGui::PopStyleVar(2);
   ImGui::End();
 }
 
@@ -137,60 +153,92 @@ Control_Action draw_simulation_control_window(bool &show, Master_State &state,
                                               Sim_Config &cfg) {
   Control_Action action = Control_Action::None;
 
-  ImGui::SetNextWindowPos(ImVec2(423, 16), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(562, 54), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowPos(ImVec2(300, 25), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(495, 270), ImGuiCond_FirstUseEver);
   ImGui::Begin("Simulation Control", &show);
+
+  ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(10, 8));
+  ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(8, 5));
+
+  //  ROW 1: Actions
+  ImGui::Text("Simulation");
+  ImGui::Separator();
 
   if (ImGui::Button("Step In")) {
     action = Control_Action::Step_In;
   }
-
   ImGui::SameLine();
+
   if (ImGui::Button("Step Over")) {
     action = Control_Action::Step_Over;
   }
-
   ImGui::SameLine();
-  if (ImGui::Button("Run right until avalanche happened")) {
+
+  if (ImGui::Button("Run until avalanche")) {
     action = Control_Action::Run_Until_Avalanche;
   }
-
   ImGui::SameLine();
-  if (ImGui::Button("Run forever")) {
+
+  if (ImGui::Button("Run")) {
     action = Control_Action::Run;
   }
-
   ImGui::SameLine();
+
+  ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.8f, 0.2f, 0.2f, 1.0f));
   if (ImGui::Button("Stop")) {
     action = Control_Action::Stop;
   }
+  ImGui::PopStyleColor();
 
-  ImGui::InputInt("Rendering frequency", &state.draw_every);
+  ImGui::Spacing();
+  ImGui::Spacing();
 
-  ImGui::Checkbox("Use random sand distribution.",
-                  &cfg.random_sand_distribution);
+  // ROW 2: Config
+  ImGui::Text("Configuration");
+  ImGui::Separator();
+
+  ImGui::PushItemWidth(140);
+  ImGui::InputInt("Render freq", &state.draw_every);
+  ImGui::PopItemWidth();
+
+  ImGui::SameLine();
+
+  ImGui::Checkbox("Random sand", &cfg.random_sand_distribution);
+
   if (!cfg.random_sand_distribution) {
-    ImGui::InputScalar("Which vertex to distribute sand to", ImGuiDataType_U64,
+    ImGui::SameLine();
+    ImGui::PushItemWidth(180);
+    ImGui::InputScalar("Vertex", ImGuiDataType_U64,
                        &cfg.specific_vertex_to_distribute);
+    ImGui::PopItemWidth();
   }
 
-  if (ImGui::Button("Generate the same graph")) {
+  ImGui::Spacing();
+  ImGui::Spacing();
+
+  // ROW 3: Graph
+  ImGui::Text("Graph");
+  ImGui::Separator();
+
+  if (ImGui::Button("Regenerate (same)")) {
     action = Control_Action::Generate_The_Same_Graph;
   }
-  if (ImGui::Button("Generate different graph")) {
+
+  ImGui::SameLine();
+
+  if (ImGui::Button("New graph...")) {
     action = Control_Action::Launch_Builder;
   }
 
-  ImGui::Separator();
-
+  ImGui::PopStyleVar(2);
   ImGui::End();
 
   return action;
 }
 
 void draw_stats_window(bool &show, const ssoc::stat::Stats_Collector &sc) {
-  ImGui::SetNextWindowPos(ImVec2(968, 85), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(311, 610), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowPos(ImVec2(800, 25), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(460, 755), ImGuiCond_FirstUseEver);
   ImGui::Begin("Statistics", &show);
 
   _detail::draw_stats_overview_s(sc);

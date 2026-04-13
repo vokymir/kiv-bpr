@@ -49,8 +49,6 @@ void App::generate_graph_from_cfg() {
   set_dist();
   // reset stats
   stats_.reset();
-  // show graph window
-  master_state_.show_visualization_window = true;
 }
 
 void App::run() {
@@ -127,8 +125,18 @@ void App::master_action(Master_Action action) {
   switch (action) {
   case Master_Action::None:
     return;
+    // if graph is generated via Builder Window, show everything and hide
+    // builder (don't effect help)
   case Master_Action::Generate_Graph:
+    master_state_.show_visualization_window = true;
+    master_state_.show_visualization_config_window = true;
+
+    master_state_.show_simulation_control_window = true;
+    master_state_.show_stats_window = true;
+
     generate_graph_from_cfg();
+
+    master_state_.show_builder_window = false;
     break;
   }
 }
@@ -163,6 +171,12 @@ void App::control_action(Control_Action action) {
     break;
   case Control_Action::Launch_Builder:
     master_state_.show_builder_window = true;
+
+    master_state_.show_visualization_window = false;
+    master_state_.show_visualization_config_window = false;
+
+    master_state_.show_simulation_control_window = false;
+    master_state_.show_stats_window = false;
     break;
   }
 }

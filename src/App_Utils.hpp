@@ -11,13 +11,13 @@ enum class Run_Mode {
 
 struct Master_State {
   bool show_help_window = true;
-
-  bool show_visualization_window = true;
-  bool show_visualization_config_window = true;
-
   bool show_builder_window = true;
-  bool show_simulation_control_window = true;
-  bool show_stats_window = true;
+
+  bool show_visualization_window = false;
+  bool show_visualization_config_window = false;
+
+  bool show_simulation_control_window = false;
+  bool show_stats_window = false;
 
   int draw_every = 1; // draw every Xth iteration - can greatly sped up things
 
