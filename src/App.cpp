@@ -96,11 +96,11 @@ void App::run() {
           current_vertex_, to_topple_);
     }
     if (master_state_.show_simulation_control_window) {
-      control_action(ui::views::draw_control_w(
-          master_state_.show_simulation_control_window));
+      control_action(ui::views::draw_simulation_control_window(
+          master_state_.show_simulation_control_window, master_state_));
     }
     if (master_state_.show_stats_window) {
-      ui::views::draw_stats_w(master_state_.show_stats_window, stats_);
+      ui::views::draw_stats_window(master_state_.show_stats_window, stats_);
     }
 
     // ^^^^^

@@ -22,7 +22,7 @@ void draw_menu(Master_State &state) {
 
       ImGui::MenuItem("Show graph visualization", nullptr,
                       &state.show_visualization_window);
-      ImGui::MenuItem("Show graph visualization config", nullptr,
+      ImGui::MenuItem("Show graph visualization configuration", nullptr,
                       &state.show_visualization_config_window);
       ImGui::MenuItem("Show graph builder", nullptr,
                       &state.show_builder_window);
@@ -75,7 +75,7 @@ void draw_graph_visualization_window(
   vis.show_window(g, show, last_vertex, checking_topple_vertices, vis_cfg);
 }
 
-Control_Action draw_control_w(bool &show) {
+Control_Action draw_simulation_control_window(bool &show, Master_State &state) {
   Control_Action action = Control_Action::None;
 
   ImGui::SetNextWindowPos(ImVec2(423, 16), ImGuiCond_FirstUseEver);
@@ -106,12 +106,14 @@ Control_Action draw_control_w(bool &show) {
     action = Control_Action::Stop;
   }
 
+  ImGui::InputInt("Rendering frequency", &state.draw_every);
+
   ImGui::End();
 
   return action;
 }
 
-void draw_stats_w(bool &show, const ssoc::stat::Stats_Collector &sc) {
+void draw_stats_window(bool &show, const ssoc::stat::Stats_Collector &sc) {
   ImGui::SetNextWindowPos(ImVec2(968, 85), ImGuiCond_FirstUseEver);
   ImGui::SetNextWindowSize(ImVec2(311, 610), ImGuiCond_FirstUseEver);
   ImGui::Begin("Stats", &show);

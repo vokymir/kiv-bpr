@@ -16,6 +16,9 @@ namespace ssoc::ui::views {
 // windows
 void draw_menu(Master_State &state);
 
+// onboarding + overall help & about us info
+void draw_welcome_help_window(bool &show);
+
 // allow user build their own graph, return if user clicked CREATE button
 [[nodiscard]] Master_Action draw_graph_builder_windows(bool &show,
                                                        Sim_Config &sim_cfg,
@@ -30,9 +33,12 @@ void draw_graph_visualization_window(
 // allow user to control visualization via UI
 void draw_graph_control_window(bool &show, Visualizer_Config &cfg);
 
-[[nodiscard]] Control_Action draw_control_w(bool &show);
+// allow for controlling the simulation (stepping, rendering, etc.) via UI
+[[nodiscard]] Control_Action
+draw_simulation_control_window(bool &show, Master_State &state);
 
-void draw_stats_w(bool &show, const stat::Stats_Collector &sc);
+// show all wonderful statistics
+void draw_stats_window(bool &show, const stat::Stats_Collector &sc);
 
 // kinda PRIVATE
 namespace _detail {
