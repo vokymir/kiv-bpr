@@ -143,6 +143,8 @@ $
 
 TODO: small-world network properties (the previous needed for that)
 
+TODO: connected graph definition
+
 = Sandpile Model <h:sandpile_model_general>
 
 The very original sandpile model is a cellular automaton on a lattice. Every
@@ -269,8 +271,10 @@ the models behaviour for different graph topologies.
 
 == Graph Topologies
 
-Standard choice for graph in sandpile model is square lattice with arbitrary
-size.
+Standard choice for sandpile model graph is square lattice with arbitrary size.
+
+TODO: on graphs, the toppling rule is: $K = d(v), quad forall v in V$ \
+(problem if $d(v) = 0$, must fix by dissipation rules)
 
 TODO: square lattice - properties
 
@@ -287,35 +291,66 @@ fundamental for the model not to supersaturate.
 
 A dissipation rule determines how many times a vertex should be connected to the
 sink. There is not a single rule which would be generally applied to any graph.
-We will discuss different rules, their properties and analogies.
+We will discuss different rules, their properties and analogies. Dissipation
+rules are not well-known thus their names were created for the purposes of this
+thesis.
 
-As discussed in @h:sandpile_model_general the existence of a sink vertex is
-necessary for any graph representation of a sandpile model. However there are
-various rules by which you can determine if a given vertex should be connected
-to a sink vertex and how many times if so.
+We can present a dissipation rule as a function of vertex returning an integer
+which denotes how many times should a vertex be connected to the sink.
+$
+  D: v arrow NN
+$
 
-For example the original model uses a rule (named by me as) _Fill to Four_. This
-rule states that the degree of vertex must be exactly four. The sink vertex is
-connected to all vertices as many times it is needed to fulfill that rule. For
-the square lattice, only vertices on the edge are connected (exactly once except
-for corner vertices, which are connected twice). This rule precisely reproduces
-the original chessboard idea.
+For example, the graph representation of the original model uses a _Fill to
+Four_ rule. It states that the degree of any vertex must be four or more. The
+sink vertex is connected to all vertices as many times it is needed to fulfil
+that rule. For the square lattice, only vertices on the edge are connected
+(exactly once except for corner vertices, which are connected twice).
+$
+  D(v) = cases(
+    4 - d(v) quad d(v) >= 4,
+    0
+  )
+$
 
-For an arbitrary graph though, the rule is insufficient. It does not ensure
-dissipation which can lead to graph supersaturation and never-ending avalanche.
-This rule does not reflect on the vertex degree if it is higher than four.
+For different graphs though, this rule might be insufficient. It does not ensure
+dissipation. This rule does not consider the vertex degree if it is higher
+than four.
 
-One possible rule which guarantees dissipation on any graph may be _All Once_.
-The rule is fair in a sense that all vertices have connection to the sink and is
-uniform because every vertex, no matter its degree, is connected exactly once.
+To ensure dissipation on any graph, the rule must connect all vertices to the
+sink at least once. That is because there might exist vertices which are not
+connected to any other vertex. A problem arises with such vertex if it were not
+connected: $d(v) = 0 = K$ meaning it should trigger an avalanche but that itself
+is nonsensical. Dissipation rules must prevent this from happening.
 
-Finally, another rule which assures dissipation is _As Many As Neighbours_. This
-rule connects every vertex to sink proportionally to the number of its
-neighbouring vertices, therefore emphasizing how many connections it has.
+If we consider connected graphs the dissipation condition softens. It is
+guaranteed that for all pairs of vertices exist at least one path therefore only
+one sink is sufficient to ensure dissipation. This might be useful for the
+sandpile model is only interested on connected graphs where they exhibit
+critical behaviour.
+
+One possible rule which guarantees dissipation on any graph is _All Once_. It
+ensures just the necessary condition that every vertex must be connected to sink
+at least once but nothing more. The rule is fair to all vertices as the
+connection to the sink is not exclusive to vertices of some characteristic
+#footnote[Possible characteristics include vertex neighbourhood size, shortest
+  path by which it reaches all other vertices and more.].
+$
+  D(v) = 1
+$
+
+One rule sufficient for connected graph is _As Many As Neighbours_. This
+rule connects every vertex to sink proportionally to its neighbourhood size.
+When considering connected graph this rule ensures dissipation and even provide
+a connection to the sink to all vertices.
+$
+  D(v) = d(v)
+$
 
 Every rule represents a different approach and not all can be applied to all
-types of graph topology.
+types of graph topology. TODO
 
+TODO: put graph topology & dissipation rules together
 
 = Observed Behaviour
 
@@ -325,6 +360,12 @@ the graph configurations (eg $beta$ for WS)
 TODO: metrics, how it changed criticality? origin distribution, avalanche size
 (max, avg)
 
+TODO: imagery from the app
+
+= Conclusion
+
+TODO
+
 = Technical Documentation
 
 TODO
@@ -333,7 +374,8 @@ TODO
 
 #heading([TODO], numbering: none)
 
-- multigraph?
+- příběh někam zakomponovat?
+- app: log-log plot
 
 #heading([TODO PS], numbering: none)
 
