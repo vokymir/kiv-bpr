@@ -70,10 +70,7 @@ void App::run() {
       periodic_step();
     }
 
-    if (periodic_emit_can_ && current_step_ % 10 == 0) {
-      periodic_emit_can_ = false;
-      events_.grains.emit({g_->grains_count()});
-    }
+    events_.grains_total.emit({g_->grains_count()});
 
     // tick
     counter = (counter + 1) % master_state_.draw_every_safe();
@@ -93,7 +90,7 @@ void App::run() {
     if (master_state_.show_visualization_window) {
       ui::views::draw_graph_visualization_window(
           master_state_.show_visualization_window, vis_cfg_, vis_, *g_,
-          current_vertex_, to_topple_);
+          avalanche_origin_current_, to_topple_);
     }
     if (master_state_.show_visualization_config_window) {
       ui::views::draw_graph_control_window(
@@ -200,11 +197,12 @@ size_t App::drop_sand() {
   }
 
   current_step_++;
-  current_vertex_ = idx;
+  avalanche_origin_current_ = idx;
+  sink_size_before_avalanche = g_->sink_size();
   avalanche_topples_ = 0;
-  periodic_emit_can_ = true;
 
   heights[idx] += 1;
+  events_.grain_dropped.emit({idx});
   to_topple_.push_back(idx);
 
   return idx;
@@ -284,8 +282,11 @@ size_t App::check_topple(int option) {
   avalanche_topples_ += toppled;
 
   if (to_topple_.empty() && avalanche_topples_ > 0) {
-    events_.avalanche.emit(
-        {avalanche_topples_, current_vertex_, current_step_});
+    auto sink_size_now = g_->sink_size();
+    int dissipated_grains = sink_size_now - sink_size_before_avalanche;
+
+    events_.avalanche.emit({avalanche_topples_, avalanche_origin_current_,
+                            current_step_, dissipated_grains});
   }
 
   return toppled;

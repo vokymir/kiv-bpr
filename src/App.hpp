@@ -44,10 +44,12 @@ private:
   stat::Simulation_Events events_;
   stat::Stats_Collector stats_;
   // transient (temporary) stats
-  bool periodic_emit_can_ = true;
-  size_t current_step_ = 0;
-  size_t current_vertex_;
+  // (temporary in a sense that they are not stored here but sent to stats
+  // collector. but they must be here for stats to work!)
+  size_t current_step_;
+  size_t avalanche_origin_current_;
   size_t avalanche_topples_ = 0;
+  int sink_size_before_avalanche = 0;
 
 public:
   // hook-up stats gathering machinery

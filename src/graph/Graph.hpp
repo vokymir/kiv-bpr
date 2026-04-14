@@ -97,6 +97,7 @@ public:
     return sand_height_[idx];
   }
 
+  // total count of grains on the graph
   size_t grains_count() const {
     const auto &heights = sand_height_;
 
@@ -126,6 +127,12 @@ public:
     }
 
     return result;
+  }
+
+  // get how many grains are in the sink
+  int sink_size() const {
+    // we know sink is the last in array
+    return static_cast<int>(sand_height_[sand_height_.size() - 1]);
   }
 
   // =====
