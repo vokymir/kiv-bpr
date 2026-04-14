@@ -1,3 +1,10 @@
+
+// library to create graphs
+#import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
+
+// my own small lib to easily create diagrams
+#import "diagram_functions.typ": boundary-style, square-lattice, uniform-style
+
 #set text(lang: "en")
 #set heading(numbering: "1.")
 #set math.equation(numbering: "(1)")
@@ -138,19 +145,115 @@ TODO: small-world network properties (the previous needed for that)
 
 = Sandpile Model <h:sandpile_model_general>
 
-TODO: where to put
+TODO: where to put next paragraph
 
 This model was later generalized from square lattice to arbitrary graph
 @Holroyd_2008. That generalization is important because it allows us to study
 the model's behaviour for different graph topologies.
 
-The original sandpile model presents a simple chessboard and falling sand
-grains. Each grain falls on a chess square determined by a random distribution.
-If the number of grains on any square reaches four, the sandpile topples and the
-four grains fall on adjacent squares, possibly causing additional squares to
+The very original sandpile model is a cellular automaton on a lattice. Every
+cell can hold up to $K$ grains, the height of a cell is a function of position
+$z(x,y,...)$. Fixed boundary conditions are used, on a boundary $z = 0$ cannot
+be changed. In two dimensions $z$ is updated as follows:
+$
+                z(x,y) & arrow z(x,y) - 4 \
+  z(x plus.minus 1, y) & arrow z(x plus.minus 1, y) + 1 \
+  z(x, y plus.minus 1) & arrow z(x, y plus.minus 1) + 1
+$ <eq:cell-automaton_topple_rules_2d>
+if $z$ exceeds (or meets) critical value $K = 4$. The system is initialized
+randomly but with $z >> K$. That initial state or rather the size of a lattice
+along with $ZZ$ (the height of all cells) is called _configuration_.
+
+For simplicity we can imagine a simple chessboard and falling sand grains. Each
+grain falls on a chess square determined by a random distribution #footnote[In
+  the original model, all sand grains were distributed initially. It might be
+  more obvious if we let grains fall one at a time for demonstration purposes.].
+If the number of grains on any square reaches four, the sandpile topples and
+the four grains fall on adjacent squares, possibly causing additional squares to
 topple. In case the square does not have four adjacent squares (i.e. it is on
 the edge of chessboard) the remaining grains fall off the board and are
 therefore removed from the model.
+
+We can express the square lattice (chessboard) as a graph $G = (V,E)$ with size
+#footnote[In a square lattice, the $"size"^2 = n$, which is the number of
+  vertices in graph.] $sqrt(n)$. For a boundary condition, the boundary vertices
+height is fixed to zero $z = 0$. Alternatively, we may imagine only one vertex,
+called _sink vertex_, with such condition. This sink is connected to all
+boundary vertices, thus creating the same effect. Please note, that this
+simplification creates a multigraph, because corner vertices and sink are
+connected via two edges. For the rest of this thesis we will consider the
+simplified version with one sink vertex and therefore a multigraph. However, it
+is trivial to create multiple sink vertices to restore a simple undirected
+graph.
+
+#figure(
+  caption: "Comparison of square lattice sink vertices (blue). On the left is a
+  graph with sinks at the boundary - as in the original model. On the right is
+  a multigraph, square lattice with only one sink connected to all vertices at
+  the boundary which is hinted by outgoing edges.",
+
+  grid(
+    columns: (1fr, 1fr),
+    gutter: 2em,
+    align: center,
+
+    diagram(
+      node-shape: circle,
+      node-fill: none,
+      node-stroke: 1pt + black,
+      node-inset: 0pt,
+      spacing: 10pt,
+      label-size: 0pt,
+
+      ..square-lattice(
+        5,
+        5,
+        styles-fn: (x, y, n, m) => boundary-style(
+          x,
+          y,
+          5,
+          5,
+          boundary-fill: rgb(39, 245, 245),
+          inner-fill: none,
+        ),
+      ),
+    ),
+
+    diagram(
+      node-shape: circle,
+      node-fill: none,
+      node-stroke: 1pt + black,
+      node-inset: 0pt,
+      spacing: 10pt,
+      label-size: 0pt,
+
+      ..square-lattice(
+        5,
+        5,
+        skip-boundary-edges: true,
+        styles-fn: (x, y, n, m) => boundary-style(
+          x,
+          y,
+          5,
+          5,
+          boundary-fill: none,
+          boundary-stroke: none,
+        ),
+      ),
+
+      node(
+        (-2, 2), //
+        width: 6pt,
+        height: 6pt,
+        fill: rgb(39, 245, 245),
+      ),
+
+      edge((-2, 2), (-1, 2)),
+
+      // ..square-lattice-with-sink(3, 3, sink-color: rgb(39, 245, 245)),
+    ),
+  ),
+) <fig:sq-lat_comp_sinks>
 
 The topology of this model can be expressed as an undirected graph, a square
 lattice of the size $8 times 8$. However, it is not a correct representation
