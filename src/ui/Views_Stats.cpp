@@ -198,6 +198,7 @@ void draw_stats_avalanche_sizes_s(const stat::Stats_Collector &sc) {
 
 std::unique_ptr<AvalancheOriginPlotModel>
 build_origin_model(const stat::Stats_Collector &sc) {
+
   const auto &g = sc.grain_dropped_counts();
   const auto &o = sc.avalanche_origins();
 
@@ -211,17 +212,31 @@ build_origin_model(const stat::Stats_Collector &sc) {
   grains.reserve(n);
   origins.reserve(n);
 
+  double max_g = 0.0;
+  double max_o = 0.0;
+
+  // collect + compute maxima
   for (std::size_t i = 0; i < n; ++i) {
     const double gv = (i < g.size()) ? static_cast<double>(g[i]) : 0.0;
     const double ov = (i < o.size()) ? static_cast<double>(o[i]) : 0.0;
 
-    if (gv == 0.0 && ov == 0.0)
-      continue;
+    max_g = std::max(max_g, gv);
+    max_o = std::max(max_o, ov);
 
     x.push_back(static_cast<double>(i));
     grains.push_back(gv);
     origins.push_back(ov);
   }
+
+  // normalize
+  const double inv_g = (max_g > 0.0) ? (1.0 / max_g) : 1.0;
+  const double inv_o = (max_o > 0.0) ? (1.0 / max_o) : 1.0;
+
+  for (auto &v : grains){
+    v *= inv_g;}
+
+  for (auto &v : origins){
+    v *= inv_o;}
 
   return std::make_unique<AvalancheOriginPlotModel>(AvalancheOriginPlotModel{
       std::move(x), std::move(grains), std::move(origins)});
@@ -247,10 +262,10 @@ void plot_origin_grouped(const AvalancheOriginPlotModel &m) {
       x_right.push_back(v + bar_width * 0.5);
     }
 
-    ImPlot::PlotBars("Grains", x_left.data(), m.grains.data(),
+    ImPlot::PlotBars("Grains dropped", x_left.data(), m.grains.data(),
                      static_cast<int>(m.x.size()), bar_width);
 
-    ImPlot::PlotBars("Origins", x_right.data(), m.origins.data(),
+    ImPlot::PlotBars("Avalanche origin", x_right.data(), m.origins.data(),
                      static_cast<int>(m.x.size()), bar_width);
 
     ImPlot::EndPlot();
