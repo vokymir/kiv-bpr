@@ -6,7 +6,6 @@
 #include "graph/Graph.hpp"
 #include "stat/Stats_Collector.hpp"
 #include "ui/Visualizer.hpp"
-#include <cmath>
 #include <cstddef>
 #include <deque>
 #include <imgui.h>
@@ -125,119 +124,87 @@ void draw_gla(gla_::Hidden_GLA &cfg);
 
 // =====>
 // STATS
+
+// ===
+// OVERVIEW
+
 void draw_stats_overview_s(const stat::Stats_Collector &sc);
 
-inline std::pair<double, double> fit_power_law(const std::vector<double> &xs,
-                                               const std::vector<double> &ys) {
-  // log(y) = a log(x) + b  => a = alpha
+// ===
+// AVALANCHE SIZE
 
-  double Sx = 0, Sy = 0, Sxx = 0, Sxy = 0;
-  size_t n = 0;
-
-  for (size_t i = 0; i < xs.size(); ++i) {
-    double x = xs[i];
-    double y = ys[i];
-
-    if (x <= 0 || y <= 0)
-      continue;
-
-    double lx = std::log(x);
-    double ly = std::log(y);
-
-    Sx += lx;
-    Sy += ly;
-    Sxx += lx * lx;
-    Sxy += lx * ly;
-    ++n;
-  }
-
-  if (n < 2)
-    return {0.0, 0.0};
-
-  double denom = n * Sxx - Sx * Sx;
-  if (denom == 0)
-    return {0.0, 0.0};
-
-  double a = (n * Sxy - Sx * Sy) / denom;
-  double b = (Sy - a * Sx) / n;
-
-  return {a, b}; // alpha, intercept
-}
-static std::vector<double> make_fit_line(const std::vector<double> &xs,
-                                         double a, double b) {
-  std::vector<double> yfit;
-  yfit.reserve(xs.size());
-
-  for (double x : xs) {
-    yfit.push_back(std::exp(b) * std::pow(x, a));
-  }
-
-  return yfit;
-}
-
-// == avalanche size
-
-// all neccesarry data taken from sc.avalanche_sizes()
-struct Avalanche_Size_Plot_Data {
+struct AvalancheSizePlotModel {
   std::vector<double> xs;
   std::vector<double> ys;
 
   double alpha = 0.0;
   double intercept = 0.0;
 };
-// get the struct from given sc.avalanche_sizes()
-std::unique_ptr<Avalanche_Size_Plot_Data>
-prepare_avalanche_data(const std::vector<size_t> &input_data);
-// actually render the ImPlot
-void render_avalanche_size_plot(const Avalanche_Size_Plot_Data &data);
+
+std::unique_ptr<AvalancheSizePlotModel>
+build_avalanche_size_model(const std::vector<size_t> &input);
+
+void plot_avalanche_size(const AvalancheSizePlotModel &model);
 
 void draw_stats_avalanche_sizes_s(const stat::Stats_Collector &sc);
 
-// == avalanche origin
+// ===
+// AVALANCHE ORIGINS
 
-struct Avalanche_Origin_Plot_Data {
-  // must be double ImPlot::PlotBars
+struct AvalancheOriginPlotModel {
   std::vector<double> hist;
   size_t max_vertex = 0;
-  size_t max_freq = 0.0;
+  size_t max_freq = 0;
 };
 
-struct Avalanche_Origin_Grouped_Plot_Data {
+struct AvalancheOriginGroupedPlotModel {
   std::vector<double> x;
   std::vector<double> grains;
   std::vector<double> origins;
 
   size_t max_vertex = 0;
 };
-void render_avalanche_origin_grouped_plot(
-    const Avalanche_Origin_Grouped_Plot_Data &data);
-std::unique_ptr<Avalanche_Origin_Grouped_Plot_Data>
-prepare_origin_grouped_data(const stat::Stats_Collector &sc);
-void draw_stats_grouped_origins(const stat::Stats_Collector &sc);
 
-std::unique_ptr<Avalanche_Origin_Plot_Data>
-prepare_origin_data(const std::vector<size_t> &histogram);
+std::unique_ptr<AvalancheOriginPlotModel>
+build_origin_model(const std::vector<size_t> &histogram);
 
-void render_avalanche_origin_plot(const Avalanche_Origin_Plot_Data &data);
+void plot_origin(const AvalancheOriginPlotModel &model);
+
+std::unique_ptr<AvalancheOriginGroupedPlotModel>
+build_origin_grouped_model(const stat::Stats_Collector &sc);
+
+void plot_origin_grouped(const AvalancheOriginGroupedPlotModel &model);
 
 void draw_stats_avalanche_origins_s(const stat::Stats_Collector &sc);
+void section_avalanche_origins_grouped(const stat::Stats_Collector &sc);
 
-// == grains
+// ===
+// GRAINS
 
-struct Grains_Count_Plot_Data {
-  std::vector<double> recent_hist;
+struct GrainsPlotModel {
+  std::vector<double> recent;
   std::vector<double> moving_avg;
+
   double max_val = 0.0;
-  size_t latest_val = 0;
+  size_t latest = 0;
 };
 
-std::unique_ptr<Grains_Count_Plot_Data>
-prepare_grains_data(const std::vector<size_t> &grains, int display_grains,
-                    int win_size);
+std::unique_ptr<GrainsPlotModel>
+build_grains_model(const std::vector<size_t> &grains, int display_count,
+                   int window_size);
 
-void render_grains_count_plot(const Grains_Count_Plot_Data &data);
+void plot_grains(const GrainsPlotModel &model);
 
-void draw_stats_grains_counts_s(const stat::Stats_Collector &sc);
+void draw_stats_grains_s(const stat::Stats_Collector &sc);
+
+// ===
+// INTERNAL HELPERS
+
+std::pair<double, double> fit_power_law(const std::vector<double> &xs,
+                                        const std::vector<double> &ys);
+
+std::vector<double> make_power_law_fit(const std::vector<double> &xs,
+                                       double alpha, double intercept);
 
 } // namespace _detail
 

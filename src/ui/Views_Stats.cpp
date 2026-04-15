@@ -1,5 +1,6 @@
 #include "ui/Views.hpp"
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <cstdlib> // for std::system
 #include <functional>
@@ -23,14 +24,68 @@ void draw_stats_window(bool &show, const ssoc::stat::Stats_Collector &sc) {
   _detail::draw_stats_avalanche_origins_s(sc);
   ImGui::Separator();
 
-  _detail::draw_stats_grains_counts_s(sc);
-
-  _detail::draw_stats_grouped_origins(sc);
+  _detail::draw_stats_grains_s(sc);
 
   ImGui::End();
 }
 
 namespace _detail {
+
+// =========================
+// INTERNAL HELPERS
+// =========================
+
+std::pair<double, double> fit_power_law(const std::vector<double> &xs,
+                                        const std::vector<double> &ys) {
+
+  double Sx = 0, Sy = 0, Sxx = 0, Sxy = 0;
+  size_t n = 0;
+
+  for (size_t i = 0; i < xs.size(); ++i) {
+    double x = xs[i];
+    double y = ys[i];
+
+    if (x <= 0 || y <= 0)
+      continue;
+
+    double lx = std::log(x);
+    double ly = std::log(y);
+
+    Sx += lx;
+    Sy += ly;
+    Sxx += lx * lx;
+    Sxy += lx * ly;
+    ++n;
+  }
+
+  if (n < 2)
+    return {0.0, 0.0};
+
+  double denom = n * Sxx - Sx * Sx;
+  if (denom == 0)
+    return {0.0, 0.0};
+
+  double a = (n * Sxy - Sx * Sy) / denom;
+  double b = (Sy - a * Sx) / n;
+
+  return {a, b};
+}
+
+std::vector<double> make_power_law_fit(const std::vector<double> &xs, double a,
+                                       double b) {
+
+  std::vector<double> out;
+  out.reserve(xs.size());
+
+  for (double x : xs)
+    out.push_back(std::exp(b) * std::pow(x, a));
+
+  return out;
+}
+
+// =========================
+// OVERVIEW
+// =========================
 
 void draw_stats_overview_s(const stat::Stats_Collector &sc) {
   ImGui::Text("Steps: %zu", sc.steps_count());
@@ -40,214 +95,126 @@ void draw_stats_overview_s(const stat::Stats_Collector &sc) {
   ImGui::Text("Dissipated grains: %zu", sc.grain_total_dissipated());
 }
 
-void draw_stats_avalanche_sizes_s(const stat::Stats_Collector &sc) {
-  const auto &input_data = sc.avalanche_sizes();
-  if (input_data.empty()) {
-    return;
+// =========================
+// AVALANCHE SIZE
+// =========================
+
+std::unique_ptr<AvalancheSizePlotModel>
+build_avalanche_size_model(const std::vector<size_t> &input) {
+
+  if (input.empty())
+    return {};
+
+  std::vector<double> xs, ys;
+
+  for (size_t size = 1; size < input.size(); ++size) {
+    size_t count = input[size];
+    if (count > 0) {
+      xs.push_back((double)size);
+      ys.push_back((double)count);
+    }
   }
 
-  // header
+  auto model = std::make_unique<AvalancheSizePlotModel>(
+      AvalancheSizePlotModel{std::move(xs), std::move(ys)});
+
+  auto [a, b] = fit_power_law(model->xs, model->ys);
+  model->alpha = a;
+  model->intercept = b;
+
+  return model;
+}
+
+void plot_avalanche_size(const AvalancheSizePlotModel &m) {
+
+  if (m.xs.empty())
+    return;
+
+  if (ImPlot::BeginPlot("##SizeLogLog", ImVec2(-1, 250))) {
+    ImPlot::SetupAxes("Avalanche Size", "Count");
+    ImPlot::SetupAxisScale(ImAxis_X1, ImPlotScale_Log10);
+    ImPlot::SetupAxisScale(ImAxis_Y1, ImPlotScale_Log10);
+
+    ImPlot::PlotScatter("Data", m.xs.data(), m.ys.data(), (int)m.xs.size());
+
+    auto fit = make_power_law_fit(m.xs, m.alpha, m.intercept);
+    ImPlot::PlotLine("Fit", m.xs.data(), fit.data(), (int)m.xs.size());
+
+    ImGui::Text("alpha = %.3f", m.alpha);
+
+    ImPlot::EndPlot();
+  }
+
+  if (ImPlot::BeginPlot("##SizeLinear", ImVec2(-1, 250))) {
+    ImPlot::SetupAxes("Size", "Count");
+    ImPlot::PlotScatter("Data", m.xs.data(), m.ys.data(), (int)m.xs.size());
+    ImPlot::EndPlot();
+  }
+}
+
+void draw_stats_avalanche_sizes_s(const stat::Stats_Collector &sc) {
+
+  const auto &data = sc.avalanche_sizes();
+  if (data.empty())
+    return;
+
   ImGui::Text("Distribution of Avalanche Sizes");
   ImGui::SameLine();
   ImGui::TextDisabled("(?)");
+
   if (ImGui::IsItemHovered()) {
-    ImGui::SetTooltip("Avalanche Size = how many vertices were toppled");
+    ImGui::SetTooltip("Avalanche Size = toppled vertices");
   }
 
-  auto plot_data = prepare_avalanche_data(input_data);
-  if (plot_data) {
-    render_avalanche_size_plot(*plot_data);
-  }
+  auto model = build_avalanche_size_model(data);
+  if (model)
+    plot_avalanche_size(*model);
 }
 
-void draw_stats_avalanche_origins_s(const stat::Stats_Collector &sc) {
-  const auto &origin_map = sc.avalanche_origins();
-  if (origin_map.empty()) {
-    return;
-  }
+// =========================
+// ORIGINS
+// =========================
 
-  ImGui::Text("Avalanche Origins");
-  ImGui::SameLine();
-  ImGui::TextDisabled("(?)");
-  if (ImGui::IsItemHovered()) {
-    ImGui::SetTooltip("Distribution of where avalanches start.\n"
-                      "Flat = Uniform distribution.\n"
-                      "Spikes = Critical spots.");
-  }
+std::unique_ptr<AvalancheOriginPlotModel>
+build_origin_model(const std::vector<size_t> &hist) {
 
-  auto plot_data = prepare_origin_data(origin_map);
-  if (plot_data) {
-    render_avalanche_origin_plot(*plot_data);
-  }
-}
-
-void draw_stats_grouped_origins(const stat::Stats_Collector &sc) {
-  ImGui::Text("Avalanche Origins");
-  ImGui::SameLine();
-  ImGui::TextDisabled("(?)");
-  if (ImGui::IsItemHovered()) {
-    ImGui::SetTooltip("Distribution of where avalanches start.\n"
-                      "Flat = Uniform distribution.\n"
-                      "Spikes = Critical spots.");
-  }
-
-  auto plot_data = prepare_origin_grouped_data(sc);
-  if (plot_data) {
-    render_avalanche_origin_grouped_plot(*plot_data);
-  }
-}
-
-void draw_stats_grains_counts_s(const stat::Stats_Collector &sc) {
-  const auto &grains = sc.grain_dropped_counts();
-  if (grains.empty())
-    return;
-
-  ImGui::Text("Grains Counts");
-  ImGui::SameLine();
-  ImGui::TextColored(ImVec4(0.4f, 0.8f, 0.4f, 1.0f), "  Latest: %zu",
-                     grains.back());
-
-  static int display_grains = 200;
-  static int win_size = 20; // window for moving average calculations
-
-  auto plot_data = prepare_grains_data(grains, display_grains, win_size);
-  if (plot_data) {
-    if (plot_data->moving_avg.size() > 0) {
-      ImGui::SameLine();
-      ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "  Trend: %f",
-                         plot_data->moving_avg.back());
-    }
-
-    render_grains_count_plot(*plot_data);
-  }
-
-  ImGui::InputInt("Last steps shown", &display_grains);
-  ImGui::InputInt("Moving average window size", &win_size);
-}
-
-std::unique_ptr<Avalanche_Size_Plot_Data>
-prepare_avalanche_data(const std::vector<size_t> &input_data) {
-
-  if (input_data.empty()) {
-    return {};
-  }
-
-  std::vector<double> xs;
-  std::vector<double> ys;
-
-  xs.reserve(input_data.size());
-  ys.reserve(input_data.size());
-
-  // skip size 0
-  for (size_t size = 1; size < input_data.size(); ++size) {
-
-    size_t count = input_data[size];
-
-    // log-scale safe: remove zeros
-    if (count > 0 && size > 0) {
-      xs.push_back(static_cast<double>(size));
-      ys.push_back(static_cast<double>(count));
-    }
-  }
-
-  auto data =
-      std::make_unique<Avalanche_Size_Plot_Data>(std::move(xs), std::move(ys));
-
-  auto [a, b] = fit_power_law(data->xs, data->ys);
-  data->alpha = a;
-  data->intercept = b;
-
-  return data;
-}
-
-std::unique_ptr<Avalanche_Origin_Plot_Data>
-prepare_origin_data(const std::vector<size_t> &histogram) {
-
-  if (histogram.empty()) {
+  if (hist.empty())
     return nullptr;
-  }
 
-  size_t max_vertex = histogram.size() - 1;
+  size_t max_freq = *std::max_element(hist.begin(), hist.end());
 
-  size_t max_freq = 0.0;
-  for (auto v : histogram) {
-    if (v > max_freq)
-      max_freq = v;
-  }
-
-  std::vector<double> hist_double(histogram.begin(), histogram.end());
-
-  return std::make_unique<Avalanche_Origin_Plot_Data>(std::move(hist_double),
-                                                      max_vertex, max_freq);
+  return std::make_unique<AvalancheOriginPlotModel>(
+      AvalancheOriginPlotModel{std::vector<double>(hist.begin(), hist.end()),
+                               hist.size() - 1, max_freq});
 }
 
-std::unique_ptr<Grains_Count_Plot_Data>
-prepare_grains_data(const std::vector<size_t> &grains, int max_grains,
-                    int win_size) {
-  if (grains.empty()) {
-    return nullptr;
+void plot_origin(const AvalancheOriginPlotModel &m) {
+
+  if (ImPlot::BeginPlot("##OriginsHist", ImVec2(-1, 200))) {
+    ImPlot::SetupAxes("Vertex ID", "Count");
+
+    ImPlot::PlotBars("Origins", m.hist.data(), (int)m.hist.size());
+
+    ImPlot::EndPlot();
   }
-
-  size_t max_display = static_cast<size_t>(max_grains);
-  size_t window_size = static_cast<size_t>(win_size);
-  size_t drop_count =
-      grains.size() > max_display ? grains.size() - max_display : 0;
-
-  // Prepare raw data slice
-  auto recent_hist = grains | std::views::drop(drop_count) |
-                     std::views::transform(
-                         [](size_t val) { return static_cast<double>(val); }) |
-                     std::ranges::to<std::vector<double>>();
-
-  // Prepare Moving Average
-  auto ma_view = grains | std::views::slide(window_size) |
-                 std::views::transform([](auto window) {
-                   double sum =
-                       std::ranges::fold_left(window, 0.0, std::plus<double>());
-                   return sum / static_cast<double>(window.size());
-                 });
-
-  // We need to drop from the MA view to align it with the recent_hist
-  // Note: slide view is shorter than the original by (window_size - 1)
-  size_t ma_total_size =
-      (grains.size() >= window_size) ? (grains.size() - window_size + 1) : 0;
-  size_t ma_drop =
-      ma_total_size > max_display ? ma_total_size - max_display : 0;
-
-  auto moving_avg = ma_view | std::views::drop(ma_drop) |
-                    std::ranges::to<std::vector<double>>();
-
-  double max_val = std::ranges::max(recent_hist);
-
-  return std::make_unique<Grains_Count_Plot_Data>(
-      std::move(recent_hist), std::move(moving_avg), max_val, grains.back());
 }
 
-std::unique_ptr<Avalanche_Origin_Grouped_Plot_Data>
-prepare_origin_grouped_data(const stat::Stats_Collector &sc) {
+std::unique_ptr<AvalancheOriginGroupedPlotModel>
+build_origin_grouped_model(const stat::Stats_Collector &sc) {
+
   const auto &g = sc.grain_dropped_counts();
   const auto &o = sc.avalanche_origins();
 
-  if (g.empty() && o.empty())
-    return nullptr;
-
   size_t n = std::max(g.size(), o.size());
 
-  std::vector<double> x;
-  std::vector<double> grains;
-  std::vector<double> origins;
-
-  x.reserve(n);
-  grains.reserve(n);
-  origins.reserve(n);
+  std::vector<double> x, grains, origins;
 
   for (size_t i = 0; i < n; ++i) {
 
     double gv = (i < g.size()) ? (double)g[i] : 0.0;
     double ov = (i < o.size()) ? (double)o[i] : 0.0;
 
-    // optional: skip empty vertices
-    if (gv == 0.0 && ov == 0.0)
+    if (gv == 0 && ov == 0)
       continue;
 
     x.push_back((double)i);
@@ -255,157 +222,111 @@ prepare_origin_grouped_data(const stat::Stats_Collector &sc) {
     origins.push_back(ov);
   }
 
-  return std::make_unique<Avalanche_Origin_Grouped_Plot_Data>(
-      std::move(x), std::move(grains), std::move(origins), n);
+  return std::make_unique<AvalancheOriginGroupedPlotModel>(
+      AvalancheOriginGroupedPlotModel{std::move(x), std::move(grains),
+                                      std::move(origins), n});
 }
 
-void render_avalanche_size_plot(const Avalanche_Size_Plot_Data &data) {
-  const auto &xs = data.xs;
-  const auto &ys = data.ys;
+void plot_origin_grouped(const AvalancheOriginGroupedPlotModel &m) {
 
-  if (xs.empty())
-    return;
-
-  // ===== LOG-LOG PLOT =====
-  if (ImPlot::BeginPlot("##SizeLogLog", ImVec2(-1, 250))) {
-
-    ImPlot::SetupAxes("Avalanche Size", "Count", ImPlotAxisFlags_AutoFit,
-                      ImPlotAxisFlags_AutoFit);
-
-    ImPlot::SetupAxisScale(ImAxis_X1, ImPlotScale_Log10);
-    ImPlot::SetupAxisScale(ImAxis_Y1, ImPlotScale_Log10);
-
-    ImPlot::PlotScatter("Data", xs.data(), ys.data(), (int)xs.size());
-
-    // FIT LINE
-    auto fit = make_fit_line(xs, data.alpha, data.intercept);
-    ImPlot::PlotLine("Power law fit", xs.data(), fit.data(), (int)xs.size());
-
-    ImGui::Text("alpha = %.3f", data.alpha);
-
-    ImPlot::EndPlot();
-  }
-
-  // ===== LINEAR PLOT =====
-  if (ImPlot::BeginPlot("##SizeLinear", ImVec2(-1, 250))) {
-
-    ImPlot::SetupAxes("Size", "Count", ImPlotAxisFlags_AutoFit,
-                      ImPlotAxisFlags_AutoFit);
-
-    ImPlot::PlotScatter("Data", xs.data(), ys.data(), (int)xs.size());
-
-    ImPlot::EndPlot();
-  }
-}
-
-void render_avalanche_origin_plot(const Avalanche_Origin_Plot_Data &data) {
-  if (ImPlot::BeginPlot("##OriginsHist", ImVec2(-1, 200),
-                        ImPlotFlags_NoMouseText | ImPlotFlags_NoLegend)) {
-
-    ImPlot::SetupAxes("Vertex ID", "Count", ImPlotAxisFlags_AutoFit,
-                      ImPlotAxisFlags_AutoFit);
-
-    ImPlot::SetupAxisLimits(ImAxis_X1, 0, static_cast<double>(data.hist.size()),
-                            ImGuiCond_Appearing);
-    ImPlot::SetupAxisLimits(ImAxis_Y1, 0,
-                            static_cast<double>(data.max_freq) * 1.1,
-                            ImGuiCond_Appearing);
-
-    ImPlot::PlotBars("Origins", data.hist.data(), (int)data.hist.size());
-
-    if (ImPlot::IsPlotHovered()) {
-      ImPlotPoint pt = ImPlot::GetPlotMousePos();
-      size_t idx = static_cast<size_t>(pt.x + 0.5);
-
-      if (idx < data.hist.size()) {
-        ImGui::BeginTooltip();
-        ImGui::Text("Vertex ID: %zu", idx);
-        ImGui::Text("Count: %.0f", data.hist[idx]);
-        ImGui::EndTooltip();
-      }
-    }
-    ImPlot::EndPlot();
-  }
-}
-void render_avalanche_origin_grouped_plot(
-    const Avalanche_Origin_Grouped_Plot_Data &data) {
   if (ImPlot::BeginPlot("##OriginsGrouped", ImVec2(-1, 250))) {
 
-    ImPlot::SetupAxes("Vertex ID", "Count", ImPlotAxisFlags_AutoFit,
-                      ImPlotAxisFlags_AutoFit);
+    double w = 0.4;
 
-    double w = 0.4; // bar half-spacing
+    auto xg = m.x;
+    auto xo = m.x;
 
-    std::vector<double> x_grains = data.x;
-    std::vector<double> x_origins = data.x;
+    for (auto &v : xg)
+      v -= w;
+    for (auto &v : xo)
+      v += w;
 
-    for (auto &x : x_grains)
-      x -= w;
-    for (auto &x : x_origins)
-      x += w;
-
-    // TODO: grains dropped is EMPTY???
-    ImPlot::PlotBars("Grains dropped", x_grains.data(), data.grains.data(),
-                     (int)x_grains.size(), 0.4);
-
-    ImPlot::PlotBars("Avalanche origins", x_origins.data(), data.origins.data(),
-                     (int)x_origins.size(), 0.8);
+    ImPlot::PlotBars("Grains", xg.data(), m.grains.data(), (int)xg.size(), 0.4);
+    ImPlot::PlotBars("Origins", xo.data(), m.origins.data(), (int)xo.size(),
+                     0.8);
 
     ImPlot::EndPlot();
   }
 }
 
-void render_grains_count_plot(const Grains_Count_Plot_Data &data) {
-  if (ImPlot::BeginPlot("##GrainsLine", ImVec2(-1, 150),
-                        ImPlotFlags_NoMouseText | ImPlotFlags_NoLegend)) {
+void draw_stats_avalanche_origins_s(const stat::Stats_Collector &sc) {
 
-    ImPlot::SetupAxes("Recent Steps", "Grains", ImPlotAxisFlags_AutoFit,
-                      ImPlotAxisFlags_AutoFit);
-    ImPlot::SetupAxisLimits(ImAxis_X1, 0,
-                            static_cast<double>(data.recent_hist.size() - 1),
-                            ImGuiCond_Appearing);
-    ImPlot::SetupAxisLimits(ImAxis_Y1, 0, data.max_val * 1.1,
-                            ImGuiCond_Appearing);
+  auto model = build_origin_model(sc.avalanche_origins());
+  if (!model)
+    return;
 
-    // Draw raw data
-    ImPlot::PlotLine("Grains", data.recent_hist.data(),
-                     static_cast<int>(data.recent_hist.size()));
+  ImGui::Text("Avalanche Origins");
+  plot_origin(*model);
+}
 
-    // Draw Moving Average
-    if (!data.moving_avg.empty()) {
-      // We calculate the X-offset because MA might have fewer points than raw
-      // data if the simulation just started
-      double x_offset = static_cast<double>(data.recent_hist.size()) -
-                        static_cast<double>(data.moving_avg.size());
+void section_avalanche_origins_grouped(const stat::Stats_Collector &sc) {
 
-      ImPlot::PushStyleColor(ImPlotCol_PlotBg, ImVec4(1.0f, 0.4f, 0.4f, 1.0f));
-      ImPlot::PlotLine("Average", data.moving_avg.data(),
-                       static_cast<int>(data.moving_avg.size()), 1.0, x_offset,
-                       ImPlotSpec());
-      ImPlot::PopStyleColor(ImPlotCol_PlotBg);
-    }
+  auto model = build_origin_grouped_model(sc);
+  if (!model)
+    return;
 
-    if (ImPlot::IsPlotHovered()) {
-      ImPlotPoint pt = ImPlot::GetPlotMousePos();
-      size_t idx = static_cast<size_t>(pt.x + 0.5);
+  plot_origin_grouped(*model);
+}
 
-      if (idx < data.recent_hist.size()) {
-        ImGui::BeginTooltip();
-        ImGui::Text("Grains: %.0f", data.recent_hist[idx]);
+// =========================
+// GRAINS
+// =========================
 
-        // Find corresponding MA index
-        size_t ma_idx_offset = data.recent_hist.size() - data.moving_avg.size();
-        if (idx >= ma_idx_offset &&
-            (idx - ma_idx_offset) < data.moving_avg.size()) {
-          ImGui::TextColored(ImVec4(1, 0.4f, 0.4f, 1), "Trend: %.2f",
-                             data.moving_avg[idx - ma_idx_offset]);
-        }
+std::unique_ptr<GrainsPlotModel>
+build_grains_model(const std::vector<size_t> &g, int display, int win) {
 
-        ImGui::EndTooltip();
-      }
-    }
+  if (g.empty())
+    return nullptr;
+
+  size_t drop = g.size() > (size_t)display ? g.size() - display : 0;
+
+  auto recent = g | std::views::drop(drop) |
+                std::views::transform([](auto v) { return (double)v; }) |
+                std::ranges::to<std::vector>();
+
+  auto ma =
+      g | std::views::slide(win) | std::views::transform([](auto w) {
+        return std::ranges::fold_left(w, 0.0, std::plus{}) / (double)w.size();
+      });
+
+  auto moving_avg = ma | std::ranges::to<std::vector>();
+
+  double maxv = std::ranges::max(recent);
+
+  return std::make_unique<GrainsPlotModel>(GrainsPlotModel{
+      std::move(recent), std::move(moving_avg), maxv, g.back()});
+}
+
+void plot_grains(const GrainsPlotModel &m) {
+
+  if (ImPlot::BeginPlot("##GrainsLine", ImVec2(-1, 150))) {
+
+    ImPlot::PlotLine("Grains", m.recent.data(), (int)m.recent.size());
+
+    if (!m.moving_avg.empty())
+      ImPlot::PlotLine("Average", m.moving_avg.data(),
+                       (int)m.moving_avg.size());
+
     ImPlot::EndPlot();
   }
+}
+
+void draw_stats_grains_s(const stat::Stats_Collector &sc) {
+
+  const auto &g = sc.grain_dropped_counts();
+  if (g.empty())
+    return;
+
+  static int display = 200;
+  static int win = 20;
+
+  auto model = build_grains_model(g, display, win);
+
+  if (model)
+    plot_grains(*model);
+
+  ImGui::InputInt("Last steps", &display);
+  ImGui::InputInt("MA window", &win);
 }
 
 } // namespace _detail
