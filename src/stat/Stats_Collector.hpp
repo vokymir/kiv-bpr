@@ -82,6 +82,8 @@ public:
         [this](const Avalanche_Event &e) { handle_avalanche(e); });
     events.grains_total.subscribe(
         [this](const Grains_Count_Event &e) { handle_grains(e); });
+    events.grain_dropped.subscribe(
+        [this](const Grain_Dropped_Event &e) { handle_grain_dropped(e); });
   }
 
   void reset() {
