@@ -198,20 +198,24 @@ void draw_stats_avalanche_sizes_s(const stat::Stats_Collector &sc) {
 
 std::unique_ptr<AvalancheOriginPlotModel>
 build_origin_model(const stat::Stats_Collector &sc) {
-
   const auto &g = sc.grain_dropped_counts();
   const auto &o = sc.avalanche_origins();
 
-  size_t n = std::max(g.size(), o.size());
+  const std::size_t n = std::max(g.size(), o.size());
 
-  std::vector<double> x, grains, origins;
+  std::vector<double> x;
+  std::vector<double> grains;
+  std::vector<double> origins;
 
-  for (size_t i = 0; i < n; ++i) {
+  x.reserve(n);
+  grains.reserve(n);
+  origins.reserve(n);
 
-    double gv = (i < g.size()) ? static_cast<double>(g[i]) : 0.0;
-    double ov = (i < o.size()) ? static_cast<double>(o[i]) : 0.0;
+  for (std::size_t i = 0; i < n; ++i) {
+    const double gv = (i < g.size()) ? static_cast<double>(g[i]) : 0.0;
+    const double ov = (i < o.size()) ? static_cast<double>(o[i]) : 0.0;
 
-    if (gv == 0 && ov == 0)
+    if (gv == 0.0 && ov == 0.0)
       continue;
 
     x.push_back(static_cast<double>(i));
@@ -219,34 +223,35 @@ build_origin_model(const stat::Stats_Collector &sc) {
     origins.push_back(ov);
   }
 
-  return std::make_unique<AvalancheOriginPlotModel>(
-      AvalancheOriginPlotModel{std::move(x), std::move(grains),
-                                      std::move(origins), n});
+  return std::make_unique<AvalancheOriginPlotModel>(AvalancheOriginPlotModel{
+      std::move(x), std::move(grains), std::move(origins)});
 }
 
 void plot_origin_grouped(const AvalancheOriginPlotModel &m) {
-
   if (ImPlot::BeginPlot("##OriginsGrouped", ImVec2(-1, 250))) {
-
     ImPlot::SetupAxes("Vertex ID", "Count", ImPlotAxisFlags_AutoFit,
                       ImPlotAxisFlags_AutoFit);
 
-    double w = 0.4;
+    const double bar_width = 0.4;
 
-    auto xg = m.x;
-    auto xo = m.x;
+    // we shift X around SAME base
 
-    for (auto &v : xg) {
-      v -= w;
+    std::vector<double> x_left;
+    std::vector<double> x_right;
+
+    x_left.reserve(m.x.size());
+    x_right.reserve(m.x.size());
+
+    for (double v : m.x) {
+      x_left.push_back(v - bar_width * 0.5);
+      x_right.push_back(v + bar_width * 0.5);
     }
-    for (auto &v : xo) {
-      v += w;
-    }
 
-    ImPlot::PlotBars("Grains", xg.data(), m.grains.data(),
-                     static_cast<int>(xg.size()), 0.4);
-    ImPlot::PlotBars("Origins", xo.data(), m.origins.data(),
-                     static_cast<int>(xo.size()), 0.8);
+    ImPlot::PlotBars("Grains", x_left.data(), m.grains.data(),
+                     static_cast<int>(m.x.size()), bar_width);
+
+    ImPlot::PlotBars("Origins", x_right.data(), m.origins.data(),
+                     static_cast<int>(m.x.size()), bar_width);
 
     ImPlot::EndPlot();
   }
