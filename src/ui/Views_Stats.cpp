@@ -21,7 +21,6 @@ void draw_stats_window(bool &show, const ssoc::stat::Stats_Collector &sc) {
   ImGui::Separator();
 
   _detail::draw_stats_avalanche_origins_s(sc);
-  _detail::draw_stats_avalanche_origins_grouped_s(sc);
   ImGui::Separator();
 
   _detail::draw_stats_grains_s(sc);
@@ -198,33 +197,7 @@ void draw_stats_avalanche_sizes_s(const stat::Stats_Collector &sc) {
 // ORIGINS
 
 std::unique_ptr<AvalancheOriginPlotModel>
-build_origin_model(const std::vector<size_t> &hist) {
-
-  if (hist.empty())
-    return nullptr;
-
-  size_t max_freq = *std::max_element(hist.begin(), hist.end());
-
-  return std::make_unique<AvalancheOriginPlotModel>(
-      AvalancheOriginPlotModel{std::vector<double>(hist.begin(), hist.end()),
-                               hist.size() - 1, max_freq});
-}
-
-void plot_origin(const AvalancheOriginPlotModel &m) {
-
-  if (ImPlot::BeginPlot("##OriginsHist", ImVec2(-1, 200))) {
-
-    ImPlot::SetupAxes("Vertex ID", "Count", ImPlotAxisFlags_AutoFit,
-                      ImPlotAxisFlags_AutoFit);
-
-    ImPlot::PlotBars("Origins", m.hist.data(), static_cast<int>(m.hist.size()));
-
-    ImPlot::EndPlot();
-  }
-}
-
-std::unique_ptr<AvalancheOriginGroupedPlotModel>
-build_origin_grouped_model(const stat::Stats_Collector &sc) {
+build_origin_model(const stat::Stats_Collector &sc) {
 
   const auto &g = sc.grain_dropped_counts();
   const auto &o = sc.avalanche_origins();
@@ -246,12 +219,12 @@ build_origin_grouped_model(const stat::Stats_Collector &sc) {
     origins.push_back(ov);
   }
 
-  return std::make_unique<AvalancheOriginGroupedPlotModel>(
-      AvalancheOriginGroupedPlotModel{std::move(x), std::move(grains),
+  return std::make_unique<AvalancheOriginPlotModel>(
+      AvalancheOriginPlotModel{std::move(x), std::move(grains),
                                       std::move(origins), n});
 }
 
-void plot_origin_grouped(const AvalancheOriginGroupedPlotModel &m) {
+void plot_origin_grouped(const AvalancheOriginPlotModel &m) {
 
   if (ImPlot::BeginPlot("##OriginsGrouped", ImVec2(-1, 250))) {
 
@@ -281,18 +254,7 @@ void plot_origin_grouped(const AvalancheOriginGroupedPlotModel &m) {
 
 void draw_stats_avalanche_origins_s(const stat::Stats_Collector &sc) {
 
-  auto model = build_origin_model(sc.avalanche_origins());
-  if (!model) {
-    return;
-  }
-
-  ImGui::Text("Avalanche Origins");
-  plot_origin(*model);
-}
-
-void draw_stats_avalanche_origins_grouped_s(const stat::Stats_Collector &sc) {
-
-  auto model = build_origin_grouped_model(sc);
+  auto model = build_origin_model(sc);
   if (!model) {
     return;
   }

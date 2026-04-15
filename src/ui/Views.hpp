@@ -152,12 +152,6 @@ void draw_stats_avalanche_sizes_s(const stat::Stats_Collector &sc);
 // AVALANCHE ORIGINS
 
 struct AvalancheOriginPlotModel {
-  std::vector<double> hist;
-  size_t max_vertex = 0;
-  size_t max_freq = 0;
-};
-
-struct AvalancheOriginGroupedPlotModel {
   std::vector<double> x;
   std::vector<double> grains;
   std::vector<double> origins;
@@ -166,17 +160,11 @@ struct AvalancheOriginGroupedPlotModel {
 };
 
 std::unique_ptr<AvalancheOriginPlotModel>
-build_origin_model(const std::vector<size_t> &histogram);
+build_origin_model(const stat::Stats_Collector &sc);
 
 void plot_origin(const AvalancheOriginPlotModel &model);
 
-std::unique_ptr<AvalancheOriginGroupedPlotModel>
-build_origin_grouped_model(const stat::Stats_Collector &sc);
-
-void plot_origin_grouped(const AvalancheOriginGroupedPlotModel &model);
-
 void draw_stats_avalanche_origins_s(const stat::Stats_Collector &sc);
-void draw_stats_avalanche_origins_grouped_s(const stat::Stats_Collector &sc);
 
 // ===
 // GRAINS
