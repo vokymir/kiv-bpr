@@ -3,7 +3,6 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdlib> // for std::system
-#include <functional>
 #include <imgui.h>
 #include <implot.h>
 #include <memory>
@@ -22,6 +21,7 @@ void draw_stats_window(bool &show, const ssoc::stat::Stats_Collector &sc) {
   ImGui::Separator();
 
   _detail::draw_stats_avalanche_origins_s(sc);
+  _detail::draw_stats_avalanche_origins_grouped_s(sc);
   ImGui::Separator();
 
   _detail::draw_stats_grains_s(sc);
@@ -31,62 +31,86 @@ void draw_stats_window(bool &show, const ssoc::stat::Stats_Collector &sc) {
 
 namespace _detail {
 
-// =========================
+// ===
 // INTERNAL HELPERS
-// =========================
 
 std::pair<double, double> fit_power_law(const std::vector<double> &xs,
                                         const std::vector<double> &ys) {
+  // function to fit: y = a * x^(-k)
+  //
+  // alpha = -k
+  // C = a
+  //
+  // taking logs: log(y) = alpha * log(x) + log(C)
 
-  double Sx = 0, Sy = 0, Sxx = 0, Sxy = 0;
-  size_t n = 0;
+  double sum_log_x = 0.0;
+  double sum_log_y = 0.0;
+  double sum_log_x2 = 0.0;
+  double sum_log_xy = 0.0;
+
+  auto is_valid_point = [](double x, double y) { return x > 0.0 && y > 0.0; };
+  size_t valid_count = 0;
 
   for (size_t i = 0; i < xs.size(); ++i) {
-    double x = xs[i];
-    double y = ys[i];
+    const double x = xs[i];
+    const double y = ys[i];
 
-    if (x <= 0 || y <= 0)
+    // log undefined for non-positive values
+    if (!is_valid_point(xs[i], ys[i])) {
       continue;
+    }
 
-    double lx = std::log(x);
-    double ly = std::log(y);
+    const double log_x = std::log(x);
+    const double log_y = std::log(y);
 
-    Sx += lx;
-    Sy += ly;
-    Sxx += lx * lx;
-    Sxy += lx * ly;
-    ++n;
+    sum_log_x += log_x;
+    sum_log_y += log_y;
+    sum_log_x2 += log_x * log_x;
+    sum_log_xy += log_x * log_y;
+
+    ++valid_count;
   }
 
-  if (n < 2)
+  // too little values
+  if (valid_count < 2) {
     return {0.0, 0.0};
+  }
 
-  double n_double = static_cast<double>(n);
-  double denom = n_double * Sxx - Sx * Sx;
-  if (denom == 0)
+  // valid count, but to prevent repeated static cast
+  const double n = static_cast<double>(valid_count);
+
+  const double denominator = n * sum_log_x2 - sum_log_x * sum_log_x;
+  // cannot divide by zero
+  if (denominator == 0.0) {
     return {0.0, 0.0};
+  }
 
-  double a = (n_double * Sxy - Sx * Sy) / denom;
-  double b = (Sy - a * Sx) / n_double;
+  const double alpha = (n * sum_log_xy - sum_log_x * sum_log_y) / denominator;
 
-  return {a, b};
+  const double intercept = (sum_log_y - alpha * sum_log_x) / n;
+
+  return {alpha, intercept}; // intercept = log(C)
 }
 
-std::vector<double> make_power_law_fit(const std::vector<double> &xs, double a,
-                                       double b) {
+std::vector<double> make_power_law_fit(const std::vector<double> &xs,
+                                       double alpha, double log_intercept) {
+  // reconstruct: y = C * x^alpha
+  // where C = exp(log_intercept)
 
-  std::vector<double> out;
-  out.reserve(xs.size());
+  const double C = std::exp(log_intercept);
 
-  for (double x : xs)
-    out.push_back(std::exp(b) * std::pow(x, a));
+  std::vector<double> fitted;
+  fitted.reserve(xs.size());
 
-  return out;
+  for (double x : xs) {
+    fitted.push_back(C * std::pow(x, alpha));
+  }
+
+  return fitted;
 }
 
-// =========================
+// ===
 // OVERVIEW
-// =========================
 
 void draw_stats_overview_s(const stat::Stats_Collector &sc) {
   ImGui::Text("Steps: %zu", sc.steps_count());
@@ -96,9 +120,8 @@ void draw_stats_overview_s(const stat::Stats_Collector &sc) {
   ImGui::Text("Dissipated grains: %zu", sc.grain_total_dissipated());
 }
 
-// =========================
+// ===
 // AVALANCHE SIZE
-// =========================
 
 std::unique_ptr<AvalancheSizePlotModel>
 build_avalanche_size_model(const std::vector<size_t> &input) {
@@ -132,7 +155,8 @@ void plot_avalanche_size(const AvalancheSizePlotModel &m) {
     return;
 
   if (ImPlot::BeginPlot("##SizeLogLog", ImVec2(-1, 250))) {
-    ImPlot::SetupAxes("Avalanche Size", "Count");
+    ImPlot::SetupAxes("Avalanche Size", "Count", ImPlotAxisFlags_AutoFit,
+                      ImPlotAxisFlags_AutoFit);
     ImPlot::SetupAxisScale(ImAxis_X1, ImPlotScale_Log10);
     ImPlot::SetupAxisScale(ImAxis_Y1, ImPlotScale_Log10);
 
@@ -149,7 +173,8 @@ void plot_avalanche_size(const AvalancheSizePlotModel &m) {
   }
 
   if (ImPlot::BeginPlot("##SizeLinear", ImVec2(-1, 250))) {
-    ImPlot::SetupAxes("Size", "Count");
+    ImPlot::SetupAxes("Size", "Count", ImPlotAxisFlags_AutoFit,
+                      ImPlotAxisFlags_AutoFit);
     ImPlot::PlotScatter("Data", m.xs.data(), m.ys.data(),
                         static_cast<int>(m.xs.size()));
     ImPlot::EndPlot();
@@ -163,21 +188,14 @@ void draw_stats_avalanche_sizes_s(const stat::Stats_Collector &sc) {
     return;
 
   ImGui::Text("Distribution of Avalanche Sizes");
-  ImGui::SameLine();
-  ImGui::TextDisabled("(?)");
-
-  if (ImGui::IsItemHovered()) {
-    ImGui::SetTooltip("Avalanche Size = toppled vertices");
-  }
 
   auto model = build_avalanche_size_model(data);
   if (model)
     plot_avalanche_size(*model);
 }
 
-// =========================
+// ===
 // ORIGINS
-// =========================
 
 std::unique_ptr<AvalancheOriginPlotModel>
 build_origin_model(const std::vector<size_t> &hist) {
@@ -195,7 +213,9 @@ build_origin_model(const std::vector<size_t> &hist) {
 void plot_origin(const AvalancheOriginPlotModel &m) {
 
   if (ImPlot::BeginPlot("##OriginsHist", ImVec2(-1, 200))) {
-    ImPlot::SetupAxes("Vertex ID", "Count");
+
+    ImPlot::SetupAxes("Vertex ID", "Count", ImPlotAxisFlags_AutoFit,
+                      ImPlotAxisFlags_AutoFit);
 
     ImPlot::PlotBars("Origins", m.hist.data(), static_cast<int>(m.hist.size()));
 
@@ -235,15 +255,20 @@ void plot_origin_grouped(const AvalancheOriginGroupedPlotModel &m) {
 
   if (ImPlot::BeginPlot("##OriginsGrouped", ImVec2(-1, 250))) {
 
+    ImPlot::SetupAxes("Vertex ID", "Count", ImPlotAxisFlags_AutoFit,
+                      ImPlotAxisFlags_AutoFit);
+
     double w = 0.4;
 
     auto xg = m.x;
     auto xo = m.x;
 
-    for (auto &v : xg)
+    for (auto &v : xg) {
       v -= w;
-    for (auto &v : xo)
+    }
+    for (auto &v : xo) {
       v += w;
+    }
 
     ImPlot::PlotBars("Grains", xg.data(), m.grains.data(),
                      static_cast<int>(xg.size()), 0.4);
@@ -257,64 +282,86 @@ void plot_origin_grouped(const AvalancheOriginGroupedPlotModel &m) {
 void draw_stats_avalanche_origins_s(const stat::Stats_Collector &sc) {
 
   auto model = build_origin_model(sc.avalanche_origins());
-  if (!model)
+  if (!model) {
     return;
+  }
 
   ImGui::Text("Avalanche Origins");
   plot_origin(*model);
 }
 
-void section_avalanche_origins_grouped(const stat::Stats_Collector &sc) {
+void draw_stats_avalanche_origins_grouped_s(const stat::Stats_Collector &sc) {
 
   auto model = build_origin_grouped_model(sc);
-  if (!model)
+  if (!model) {
     return;
+  }
 
   plot_origin_grouped(*model);
 }
 
-// =========================
+// ===
 // GRAINS
-// =========================
 
 std::unique_ptr<GrainsPlotModel>
-build_grains_model(const std::vector<size_t> &g, int display, int win) {
-
-  if (g.empty())
+build_grains_model(const std::vector<size_t> &grains, int display,
+                   int window_size) {
+  if (grains.empty())
     return nullptr;
 
-  size_t drop = g.size() > static_cast<size_t>(display)
-                    ? g.size() - static_cast<size_t>(display)
-                    : 0;
+  const std::size_t display_sz = static_cast<std::size_t>(display);
+  const std::size_t win = static_cast<std::size_t>(window_size);
 
-  auto recent =
-      g | std::views::drop(drop) |
-      std::views::transform([](auto v) { return static_cast<double>(v); }) |
-      std::ranges::to<std::vector>();
+  // FULL moving average over entire history
+  std::vector<double> full_ma;
+  full_ma.reserve(grains.size());
 
-  auto ma = g | std::views::slide(win) | std::views::transform([](auto w) {
-              return std::ranges::fold_left(w, 0.0, std::plus{}) /
-                     static_cast<double>(w.size());
-            });
+  double sum = 0.0;
 
-  auto moving_avg = ma | std::ranges::to<std::vector>();
+  for (std::size_t i = 0; i < grains.size(); ++i) {
+    const double v = static_cast<double>(grains[i]);
+    sum += v;
 
-  double maxv = std::ranges::max(recent);
+    if (i >= win)
+      sum -= static_cast<double>(grains[i - win]);
 
-  return std::make_unique<GrainsPlotModel>(GrainsPlotModel{
-      std::move(recent), std::move(moving_avg), maxv, g.back()});
+    const std::size_t len = std::min(i + 1, win);
+    full_ma.push_back(sum / static_cast<double>(len));
+  }
+
+  // Slice BOTH series consistently (last N points)
+  const std::size_t drop =
+      (grains.size() > display_sz) ? grains.size() - display_sz : 0;
+
+  std::vector<double> recent;
+  std::vector<double> ma;
+
+  recent.reserve(std::min(display_sz, grains.size()));
+  ma.reserve(std::min(display_sz, grains.size()));
+
+  for (std::size_t i = drop; i < grains.size(); ++i) {
+    recent.push_back(static_cast<double>(grains[i]));
+    ma.push_back(full_ma[i]);
+  }
+
+  return std::make_unique<GrainsPlotModel>(
+      GrainsPlotModel{std::move(recent), std::move(ma)});
 }
 
-void plot_grains(const GrainsPlotModel &m) {
+void plot_grains(const GrainsPlotModel &model) {
+  if (ImPlot::BeginPlot("##GrainsLine", ImVec2(-1, 150),
+                        ImPlotFlags_NoMouseText | ImPlotFlags_NoLegend)) {
+    ImPlot::SetupAxes("Steps (relative)", "Grains", ImPlotAxisFlags_AutoFit,
+                      ImPlotAxisFlags_AutoFit);
 
-  if (ImPlot::BeginPlot("##GrainsLine", ImVec2(-1, 150))) {
+    const int n = static_cast<int>(model.recent.size());
 
-    ImPlot::PlotLine("Grains", m.recent.data(),
-                     static_cast<int>(m.recent.size()));
+    const double xstart = -(n - 1);
+    const double xscale = 1.0;
 
-    if (!m.moving_avg.empty())
-      ImPlot::PlotLine("Average", m.moving_avg.data(),
-                       static_cast<int>(m.moving_avg.size()));
+    ImPlot::PlotLine("Grains", model.recent.data(), n, xscale, xstart);
+
+    ImPlot::PlotLine("Average", model.moving_avg.data(), n, xscale, xstart);
 
     ImPlot::EndPlot();
   }
@@ -322,17 +369,19 @@ void plot_grains(const GrainsPlotModel &m) {
 
 void draw_stats_grains_s(const stat::Stats_Collector &sc) {
 
-  const auto &g = sc.grain_dropped_counts();
-  if (g.empty())
+  const auto &g = sc.grains_total_counts_history();
+  if (g.empty()) {
     return;
+  }
 
   static int display = 200;
   static int win = 20;
 
   auto model = build_grains_model(g, display, win);
 
-  if (model)
+  if (model) {
     plot_grains(*model);
+  }
 
   ImGui::InputInt("Last steps", &display);
   ImGui::InputInt("MA window", &win);

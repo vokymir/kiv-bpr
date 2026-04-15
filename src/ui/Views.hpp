@@ -176,7 +176,7 @@ build_origin_grouped_model(const stat::Stats_Collector &sc);
 void plot_origin_grouped(const AvalancheOriginGroupedPlotModel &model);
 
 void draw_stats_avalanche_origins_s(const stat::Stats_Collector &sc);
-void section_avalanche_origins_grouped(const stat::Stats_Collector &sc);
+void draw_stats_avalanche_origins_grouped_s(const stat::Stats_Collector &sc);
 
 // ===
 // GRAINS
@@ -184,9 +184,6 @@ void section_avalanche_origins_grouped(const stat::Stats_Collector &sc);
 struct GrainsPlotModel {
   std::vector<double> recent;
   std::vector<double> moving_avg;
-
-  double max_val = 0.0;
-  size_t latest = 0;
 };
 
 std::unique_ptr<GrainsPlotModel>
@@ -200,9 +197,12 @@ void draw_stats_grains_s(const stat::Stats_Collector &sc);
 // ===
 // INTERNAL HELPERS
 
+// linear regression in log-log space
+// return (alpha, log_C)
 std::pair<double, double> fit_power_law(const std::vector<double> &xs,
                                         const std::vector<double> &ys);
 
+// evaluate the fitted power-law curve at given x values
 std::vector<double> make_power_law_fit(const std::vector<double> &xs,
                                        double alpha, double intercept);
 
