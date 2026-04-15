@@ -166,7 +166,7 @@ void plot_avalanche_size(const AvalancheSizePlotModel &m) {
     ImPlot::PlotLine("Fit", m.xs.data(), fit.data(),
                      static_cast<int>(m.xs.size()));
 
-    ImGui::Text("alpha = %.3f", m.alpha);
+    ImGui::Text("coefficient = %.3f", m.alpha);
 
     ImPlot::EndPlot();
   }
@@ -232,11 +232,13 @@ build_origin_model(const stat::Stats_Collector &sc) {
   const double inv_g = (max_g > 0.0) ? (1.0 / max_g) : 1.0;
   const double inv_o = (max_o > 0.0) ? (1.0 / max_o) : 1.0;
 
-  for (auto &v : grains){
-    v *= inv_g;}
+  for (auto &v : grains) {
+    v *= inv_g;
+  }
 
-  for (auto &v : origins){
-    v *= inv_o;}
+  for (auto &v : origins) {
+    v *= inv_o;
+  }
 
   return std::make_unique<AvalancheOriginPlotModel>(AvalancheOriginPlotModel{
       std::move(x), std::move(grains), std::move(origins)});
