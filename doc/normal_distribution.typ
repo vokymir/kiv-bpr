@@ -25,7 +25,7 @@
       x-label: [],
       y-label: [],
       y-format: v => $#v$,
-      x-format: v => move(dy: 4pt, [$#v$]),
+      x-format: v => move(dy: 3.5pt, [$#v$]),
       {
         plot.add(
           domain: (-4, 4),

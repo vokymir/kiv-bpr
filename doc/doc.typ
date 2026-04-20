@@ -51,6 +51,11 @@ effects contribute to an outcome, the resulting distribution is often well
 approximated by a normal distribution. A common example is human height which
 clusters around an _average_ with roughly symmetric variation.
 
+#figure(
+  caption: [Normal distribution plot.],
+  plot_normal_distribution(),
+)
+
 Contrary to this, there are systems which could not be described by normal
 distribution. One example are the forest fire sizes. If they were to adhere to
 normal distribution, there would be known a _average forest fire size_. Even
@@ -62,16 +67,11 @@ Normal distribution is exponentially bounded, meaning that most of values are
 distributed within small range around the center (mean) and values far from it
 are very impropable. The probability density function of normal distribution
 with mean $mu in RR$ and variance $sigma^2 > 0$ is described in
-@eq:normal_distribution:
+@eq:normal_distribution.
 
 $
   f(x) & = 1 / sqrt(2 pi sigma^2) e^(- (x - mu)^2 \/ (2 sigma^2))
 $ <eq:normal_distribution>
-
-#figure(
-  caption: [Normal dist... TODO],
-  plot_normal_distribution(),
-)
 
 As opposed to this, the power law #footnote[Power law on $(0, infinity)$ cannot
   be a probability distribution, because the areas near 0 and under the tail are
