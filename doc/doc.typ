@@ -40,28 +40,28 @@
 
 = Introduction
 
-TODO: tento odstavec nepravda, přepsat pomocí zákona o velkých číslech
+In many systems with high degree of freedom, the average outcome stabilizes as
+the number of observations grows. This is given by the law of large numbers
+@Durrett_2019 and it applies for example to the average of many dice rolls, coin
+tosses but also many natural phenomena such as average temperature.
 
-Almost everything in nature tends to cluster around a center value. An example
-might be the height of humans. This is described by a normal distribution which
-itself got its name because this pattern is so often observed not only in nature
-but in human-made systems as well.
+Furthermore, by central limit theorem @Durrett_2019, if many independent
+effects contribute to an outcome, the resulting distribution is often well
+approximated by a normal distribution. A common example is human height which
+clusters around an _average_ with roughly symmetric variation.
 
 Contrary to this, there are systems which could not be described by normal
 distribution. One example are the forest fire sizes. If they were to adhere to
 normal distribution, there would be known a _average forest fire size_. Even
 though most of forest fires are small, there is nothing limiting the potential
-size. This is one of key properties of systems better described by power-law,
+size. This is one of key properties of systems better described by power law,
 scale-invariance.
 
-TODO: odstavec přepsat - powerlaw is heavy tailed, to heavy se vztahuje na počet
-velkých událostí, ne na to, jak rychle ocas padá dolů
-
-Normal distribution is _heavy tailed_, meaning that most of values are
-distributed within small range around the center (mean) and
-values far from it are very impropable. The probability density function of
-normal distribution with mean $mu in RR$ and variance $sigma^2 > 0$ is described
-in @eq:normal_distribution:
+Normal distribution is exponentially bounded, meaning that most of values are
+distributed within small range around the center (mean) and values far from it
+are very impropable. The probability density function of normal distribution
+with mean $mu in RR$ and variance $sigma^2 > 0$ is described in
+@eq:normal_distribution:
 
 $
   f(x) & = 1 / sqrt(2 pi sigma^2) e^(- (x - mu)^2 \/ (2 sigma^2))
@@ -69,26 +69,24 @@ $ <eq:normal_distribution>
 
 TODO: plot normal dist?
 
-TODO: check odstavec, long-tailed je heavy tailed - to už bude nahoře
-
-As opposed to this, the power-law  #footnote[Power-law on $(0, infinity)$ cannot be
-  a probability distribution, because the areas near 0 and under the tail are
-  infinite. However, with simple restrictions: $f(x) = a x^(-k), quad k > 1, quad
-  x > x_(min)$ it is a valid distribution.] is _long tailed_. Its exponential
-character described in @eq:power-law result in majority of the values being very
-far. That corresponds with the scale-invariance: Any (forest fire) size is
-realistically possible, even though smaller sizes are more likely. Power-law
-exhibit linear relationship between $log f(x)$ and $log x$. In a `log-log plot`
-it forms a straight line.
+As opposed to this, the power law #footnote[Power law on $(0, infinity)$ cannot
+  be a probability distribution, because the areas near 0 and under the tail are
+  infinite. However, with simple restrictions: $f(x) = a x^(-k), quad k > 1,
+  quad x > x_(min)$ it is a valid distribution.] is _heavy tailed_. Its
+exponential character described in @eq:power-law result in higher probability
+of extreme values. That corresponds with the scale-invariance: Any (forest
+fire) size is realistically possible, even though smaller sizes are more likely.
+Power law exhibit linear relationship between $log f(x)$ and $log x$. In a
+`log-log plot` it forms a straight line.
 
 $
        f(x) & = a x^(-k) \
   k #h(1mm) & ... #text[constant exponent]
 $ <eq:power-law>
 
-TODO: YES (use app imagery): plot power-law, in normal and log-log plot
+TODO: YES (use app imagery): plot power law, in normal and log-log plot
 
-The emergence of the power-law distribution is often connected to systems
+The emergence of the power law distribution is often connected to systems
 critical state. Consider phase transition of water from liquid to vapor. At the
 liquid-vapour boundary curve, both liquid and vapour can coexist but are
 distinctly separate. The boundary terminates at some critical temperature and
