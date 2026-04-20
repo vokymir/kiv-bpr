@@ -4,6 +4,7 @@
 
 // my own small lib to easily create diagrams
 #import "diagram_functions.typ": boundary-style, square-lattice, uniform-style
+#import "normal_distribution.typ": plot_normal_distribution
 
 #set text(lang: "en")
 #set heading(numbering: "1.")
@@ -26,7 +27,7 @@
 
     return link(
       loc,
-      [Equation #context { numbering(math.equation.numbering, ..num) }],
+      [Equation~#context { numbering(math.equation.numbering, ..num) }],
     )
   }
 
@@ -67,7 +68,10 @@ $
   f(x) & = 1 / sqrt(2 pi sigma^2) e^(- (x - mu)^2 \/ (2 sigma^2))
 $ <eq:normal_distribution>
 
-TODO: plot normal dist?
+#figure(
+  caption: [Normal dist... TODO],
+  plot_normal_distribution(),
+)
 
 As opposed to this, the power law #footnote[Power law on $(0, infinity)$ cannot
   be a probability distribution, because the areas near 0 and under the tail are
