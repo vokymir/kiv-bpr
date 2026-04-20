@@ -4,7 +4,7 @@
 
 // my own small lib to easily create diagrams
 #import "diagram_functions.typ": boundary-style, square-lattice, uniform-style
-#import "normal_distribution.typ": plot_normal_distribution
+#import "normal_distribution.typ": data_table, linear_plot, log_log_plot, plot_normal_distribution
 
 #set text(lang: "en")
 #set heading(numbering: "1.")
@@ -53,6 +53,7 @@ clusters around an _average_ with roughly symmetric variation.
 
 #figure(
   caption: [Normal distribution plot.],
+  gap: 1.5em,
   plot_normal_distribution(),
 )
 
@@ -88,7 +89,17 @@ $
   k #h(1mm) & ... #text[constant exponent]
 $ <eq:power-law>
 
-TODO: YES (use app imagery): plot power law, in normal and log-log plot
+#figure(
+  caption: [Function $y = x^(-2)$ plotted on linear scale (left) and on
+    log-log scale (right) on~interval~$chevron.l 1, 10 chevron.r$.],
+  gap: 1.5em,
+  grid(
+    gutter: 2em,
+    columns: 2,
+    linear_plot(), log_log_plot(),
+  ),
+)
+
 
 The emergence of the power law distribution is often connected to systems
 critical state. Consider phase transition of water from liquid to vapor. At the
@@ -103,8 +114,6 @@ significant difference. Criticality can be reached in many systems by
 fine-tuning certain parameters. In the case of phase transition the parameters
 were pressure and temperature. However, there exist systems which reach
 criticality independently of parameters.
-
-TODO NOTE?: usually high degree of freedom systems
 
 The phenomenon of systems reaching criticality by themselves is called
 _self-organized criticality (SOC)_. The concept of SOC was first discovered in
