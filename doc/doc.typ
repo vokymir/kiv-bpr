@@ -1,9 +1,6 @@
 
-// library to create graphs
-#import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
-
-// my own small lib to easily create diagrams
-#import "diagrams.typ": boundary-style, square-lattice, uniform-style
+// my own modules for various graphs
+#import "diagrams.typ": diagram
 #import "plots.typ": plot
 
 #set text(lang: "en")
@@ -13,6 +10,9 @@
 // highlight all TODOs, which is WOW, easy yet not
 #show regex("TODO(.*)"): it => text(fill: red, weight: "bold")[#it]
 
+// references should stay as close to default as possible, here is a list of
+// needed changes:
+// 1. Equation 1 => Equation (1)
 #show ref: it => {
   let el = it.element
 
@@ -249,61 +249,7 @@ graph.
     gutter: 2em,
     align: center,
 
-    diagram(
-      node-shape: circle,
-      node-fill: none,
-      node-stroke: 1pt + black,
-      node-inset: 0pt,
-      spacing: 10pt,
-      label-size: 0pt,
-
-      ..square-lattice(
-        5,
-        5,
-        styles-fn: (x, y, n, m) => boundary-style(
-          x,
-          y,
-          5,
-          5,
-          boundary-fill: rgb(39, 245, 245),
-          inner-fill: none,
-        ),
-      ),
-    ),
-
-    diagram(
-      node-shape: circle,
-      node-fill: none,
-      node-stroke: 1pt + black,
-      node-inset: 0pt,
-      spacing: 10pt,
-      label-size: 0pt,
-
-      ..square-lattice(
-        5,
-        5,
-        skip-boundary-edges: true,
-        styles-fn: (x, y, n, m) => boundary-style(
-          x,
-          y,
-          5,
-          5,
-          boundary-fill: none,
-          boundary-stroke: none,
-        ),
-      ),
-
-      node(
-        (-2, 2), //
-        width: 6pt,
-        height: 6pt,
-        fill: rgb(39, 245, 245),
-      ),
-
-      edge((-2, 2), (-1, 2)),
-
-      // ..square-lattice-with-sink(3, 3, sink-color: rgb(39, 245, 245)),
-    ),
+    (diagram.boundary_sinks)(), (diagram.single_sink)(),
   ),
 ) <fig:sq-lat_comp_sinks>
 

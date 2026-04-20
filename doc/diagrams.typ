@@ -1,5 +1,10 @@
+// TIS' A MODULE
+// please only import diagram (at the bottom)
 
 #import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
+
+// ============
+// BUILDING BLOCKS
 
 #let square-lattice(
   n,
@@ -73,6 +78,9 @@
   nodes + edges
 }
 
+// ===
+// FILL-STYLES
+
 #let uniform-style(fill: none, stroke: 1pt + black, width: 5pt, height: 5pt) = (
   fill: fill,
   stroke: stroke,
@@ -107,4 +115,74 @@
   },
   width: width,
   height: height,
+)
+
+// =========================================
+// COMPLETE DIAGRAMS USED IN THESIS
+
+#let boundary_sinks() = diagram(
+  node-shape: circle,
+  node-fill: none,
+  node-stroke: 1pt + black,
+  node-inset: 0pt,
+  spacing: 10pt,
+  label-size: 0pt,
+
+  ..square-lattice(
+    5,
+    5,
+    styles-fn: (x, y, n, m) => boundary-style(
+      x,
+      y,
+      5,
+      5,
+      boundary-fill: rgb(39, 245, 245),
+      inner-fill: none,
+    ),
+  ),
+)
+
+#let single_sink() = diagram(
+  node-shape: circle,
+  node-fill: none,
+  node-stroke: 1pt + black,
+  node-inset: 0pt,
+  spacing: 10pt,
+  label-size: 0pt,
+
+  ..square-lattice(
+    5,
+    5,
+    skip-boundary-edges: true,
+    styles-fn: (x, y, n, m) => boundary-style(
+      x,
+      y,
+      5,
+      5,
+      boundary-fill: none,
+      boundary-stroke: none,
+    ),
+  ),
+
+  node(
+    (-2, 2), //
+    width: 6pt,
+    height: 6pt,
+    fill: rgb(39, 245, 245),
+  ),
+
+  edge((-2, 2), (-1, 2)),
+
+  // ..square-lattice-with-sink(3, 3, sink-color: rgb(39, 245, 245)),
+)
+
+// ===================
+// PUBLIC API
+#let diagram = (
+  // generate a square lattice of any size
+  square_lattice: square-lattice,
+  // show graph with sinks on the boundary
+  boundary_sinks: boundary_sinks,
+  // show graph with only one sink
+  single_sink: single_sink,
 )
