@@ -41,6 +41,8 @@
 
 = Introduction
 
+TODO: start with the story
+
 In many systems with high degree of freedom, the average outcome stabilizes as
 the number of observations grows. This is given by the law of large numbers
 @Durrett_2019 and it applies for example to the average of many dice rolls, coin
@@ -122,6 +124,7 @@ sandpile model @1987PhRvL..59..381B. This model and its properties is the
 main focus of this thesis.
 
 TODO: talk about the idea of putting it on random graphs, not just general?
+(maybe will be at the beginning)
 
 The original sandpile model was a cellular automaton on a square and cubic
 lattice. However, the idea is to use another underlying graph structures for the
@@ -178,6 +181,8 @@ of all shortest paths:
 $
   "len"(G) = 1/n(n-1) Sigma_(i != j) "len"(P^*_(i j))
 $
+
+One family of random graphs is a _small world network_. @Watts1998
 
 TODO: small-world network properties (the previous needed for that)
 
