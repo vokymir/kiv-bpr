@@ -90,6 +90,8 @@ public:
     avalanche_records_.clear();
     avalanche_sizes_.clear();
     avalanche_origins_.clear();
+    grain_dropped_counts_.clear();
+    grain_dropped_history_.clear();
     grains_total_counts_history_.clear();
 
     avalanche_max_size_ = 0;
