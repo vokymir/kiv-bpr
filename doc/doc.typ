@@ -12,12 +12,35 @@
 // highlight all TODOs, which is WOW, easy yet not
 #show regex("TODO(.*)"): it => text(fill: red, weight: "bold")[#it]
 
+#show ref: it => {
+  let el = it.element
+
+  if el == none {
+    return it
+  }
+
+  let loc = it.element.location()
+
+  if el.func() == math.equation {
+    let num = counter(math.equation).at(loc)
+
+    return link(
+      loc,
+      [Equation #context { numbering(math.equation.numbering, ..num) }],
+    )
+  }
+
+  it
+}
+
 #title([
   Self-Organized Criticality: Sandpile Model on Undirected Graph, Influence of
   Topology and Dissipation Rules on Avalanches
 ])
 
 = Introduction
+
+TODO: tento odstavec nepravda, přepsat pomocí zákona o velkých číslech
 
 Almost everything in nature tends to cluster around a center value. An example
 might be the height of humans. This is described by a normal distribution which
@@ -26,25 +49,29 @@ but in human-made systems as well.
 
 Contrary to this, there are systems which could not be described by normal
 distribution. One example are the forest fire sizes. If they were to adhere to
-normal distribution, there would be known an _average forest fire size_. Even
+normal distribution, there would be known a _average forest fire size_. Even
 though most of forest fires are small, there is nothing limiting the potential
 size. This is one of key properties of systems better described by power-law,
 scale-invariance.
 
+TODO: odstavec přepsat - powerlaw is heavy tailed, to heavy se vztahuje na počet
+velkých událostí, ne na to, jak rychle ocas padá dolů
+
 Normal distribution is _heavy tailed_, meaning that most of values are
 distributed within small range around the center (mean) and
 values far from it are very impropable. The probability density function of
-normal distribution is described in @eq:normal_distribution
+normal distribution with mean $mu in RR$ and variance $sigma^2 > 0$ is described
+in @eq:normal_distribution:
 
 $
-        f(x) & = 1 / sqrt(2 pi sigma^2) e^(- (x - mu)^2 \/ (2 sigma^2)) \
-  mu #h(1mm) & ... #text[mean] \
-     sigma^2 & ... #text[variance]
+  f(x) & = 1 / sqrt(2 pi sigma^2) e^(- (x - mu)^2 \/ (2 sigma^2))
 $ <eq:normal_distribution>
 
 TODO: plot normal dist?
 
-As opposed to this, power-law  #footnote[Power-law on $(0, infinity)$ cannot be
+TODO: check odstavec, long-tailed je heavy tailed - to už bude nahoře
+
+As opposed to this, the power-law  #footnote[Power-law on $(0, infinity)$ cannot be
   a probability distribution, because the areas near 0 and under the tail are
   infinite. However, with simple restrictions: $f(x) = a x^(-k), quad k > 1, quad
   x > x_(min)$ it is a valid distribution.] is _long tailed_. Its exponential
@@ -59,21 +86,21 @@ $
   k #h(1mm) & ... #text[constant exponent]
 $ <eq:power-law>
 
-TODO: plot power-law? in normal and log-log plot
+TODO: YES (use app imagery): plot power-law, in normal and log-log plot
 
-The emergence of power-law distribution is often connected to systems critical
-state. Consider phase transition of water from liquid to vapor. At the
+The emergence of the power-law distribution is often connected to systems
+critical state. Consider phase transition of water from liquid to vapor. At the
 liquid-vapour boundary curve, both liquid and vapour can coexist but are
 distinctly separate. The boundary terminates at some critical temperature and
 critical pressure at which the critical point of a system is defined. While the
-system is in the critical state, the water is in not in any one state.
+system is in the critical state, the water is not in a single state.
 
-Systems in critical state are most responsive to input and behaves
-unpredictable. This is the case for phase transition and forest fires. Although,
-there is a significant difference. Criticality can be reached in many systems by
+Systems in critical state are most responsive to input and behave unpredictable.
+This is the case for phase transition and forest fires. Although, there is a
+significant difference. Criticality can be reached in many systems by
 fine-tuning certain parameters. In the case of phase transition the parameters
-were pressure and temperature. However, systems exist which reach criticality
-independently of parameters.
+were pressure and temperature. However, there exist systems which reach
+criticality independently of parameters.
 
 TODO NOTE?: usually high degree of freedom systems
 
@@ -85,9 +112,9 @@ main focus of this thesis.
 
 TODO: talk about the idea of putting it on random graphs, not just general?
 
-The original sandpile model was a cellular automaton on a sqare and cubic
+The original sandpile model was a cellular automaton on a square and cubic
 lattice. However, the idea is to use another underlying graph structures for the
-automaton. Before this generalization we introduce few needed concepts from
+automaton. Before this generalization we introduce few necessary concepts from
 graph theory.
 
 = Graph Theory
@@ -102,12 +129,12 @@ $
 
 The neighbourhood of a vertex is a set of vertices connected to it via an edge.
 $
-  "nei" (v_i) = {v_j | {v_i, v_j} in E},
+  cal(N) (v_i) = {v_j | {v_i, v_j} in E},
 $
 
 The vertex degree is defined as the size of vertex neighbourhood.
 $
-  d(v_i) = abs("nei" (v_i))
+  d(v_i) = abs(cal(N) (v_i))
 $
 
 Path between two vertices $v_i$ and $v_j$ is a sequence of vertices beginning in
@@ -158,7 +185,7 @@ $
 $ <eq:cell-automaton_topple_rules_2d>
 if $z$ exceeds (or meets) critical value $K = 4$. The system is initialized
 randomly but with $z >> K$. That initial state or rather the size of a lattice
-along with $ZZ$ (the height of all cells) is called _configuration_.
+along with $Z$ (the height of all cells) is called _configuration_.
 
 For simplicity we can imagine a simple chessboard and falling sand grains. Each
 grain falls on a chess square determined by a random distribution #footnote[In
@@ -182,23 +209,23 @@ property of the model. Without dissipation the model supersaturates, leading to
 one infinite avalanche.
 
 
-We can express the square lattice (chessboard) as a graph $G = (V,E)$ with size
-#footnote[In a square lattice, the $"size"^2 = n$, which is the number of
-  vertices in graph.] $sqrt(n)$. For a boundary condition, the boundary vertices
-height is fixed to zero $z = 0$. Alternatively, we may imagine only one vertex,
-called _sink vertex_, with such condition. This sink is connected to all
-boundary vertices, thus creating the same effect. Please note, that this
-simplification creates a multigraph, because corner vertices and sink are
-connected via two edges. For the rest of this thesis we will consider the
+We can express the square lattice (chessboard) as a graph $G = (V,E)$ with the
+size given by #footnote[In a square lattice, the $"size"^2 = n$, which is the
+  number of vertices in graph.] $sqrt(n)$. For a boundary condition, the
+boundary vertices height is fixed to zero $z = 0$. Alternatively, we may
+imagine only one vertex, called _sink vertex_, with such condition. This sink is
+connected to all boundary vertices, thus creating the same effect. Please note,
+that this simplification creates a multigraph, because corner vertices and sink
+are connected via two edges. For the rest of this thesis we will consider the
 simplified version with one sink vertex and therefore a multigraph. However, it
 is trivial to create multiple sink vertices to restore a simple undirected
 graph.
 
 #figure(
-  caption: "Comparison of square lattice sink vertices (blue). On the left is a
-  graph with sinks at the boundary - as in the original model. On the right is
-  a multigraph, square lattice with only one sink connected to all vertices at
-  the boundary which is hinted by outgoing edges.",
+  caption: "Comparison of square lattice sink vertices (blue). On the left there
+  is a graph with sinks at the boundary - as in the original model. On the right
+  there is a multigraph, the square lattice with a single sink connected to all
+  vertices at the boundary which is hinted by outgoing edges.",
 
   grid(
     columns: (1fr, 1fr),
@@ -285,9 +312,9 @@ TODO: WS graph - we have
 == Dissipation Rules <h:dissipation_rules>
 
 With the introduction of arbitrary graph we must reconsider dissipation rules.
-The square lattice has explicit boundaries which serves as sinks. However, many
-graphs do not even have an implicit boundary. The existence of sink is
-fundamental for the model not to supersaturate.
+The square lattice has explicit boundaries which serve as sinks. However, many
+graphs do not have an implicit boundary. The existence of sink is fundamental
+for the model not to supersaturate.
 
 A dissipation rule determines how many times a vertex should be connected to the
 sink. There is not a single rule which would be generally applied to any graph.
@@ -308,8 +335,8 @@ that rule. For the square lattice, only vertices on the edge are connected
 (exactly once except for corner vertices, which are connected twice).
 $
   D(v) = cases(
-    4 - d(v) quad d(v) >= 4,
-    0
+    4 - d(v) quad d(v) >= 4",",
+    0 #h(1mm) "."
   )
 $
 
