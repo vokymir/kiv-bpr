@@ -56,7 +56,7 @@ clusters around an _average_ with roughly symmetric variation.
 #figure(
   caption: [Normal distribution plot.],
   gap: 1.5em,
-  (plot.normal)((legend-size: 30pt)),
+  (plot.normal)((:)),
 )
 
 Contrary to this, there are systems which could not be described by normal
