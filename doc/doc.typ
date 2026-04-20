@@ -60,10 +60,11 @@ clusters around an _average_ with roughly symmetric variation.
 )
 
 Contrary to this, there are systems which could not be described by normal
-distribution. One example are the forest fire sizes. If they were to adhere to
-normal distribution, there would be known a _average forest fire size_. Even
-though most of forest fires are small, there is nothing limiting the potential
-size. This is one of key properties of systems better described by power law,
+distribution @doi:10.1137_070710111 . One example are the forest fire
+sizes@doi:10.1126_science.281.5384.1840. If they were to adhere to normal
+distribution, there would be known a _average forest fire size_. Even though
+most of forest fires are small, there is nothing limiting the potential size.
+This is one of key properties of systems better described by power law,
 scale-invariance.
 
 Normal distribution is exponentially bounded, meaning that most of values are
@@ -110,9 +111,9 @@ distinctly separate. The boundary terminates at some critical temperature and
 critical pressure at which the critical point of a system is defined. While the
 system is in the critical state, the water is not in a single state.
 
-Systems in critical state are most responsive to input and behave unpredictable.
-This is the case for phase transition and forest fires. Although, there is a
-significant difference. Criticality can be reached in many systems by
+Systems in critical state are most responsive to input and behave unpredictable
+@Bak1996. This is the case for phase transition and forest fires. Although,
+there is a significant difference. Criticality can be reached in many systems by
 fine-tuning certain parameters. In the case of phase transition the parameters
 were pressure and temperature. However, there exist systems which reach
 criticality independently of parameters.
