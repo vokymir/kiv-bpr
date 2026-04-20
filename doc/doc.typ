@@ -3,8 +3,8 @@
 #import "@preview/fletcher:0.5.8" as fletcher: diagram, edge, node
 
 // my own small lib to easily create diagrams
-#import "diagram_functions.typ": boundary-style, square-lattice, uniform-style
-#import "normal_distribution.typ": data_table, linear_plot, log_log_plot, plot_normal_distribution
+#import "diagrams.typ": boundary-style, square-lattice, uniform-style
+#import "plots.typ": plot
 
 #set text(lang: "en")
 #set heading(numbering: "1.")
@@ -56,7 +56,7 @@ clusters around an _average_ with roughly symmetric variation.
 #figure(
   caption: [Normal distribution plot.],
   gap: 1.5em,
-  plot_normal_distribution(),
+  (plot.normal)((legend-size: 30pt)),
 )
 
 Contrary to this, there are systems which could not be described by normal
@@ -98,7 +98,7 @@ $ <eq:power-law>
   grid(
     gutter: 2em,
     columns: 2,
-    linear_plot(), log_log_plot(),
+    (plot.cmp_linear)((:)), (plot.cmp_loglog)((:)),
   ),
 )
 
@@ -182,11 +182,12 @@ $
   "len"(G) = 1/n(n-1) Sigma_(i != j) "len"(P^*_(i j))
 $
 
+TODO: connected graph definition
+
 One family of random graphs is a _small world network_. @Watts1998
 
 TODO: small-world network properties (the previous needed for that)
 
-TODO: connected graph definition
 
 = Sandpile Model <h:sandpile_model_general>
 
@@ -417,8 +418,7 @@ TODO
 
 #heading([TODO], numbering: none)
 
-- příběh někam zakomponovat?
-- app: log-log plot
+-
 
 #heading([TODO PS], numbering: none)
 

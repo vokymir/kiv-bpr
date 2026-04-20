@@ -1,9 +1,20 @@
+// MODULE
+// only import 'plot', it contains everything
 
 #import "@preview/cetz:0.5.0"
 #import "@preview/cetz-plot:0.1.3"
 
-#let legend_size = 8pt
+// ===========================
+// MODULE SECTION
+#let default_config = (
+  legend_size: 8pt,
+)
 
+#let setup_config(config: (:)) = { default_config + config }
+
+
+// ==============================
+// NORMAL DISTRIBUTION SECTION
 #let mu = 0
 #let sigma = 1
 
@@ -12,8 +23,11 @@
   (1 / calc.sqrt(2 * calc.pi * variance)) * calc.exp(-calc.pow(x - mu, 2) / (2 * variance))
 }
 
-#let plot_normal_distribution() = {
-  set text(size: legend_size)
+#let plot_normal_distribution(config) = {
+  let cfg = setup_config(config: config)
+
+  set text(size: cfg.legend_size)
+
   cetz.canvas({
     import cetz-plot: plot
 
@@ -39,10 +53,11 @@
   })
 }
 
-// =====
+// ===============
+// FUNCTION ON LINEAR VS LOG-LOG SCALE
 
 // define function to show
-#let fn(x) =  calc.pow(x, -2)
+#let fn(x) = calc.pow(x, -2)
 
 // Generate data points
 #let plot_data = range(1, 11).map(i => {
@@ -50,8 +65,10 @@
   (x, fn(x))
 })
 
-#let linear_plot() = {
-  set text(size: legend_size)
+#let linear_plot(config) = {
+  let cfg = setup_config(config: config)
+
+  set text(size: cfg.legend_size)
   cetz.canvas({
     import cetz-plot: plot
 
@@ -67,8 +84,11 @@
   })
 }
 
-#let log_log_plot() = {
-  set text(size: legend_size)
+#let log_log_plot(config) = {
+  let cfg = setup_config(config: config)
+
+  set text(size: cfg.legend_size)
+
   cetz.canvas({
     import cetz-plot: plot
 
@@ -95,8 +115,11 @@
   })
 }
 
-#let data_table() = {
-  set text(size: 8pt)
+#let data_table(config) = {
+  let cfg = setup_config(config: config)
+
+  set text(size: cfg.legend_size)
+
   let display_data = plot_data
 
   align(center, table(
@@ -113,3 +136,18 @@
     [*$y$*], ..display_data.map(d => [#calc.round(d.at(1), digits: 2)]),
   ))
 }
+
+// ============
+// PUBLIC API
+#let plot = (
+  // GAUSS
+  // plot normal distribution heeey
+  normal: plot_normal_distribution,
+  // COMPARE PLOTTING
+  // standard linear plot
+  cmp_linear: linear_plot,
+  // log-log plot
+  cmp_loglog: log_log_plot,
+  // table showing x and y(x)
+  cmp_table: data_table,
+)
