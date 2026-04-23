@@ -48,10 +48,10 @@ the number of observations grows. This is given by the law of large numbers
 @Durrett_2019 and it applies for example to the average of many dice rolls, coin
 tosses but also many natural phenomena such as average temperature.
 
-Furthermore, by central limit theorem @Durrett_2019, if many independent
-effects contribute to an outcome, the resulting distribution is often well
-approximated by a normal distribution. A common example is human height which
-clusters around an _average_ with roughly symmetric variation.
+Furthermore,  if many independent effects contribute to an outcome, the
+resulting distribution is often well approximated by a normal distribution
+according to central limit theorem @Durrett_2019. A common example is human
+height which clusters around an _average_ with roughly symmetric variation.
 
 #figure(
   caption: [Normal distribution plot.],
@@ -60,11 +60,11 @@ clusters around an _average_ with roughly symmetric variation.
 )
 
 Contrary to this, there are systems which could not be described by normal
-distribution @doi:10.1137_070710111 . One example are the forest fire
-sizes@doi:10.1126_science.281.5384.1840. If they were to adhere to normal
-distribution, there would be known a _average forest fire size_. Even though
-most of forest fires are small, there is nothing limiting the potential size.
-This is one of key properties of systems better described by power law,
+distribution @doi:10.1137_070710111 . One example are the forest fire sizes
+@doi:10.1126_science.281.5384.1840. If they were to adhere to normal
+distribution, there would be a known _average forest fire size_. Even though
+most forest fires are small, there is nothing limiting the potential size. This
+is one of the key properties of systems better described by the power law,
 scale-invariance.
 
 Normal distribution is exponentially bounded, meaning that most of values are
@@ -74,13 +74,14 @@ with mean $mu in RR$ and variance $sigma^2 > 0$ is described in
 @eq:normal_distribution.
 
 $
-  f(x) & = 1 / sqrt(2 pi sigma^2) e^(- (x - mu)^2 \/ (2 sigma^2))
+  f(x) & = 1 / sqrt(2 pi sigma^2) e^(- (x - mu)^2 \/ (2 sigma^2)) #h(1mm) .
 $ <eq:normal_distribution>
 
 As opposed to this, the power law #footnote[Power law on $(0, infinity)$ cannot
   be a probability distribution, because the areas near 0 and under the tail are
   infinite. However, with simple restrictions: $f(x) = a x^(-k), quad k > 1,
-  quad x > x_(min)$ it is a valid distribution.] is _heavy tailed_. Its
+  quad x > x_(min)$ it is a valid distribution. TODO: nerozumím poznámce; stačí
+  asymptoticky] is _heavy tailed_. Its
 exponential character described in @eq:power-law result in higher probability
 of extreme values. That corresponds with the scale-invariance: Any (forest
 fire) size is realistically possible, even though smaller sizes are more likely.
@@ -111,11 +112,11 @@ distinctly separate. The boundary terminates at some critical temperature and
 critical pressure at which the critical point of a system is defined. While the
 system is in the critical state, the water is not in a single state.
 
-Systems in critical state are most responsive to input and behave unpredictable
-@Bak1996. This is the case for phase transition and forest fires. Although,
+Systems in critical state are most responsive to input and behave unpredictably
+@Bak1996. This is the case for phase transition and forest fires. However,
 there is a significant difference. Criticality can be reached in many systems by
 fine-tuning certain parameters. In the case of phase transition the parameters
-were pressure and temperature. However, there exist systems which reach
+are pressure and temperature. However, there exist systems which reach
 criticality independently of parameters.
 
 The phenomenon of systems reaching criticality by themselves is called
@@ -165,8 +166,8 @@ Similarily, path length is the number of _steps_ (edges) needed to walk the
 path. If path doesn't exist we define its legth as zero.
 $
   "len"(P) = cases(
-    abs(P) - 1 quad & abs(P) >= 2,
-    0 quad & "else"
+    abs(P) - 1 quad & abs(P) >= 2",",
+    0 quad & "else ."
   )
 $
 
@@ -174,13 +175,13 @@ The shortest path between vertices $v_i$ and $v_j$ is the path with minimal
 length among all paths connecting these vertices. Let $PP(v_i, v_j)$ be the set
 of all paths between $v_i$ and $v_j$:
 $
-  P^*_(i j) = min_(P in PP(v_i, v_j)) "len"(P)
+  P^*_(i j) = min_(P in PP(v_i, v_j)) "len"(P) " ."
 $
 
 A graph has an average (shortest) path length $"len"(G)$. Let $PP^*$ be the set
 of all shortest paths:
 $
-  "len"(G) = 1/n(n-1) Sigma_(i != j) "len"(P^*_(i j))
+  "len"(G) = 1/n(n-1) Sigma_(i != j) "len"(P^*_(i j)) " ."
 $
 
 TODO: connected graph definition
@@ -221,7 +222,7 @@ stable cell, it can destabilize it resulting in an avalanche. Avalanche is the
 set of topplings which occur before the system is stabilized again.
 
 The sandpile model is a dissipative dynamical system. The dissipation is
-demonstrating on the boundaries. When a grain leaves the chessboard (or enter a
+demonstrating on the boundaries. When a grain leaves the chessboard (or enters a
 boundary cell) it dissipated from the system. Dissipation is an important
 property of the model. Without dissipation the model supersaturates, leading to
 one infinite avalanche.
@@ -258,7 +259,7 @@ graph.
 All properties of the cellular automaton system holds on a square lattice. This
 model was later generalized from square lattice to arbitrary graph
 @Holroyd_2008. That generalization is important because it allows us to study
-the models behaviour for different graph topologies.
+the model's behaviour for different graph topologies.
 
 == Graph Topologies
 
@@ -282,14 +283,14 @@ for the model not to supersaturate.
 
 A dissipation rule determines how many times a vertex should be connected to the
 sink. There is not a single rule which would be generally applied to any graph.
-We will discuss different rules, their properties and analogies. Dissipation
-rules are not well-known thus their names were created for the purposes of this
+We discuss different rules, their properties and analogies. Dissipation
+rules are not well-known thus their names are created for the purposes of this
 thesis.
 
 We can present a dissipation rule as a function of vertex returning an integer
-which denotes how many times should a vertex be connected to the sink.
+which denotes how many times a vertex should be connected to the sink.
 $
-  D: v arrow NN
+  D: v arrow NN " ."
 $
 
 For example, the graph representation of the original model uses a _Fill to
@@ -327,7 +328,7 @@ connection to the sink is not exclusive to vertices of some characteristic
 #footnote[Possible characteristics include vertex neighbourhood size, shortest
   path by which it reaches all other vertices and more.].
 $
-  D(v) = 1
+  D(v) = 1 " ."
 $
 
 One rule sufficient for connected graph is _As Many As Neighbours_. This
@@ -335,7 +336,7 @@ rule connects every vertex to sink proportionally to its neighbourhood size.
 When considering connected graph this rule ensures dissipation and even provide
 a connection to the sink to all vertices.
 $
-  D(v) = d(v)
+  D(v) = d(v) " ."
 $
 
 Every rule represents a different approach and not all can be applied to all
@@ -365,9 +366,8 @@ TODO
 
 #heading([TODO], numbering: none)
 
--
+- otázka: mám , a . v rovnicích dávat s mezerou, nebo bez?
 
 #heading([TODO PS], numbering: none)
 
-- oponent
-- předběžná verze L. Vášovi
+-

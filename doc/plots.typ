@@ -59,11 +59,17 @@
 // define function to show
 #let fn(x) = calc.pow(x, -2)
 
-// Generate data points
-#let plot_data = range(1, 11).map(i => {
-  let x = i
-  (x, fn(x))
-})
+// return [steps] samples of [fn] on x in <[start], [end]>
+#let sample(fn, start, end, steps) = {
+  range(0, steps).map(i => {
+    let t = i / (steps - 1)
+    let x = start + (end - start) * t
+    (x, fn(x))
+  })
+}
+
+// get data on x in <1,10>
+#let plot_data = sample(fn, 1, 10, 200)
 
 #let linear_plot(config) = {
   let cfg = setup_config(config: config)
