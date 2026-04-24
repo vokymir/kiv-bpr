@@ -367,15 +367,57 @@ consider sink vertex.
 Regularity is not often found in human social networks, meaning graphs where
 vertices represent individuals and edges their mutual acquaintance. Purely
 random graph also would not be optimal for although it is not regular, human
-networks are not random. Fortunately, a small-world network (better described in
-@h:graph_theory) are almost perfect.
+networks are not completely random. Fortunately, a small-world network (better
+described in @h:graph_theory) are almost perfect.
 
+The three most known random graph generators are the Erdős–Rényi (ER) model
+@Erdos2022OnRG, Barabási-Albert (BA) @Baraba_si_1999 model and Watts-Strogatz
+(WS) model @Watts1998. Each of this methods generates the graph differently
+resulting in various _small-worldness_.
 
-The three most known small-world networks are the Erdős–Rényi model
-@Erdos2022OnRG, Barabási-Albert @Baraba_si_1999 model and Watts-Strogatz model
-@Watts1998.
+The *ER model* was the first discovered. There are two variants, both of which
+start with graph with $n$ vertices. The $G(n,m)$ model chooses a graph uniformly
+from the set of all possible graphs with $n$ vertices and $m$ edges. The
+$G(n,p)$ model creates all possible edges but only with the probability $p$.
 
-TODO: ER graph
+The $G(n,m)$ model ensures that any edge is equally likely and the number of
+edges is known before. This, however, do not provide the resulting graph being
+connected. The $G(n,p)$ model ensures that every edge has fixed probability of
+being present, also not ensuring connected graph.
+
+Another drawback of this model is the low clustering coefficient. That is a
+consequence of all edges having the same probability, which is not usually seen
+in social networks and in turn in small-world networks.
+
+The latest to be discovered is the *BA model*. The important observation BA made
+is that many observed networks are _scale-free_, meaning they have power-law
+degree distribution. Their method of generating has two key concepts: growth and
+preferential attachment.
+
+Growth simply means that the graph is build up from small number of vertices.
+Preferential attachment means for a vertex, the higher degree it has, the more
+likely it is to be connected to new vertex.
+
+The algorithm for generating the graph is, simply put, a loop in which one
+vertex is added to the graph and connected to each vertex with probability shown
+in @eq:ba_prob, where $v$ is the examined vertex and $u$ represents all
+vertices. The newly added vertex is yet not considered.
+
+$
+  p(v) = d(v) / (Sigma_u d(u)), quad u,v in V
+$ <eq:ba_prob>
+
+This yields in quick emergence of hubs, vertices with high degree. BA provide
+example, newly create webpage is more likely to link to well-known websites
+which already have high degree.
+
+As the consequence of hubs existence, the average path is short. However,
+interesting property of BA model is the dependance of clustering on $N =
+abs(V)$, in @eq:ba_clustering.
+
+$
+  C ~ ln(N^2) / N
+$ <eq:ba_clustering>
 
 TODO: BA graph
 
