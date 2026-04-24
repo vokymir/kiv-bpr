@@ -14,6 +14,10 @@
 // highlight all TODOs, which is WOW, easy yet not
 #show regex("TODO(.*)"): it => text(fill: red, weight: "bold")[#it]
 
+// hide all figures and math (useful to count normo-pages)
+// #show figure: it => []
+// #show math.equation: it => []
+
 // references should stay as close to default as possible, here is a list of
 // needed changes:
 // 1. Equation 1 => Equation (1)
@@ -141,7 +145,7 @@ graph structures. Specifically, on small-world networks which are a
 class of random networks. Before this generalization we introduce few necessary concepts from
 graph theory.
 
-= Graph Theory
+= Graph Theory <h:graph_theory>
 
 An undirected graph is defined as a pair, containing set of vertices and set
 of edges. The graph has $n$ vertices and $m$ edges.
@@ -312,7 +316,16 @@ contains sink vertex, and possibly multiple times. The toppling rule will not
 work if $K(v) = 0$. We acknowledge this constraint but leave its resolution to
 dissipation rules.
 
-TODO: square lattice - properties
+With $K$, toppling rule and dissipation rules specified, we now continue onto
+the properties of different graph topologies. Sqaure lattice is a regular graph,
+meaning the degree of all vertices is the same @Chen1997GraphTheory, if we
+consider sink vertex.
+
+Regularity is not often found in human social networks, meaning graphs where
+vertices represent individuals and edges their mutual acquaintance. Purely
+random graph also would not be optimal for although it is not regular, human
+networks are not random. Fortunately, a small-world network (better described in
+@h:graph_theory) are almost perfect.
 
 TODO: ER graph - we don't have
 
