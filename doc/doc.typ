@@ -6,6 +6,10 @@
 #set text(lang: "en")
 #set heading(numbering: "1.")
 #set math.equation(numbering: "(1)")
+#set page(
+  paper: "a4",
+  footer: place(center, context [#counter(page).display("1")]),
+)
 
 // highlight all TODOs, which is WOW, easy yet not
 #show regex("TODO(.*)"): it => text(fill: red, weight: "bold")[#it]
