@@ -207,9 +207,43 @@ $
   forall u,v in V, u != v: quad "len"(P_(u,v)) > 0 "."
 $
 
-One family of random graphs is a _small world network_. @Watts1998
+The measurement of how much do individual vertices in graph cluster together is
+called global clustering coefficient and it is based on triplets of nodes. One
+triplet is defined as three vertices with two or three edges between them. If
+the number of mutual edges is two, the triplet is called open, if it is three,
+the triplet is called closed. The global clustering coefficient of graph $C(G)$ is defined
+as:
 
-TODO: small-world network properties (the previous needed for that)
+$
+  C(G) = "# closed triplets" / "# all triplets"
+$ <eq:clustering_coefficient>
+
+Small world network is a graph with certain characteristic @Watts1998. It has
+high clustering coefficient and low distances. One example of small world
+network might be a human relationships network. The low distances might be
+expressed with respect to number of vertices as:
+
+$
+  "len"(G) prop log(abs(V))
+$
+
+Small world networks tend to contain complete subgraphs (cliques). This is
+direct result of high clustering coefficient. Additionally, because the average
+path is small, they often contain _hubs_ (vertices with high degree) which
+serves as connections between other vertices.
+
+One of methods to quantify the _small-worldness_ of a network is a small-world
+measure ($omega$) defined as follows @telesford2011ubiquitysmallworldnetworks:
+
+$
+  omega(G) = "len"(R) / "len"(G) - C(G) / C(L)
+$
+
+Where $G$ is the analyzed network, $R$ is an equivalent random network to $G$,
+and $L$ is an equivalent (ring) lattice network to $G$. This method aims to
+quantify the formulating properties of small-world network: high clustering
+coefficient which is _ideal_ in lattice networks, and low average path which is
+_ideal_ in random networks.
 
 
 = Sandpile Model <h:sandpile_model_general>
