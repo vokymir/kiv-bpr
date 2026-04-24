@@ -1,0 +1,8 @@
+#let diff-added(body) = {
+  set text(fill: rgb("#009900"))
+  body
+}
+#let diff-deleted(body) = {
+  set text(fill: rgb("#cc0000"))
+  strike(body)
+}
