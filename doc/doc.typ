@@ -41,14 +41,21 @@
 
 = Introduction
 
-TODO: start with the story
+In everyday life, person's outburst is rarely caused by a single large event.
+Rather, the tension builds up from small frustrations over time. When certain
+treshold is reached, even a minor additional stress can trigger an outburst.
+That redistributes the tension to others in their social circle. This may in
+turn cause further reactions, leading to a cascade of reach and size which are
+difficult to predict. A local event may therefore propagate through a network,
+depending on individual thresholds and the shape of the network.
 
-In many systems with high degree of freedom, the average outcome stabilizes as
-the number of observations grows. This is given by the law of large numbers
-@Durrett_2019 and it applies for example to the average of many dice rolls, coin
-tosses but also many natural phenomena such as average temperature.
+This may seem irregular or unpredictable, but many complex systems exhibit
+stable statistical properties when the number of observation is large. This
+phenomenon is explained by the law of large numbers @Durrett_2019 which applies,
+for example, to repeated coin tosses, dice rolls and also many natural
+phenomenon such as average temperature.
 
-Furthermore,  if many independent effects contribute to an outcome, the
+Furthermore, if many independent effects contribute to an outcome, the
 resulting distribution is often well approximated by a normal distribution
 according to central limit theorem @Durrett_2019. A common example is human
 height which clusters around an _average_ with roughly symmetric variation.
@@ -122,15 +129,12 @@ criticality independently of parameters.
 The phenomenon of systems reaching criticality by themselves is called
 _self-organized criticality (SOC)_. The concept of SOC was first discovered in
 1987 by Bak, Tang and Wiesenfeld and its properties were demonstrated on a
-sandpile model @1987PhRvL..59..381B. This model and its properties is the
-main focus of this thesis.
+sandpile model @1987PhRvL..59..381B. The original model was a cellular automaton
+on a square and cubic lattice.
 
-TODO: talk about the idea of putting it on random graphs, not just general?
-(maybe will be at the beginning)
-
-The original sandpile model was a cellular automaton on a square and cubic
-lattice. However, the idea is to use another underlying graph structures for the
-automaton. Before this generalization we introduce few necessary concepts from
+In this thesis, we investigate the behaviour of the sandpile model on different
+graph structures. Specifically, on small-world networks which are a
+class of random networks. Before this generalization we introduce few necessary concepts from
 graph theory.
 
 = Graph Theory
