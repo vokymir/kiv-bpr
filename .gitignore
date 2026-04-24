@@ -6,3 +6,6 @@ external/
 vcpkg/
 *.ini
 vcpkg_installed/
+
+#doc
+diff/
