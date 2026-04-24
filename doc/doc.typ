@@ -424,7 +424,38 @@ $ <eq:ba_clustering>
 This model generates a connected graph, because when new vertex is added, it is
 connected to exactly $m$ existing vertices.
 
-TODO: WS graph - we have (why)
+The WS model authors have also defined the small-world measure (#sym.omega)
+discussed in @h:graph_theory. WS argued that ER model lacks two important
+properties often observed in small-world network: high clustering coeficient and
+degree distribution convergence to power law. Their model was designed to
+address the first issue.
+
+The generation algorithm is simple: 1. start with a regular ring lattice, 2.
+rewire every edge with probability #sym.beta. The idea is to preserve the short
+average path present in ER model, but simultaneously create high clustering.
+
+This is done by interpolating between the regular ring lattice (which has high
+clustering coefficient) and ER model. When $beta = 0$, no edge is rewired and
+the ring lattice holds. It cannot approach the ER model, because rewiring does
+not remove edges and therefore the graph is connected - not a guaranteed
+property in ER model.
+
+The algorithm for WS graph generation needs these parameters: number of
+vertices $N$, mean degree $K$ (even integer) and rewiring probability $beta$.
+When $beta = 1$ it approaches a structure close to ER $G(n,p)$ model with $p =
+K/(N-1)$.
+
+While this method was designed to have high clustering coefficient and low
+average path length, the degree distribution is not power law as seen in BA
+model. This divergence from observable small-world networks (e.g. airport
+networks) is reflected in all vertices having similar degree.
+
+Either of these methods of generating small-world network has its imperfections.
+In the interactive tool developed for the needs of this thesis is only
+implemented WS method, solely because its authors concentrated specifically on
+small-world #footnote[BA method is focused on scale-free networks and ER method
+  on random graphs.]. For that reason, in @h:observed_behaviour we will focus
+only on WS method.
 
 == Dissipation Rules <h:dissipation_rules>
 
@@ -496,7 +527,7 @@ types of graph topology. TODO
 
 TODO: put graph topology & dissipation rules together
 
-= Observed Behaviour
+= Observed Behaviour <h:observed_behaviour>
 
 TODO: how did it work for different types of graphs and dissipation rules? also
 the graph configurations (eg $beta$ for WS)
