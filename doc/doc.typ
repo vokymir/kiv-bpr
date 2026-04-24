@@ -157,46 +157,56 @@ $
 
 The neighbourhood of a vertex is a set of vertices connected to it via an edge.
 $
-  cal(N) (v_i) = {v_j | {v_i, v_j} in E},
+  cal(N) (v) = {u | {u, v} in E},
 $
 
 The vertex degree is defined as the size of vertex neighbourhood.
 $
-  d(v_i) = abs(cal(N) (v_i))
+  d(v) = abs(cal(N) (v))
 $
 
-Path between two vertices $v_i$ and $v_j$ is a sequence of vertices beginning in
+Path between two vertices $u$ and $v$ is a sequence of vertices beginning in
 the first and ending in the second where every two vertices in path must be
 directly connected.
 $
-  P = (v_1, v_2, ..., v_k), quad v_1 = v_i, quad v_k = v_j, \
-  quad {v_l, v_(l+1)} in E quad forall l in {1, ..., l-1}
+  P(u,v) = (v_1, v_2, ..., v_k), quad v_1 = u, quad v_k = v, \
+  quad {v_l, v_(l+1)} in E quad forall l in {1, ..., k-1}
 $
-If there exist no such path, let $P = ()$.
+If there exist no such path, let $P_(u,v) = ()$.
 
 Similarily, path length is the number of _steps_ (edges) needed to walk the
 path. If path doesn't exist we define its legth as zero.
 $
-  "len"(P) = cases(
-    abs(P) - 1 quad & abs(P) >= 2",",
+  "len"(P_(u,v)) = cases(
+    abs(P_(u,v)) - 1 quad & abs(P_(u,v)) >= 2",",
     0 quad & "else ."
   )
 $
 
-The shortest path between vertices $v_i$ and $v_j$ is the path with minimal
-length among all paths connecting these vertices. Let $PP(v_i, v_j)$ be the set
-of all paths between $v_i$ and $v_j$:
+The shortest path between vertices $u$ and $v$ is the path with minimal
+length among all paths connecting these vertices. Let $PP(u, v)$ be the set
+of all paths between $u$ and $v$:
 $
-  P^*_(i j) = min_(P in PP(v_i, v_j)) "len"(P) " ."
-$
-
-A graph has an average (shortest) path length $"len"(G)$. Let $PP^*$ be the set
-of all shortest paths:
-$
-  "len"(G) = 1/n(n-1) Sigma_(i != j) "len"(P^*_(i j)) " ."
+  P^*_(u, v) = min_(P in PP(u, v)) "len"(P) " ."
 $
 
-TODO: connected graph definition
+A graph has an average (shortest) path length $"len"(G)$.
+$
+  "len"(G) = 1/n(n-1) Sigma_(u != v) "len"(P^*_(u, v)) " ."
+$
+
+We say that two vertices $u$, $v$ are connected if at least one path between
+them exist, i.e.
+
+$
+  "len"(P_(u,v)) > 0 "."
+$
+
+The graph is connected if all its vertices are connected:
+
+$
+  forall u,v in V, u != v: quad "len"(P_(u,v)) > 0 "."
+$
 
 One family of random graphs is a _small world network_. @Watts1998
 
