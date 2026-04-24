@@ -43,7 +43,7 @@
   Topology and Dissipation Rules on Avalanches
 ])
 
-= Introduction
+= Introduction <h:intro>
 
 In everyday life, person's outburst is rarely caused by a single large event.
 Rather, the tension builds up from small frustrations over time. When certain
@@ -272,9 +272,45 @@ the model's behaviour for different graph topologies.
 == Graph Topologies
 
 Standard choice for sandpile model graph is square lattice with arbitrary size.
+This however do not realistically represent the model from motivation story in
+@h:intro. That is why we introduce different graph topologies.
 
-TODO: on graphs, the toppling rule is: $K = d(v), quad forall v in V$ \
-(problem if $d(v) = 0$, must fix by dissipation rules)
+Before leaving square lattice entirely, we discuss toppling and dissipation
+rules on it. The original model presents to us a toppling rule described in
+@eq:cell-automaton_topple_rules_2d and $K=4$, where $K$ is the number of grains
+which cause a single cell (vertex) to topple.
+
+Dissipation rules on general graph are more complex and further discussed later
+in @h:dissipation_rules. While the different definitions of $K$ and toppling
+rules might be more deeply explored, we will only consider $K$ being a function
+of vertex:
+
+$
+  K(v) = d(v), quad v in V "."
+$ <eq:definition_max_grains>
+
+And the toppling rule is also expressed as a function of vertex. Similarily to
+original definition as cellular automaton, the height of a vertex is expressed
+as a function $z(v)$:
+
+$
+  z(v) arrow z(v) - K(v) \
+  z(n) arrow z(n) + 1, quad n in cal(N)(v)
+$ <eq:toppling_rule>
+
+This simple rule states, that during the toppling process the original vertex
+loses as many grains as many neighbours it has and all its neighbours gain one.
+The benefit of this $K$ and toppling rule is their simplicity.
+
+For example, it might be interesting to set $K = "const"$, but that would create
+problems. If a vertex has less neighbours, it is unclear where the additional
+grains go during a topple, and if it has more neighbours, does it artifically
+generate more grains, or randomly distribute fewer than $K$.
+
+Note that in these reasonings, the neighbourhood of a vertex $cal(N)(v)$
+contains sink vertex, and possibly multiple times. The toppling rule will not
+work if $K(v) = 0$. We acknowledge this constraint but leave its resolution to
+dissipation rules.
 
 TODO: square lattice - properties
 
