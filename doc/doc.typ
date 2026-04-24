@@ -327,9 +327,16 @@ random graph also would not be optimal for although it is not regular, human
 networks are not random. Fortunately, a small-world network (better described in
 @h:graph_theory) are almost perfect.
 
-TODO: ER graph - we don't have
 
-TODO: WS graph - we have
+The three most known small-world networks are the Erdős–Rényi model
+@Erdos2022OnRG, Barabási-Albert @Baraba_si_1999 model and Watts-Strogatz model
+@Watts1998.
+
+TODO: ER graph
+
+TODO: BA graph
+
+TODO: WS graph - we have (why)
 
 == Dissipation Rules <h:dissipation_rules>
 
