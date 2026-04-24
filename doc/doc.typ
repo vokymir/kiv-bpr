@@ -399,9 +399,10 @@ Preferential attachment means for a vertex, the higher degree it has, the more
 likely it is to be connected to new vertex.
 
 The algorithm for generating the graph is, simply put, a loop in which one
-vertex is added to the graph and connected to each vertex with probability shown
-in @eq:ba_prob, where $v$ is the examined vertex and $u$ represents all
-vertices. The newly added vertex is yet not considered.
+vertex is added to the graph and connected $m$ vertices. They are choosed from
+all vertices with probability shown in @eq:ba_prob, where $v$ is the examined
+vertex and $u$ represents all vertices. The newly added vertex is yet not
+considered.
 
 $
   p(v) = d(v) / (Sigma_u d(u)), quad u,v in V
@@ -413,13 +414,15 @@ which already have high degree.
 
 As the consequence of hubs existence, the average path is short. However,
 interesting property of BA model is the dependance of clustering on $N =
-abs(V)$, in @eq:ba_clustering.
+abs(V)$, in @eq:ba_clustering (both @Baraba_si_1999). This behaviour is
+different from small-world network where clustering is independent of size.
 
 $
   C ~ ln(N^2) / N
 $ <eq:ba_clustering>
 
-TODO: BA graph
+This model generates a connected graph, because when new vertex is added, it is
+connected to exactly $m$ existing vertices.
 
 TODO: WS graph - we have (why)
 
