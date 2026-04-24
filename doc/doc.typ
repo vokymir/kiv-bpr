@@ -72,7 +72,7 @@ height which clusters around an _average_ with roughly symmetric variation.
   caption: [Normal distribution plot.],
   gap: 1.5em,
   (plot.normal)((:)),
-)
+) <fig:normal_distribution>
 
 Contrary to this, there are systems which could not be described by normal
 distribution @doi:10.1137_070710111 . One example are the forest fire sizes
@@ -101,12 +101,19 @@ exponential character described in @eq:power-law result in higher probability
 of extreme values. That corresponds with the scale-invariance: Any (forest
 fire) size is realistically possible, even though smaller sizes are more likely.
 Power law exhibit linear relationship between $log f(x)$ and $log x$. In a
-`log-log plot` it forms a straight line.
+`log-log plot` it forms a straight line, as can be seen on @fig:cmp_scale.
 
 $
        f(x) & = a x^(-k) \
   k #h(1mm) & ... #text[constant exponent]
 $ <eq:power-law>
+
+The emergence of the power law distribution is often connected to systems
+critical state. Consider phase transition of water from liquid to vapor. At the
+liquid-vapour boundary curve, both liquid and vapour can coexist but are
+distinctly separate. The boundary terminates at some critical temperature and
+critical pressure at which the critical point of a system is defined. While the
+system is in the critical state, the water is not in a single state.
 
 #figure(
   caption: [Function $y = x^(-2)$ plotted on linear scale (left) and on
@@ -117,15 +124,7 @@ $ <eq:power-law>
     columns: 2,
     (plot.cmp_linear)((:)), (plot.cmp_loglog)((:)),
   ),
-)
-
-
-The emergence of the power law distribution is often connected to systems
-critical state. Consider phase transition of water from liquid to vapor. At the
-liquid-vapour boundary curve, both liquid and vapour can coexist but are
-distinctly separate. The boundary terminates at some critical temperature and
-critical pressure at which the critical point of a system is defined. While the
-system is in the critical state, the water is not in a single state.
+) <fig:cmp_scale>
 
 Systems in critical state are most responsive to input and behave unpredictably
 @Bak1996. This is the case for phase transition and forest fires. However,
