@@ -105,10 +105,13 @@ void draw_help_bottom_right();
 void draw_sim_config_s(Sim_Config &cfg);
 // draw the section in Sim Config which is relevant to graph generation
 // algorithm
-void draw_gga_s(Graph_Generation_Algorithm &gga);
-// specific algorithm: square lattice
+void draw_gga_s(Graph_Generation_Algorithm &gga, Sink_Rule &rule);
+void draw_sink_rule(Sink_Rule &rule);
+// specific algorithms
 void draw_gga(gga_::Square_Lattice &cfg);
-// specific algorithm: watts strogatz
+void draw_gga(gga_::Erdos_Renyi_nm &cfg);
+void draw_gga(gga_::Erdos_Renyi_np &cfg);
+void draw_gga(gga_::Barabasi_Albert &cfg);
 void draw_gga(gga_::Watts_Strogatz_2D &cfg);
 
 // = vis config

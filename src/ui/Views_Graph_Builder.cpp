@@ -59,12 +59,12 @@ Master_Action draw_graph_builder_windows(bool &show, Sim_Config &sim_cfg,
 
 namespace _detail {
 
-void draw_sim_config_s(Sim_Config &cfg) { draw_gga_s(cfg.gga); }
+void draw_sim_config_s(Sim_Config &cfg) { draw_gga_s(cfg.gga, cfg.sink_rule); }
 
-void draw_gga_s(Graph_Generation_Algorithm &gga) {
+void draw_gga_s(Graph_Generation_Algorithm &gga, Sink_Rule &rule) {
   constexpr const char *labels[] = {
-      "Square Lattice 2D",
-      "Watts Strogatz 2D",
+      "Square Lattice",     "Watts-Strogatz 2D", "Erdös-Renyi G(n,m)",
+      "Erdös-Renyi G(n,p)", "Barabasi-Albert",
   };
 
   size_t idx = gga.index();
@@ -78,6 +78,15 @@ void draw_gga_s(Graph_Generation_Algorithm &gga) {
       case 1:
         gga = gga_::Watts_Strogatz_2D{};
         break;
+      case 2:
+        gga = gga_::Erdos_Renyi_nm{};
+        break;
+      case 3:
+        gga = gga_::Erdos_Renyi_np{};
+        break;
+      case 4:
+        gga = gga_::Barabasi_Albert{};
+        break;
 
       default:
         gga = gga_::Square_Lattice{};
@@ -87,6 +96,24 @@ void draw_gga_s(Graph_Generation_Algorithm &gga) {
   }
 
   std::visit([](auto &alg) { draw_gga(alg); }, gga);
+  draw_sink_rule(rule);
+}
+
+void draw_sink_rule(Sink_Rule &rule) {
+
+  ImGui::SeparatorText("Sandpile Rules");
+
+  const char *rule_names[] = {"Fill To N", "All Once", "As Many As Neighbours",
+                              "Fill Up"};
+  int current_rule = static_cast<int>(rule.type);
+
+  // quality-of-life upgrade
+  using t = Sink_Rule::Type;
+
+  if (ImGui::Combo("Sink Rule", &current_rule, rule_names,
+                   IM_ARRAYSIZE(rule_names))) {
+    rule.type = static_cast<t>(current_rule);
+  }
 }
 
 void draw_gga(gga_::Square_Lattice &cfg) {
@@ -97,68 +124,48 @@ void draw_gga(gga_::Square_Lattice &cfg) {
   ImGui::SeparatorText("Boundary Conditions");
   ImGui::Checkbox("Circular on x axis", &cfg.circular_on_x);
   ImGui::Checkbox("Circular on y axis", &cfg.circular_on_y);
+}
 
-  ImGui::SeparatorText("Sandpile Rules");
+void draw_gga(gga_::Erdos_Renyi_nm &cfg) {
 
-  const char *rule_names[] = {"Fill To Four", "All Once"};
-  int current_rule = static_cast<int>(cfg.sink_rule);
+  ImGui::InputInt("n", &cfg.vertices);
+  ImGui::TextDisabled("N = # vertices in final graph");
 
-  if (ImGui::Combo("Sink Rule", &current_rule, rule_names,
-                   IM_ARRAYSIZE(rule_names))) {
-    cfg.sink_rule = static_cast<gga_::Square_Lattice::Sink_Rule>(current_rule);
-  }
+  ImGui::InputInt("m", &cfg.edges);
+  ImGui::TextDisabled("m = # edges in final graph");
+}
 
-  if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
-    ImGui::BeginTooltip();
-    if (cfg.sink_rule == gga_::Square_Lattice::Sink_Rule::Fill_To_Four) {
-      ImGui::Text(
-          "Ensures all nodes have degree 4 by adding edges to the sink.");
-    } else {
-      ImGui::Text("Adds exactly one edge to the sink for every node.");
-    }
-    ImGui::EndTooltip();
-  }
+void draw_gga(gga_::Erdos_Renyi_np &cfg) {
 
-  if (cfg.circular_on_x && cfg.circular_on_y &&
-      cfg.sink_rule == gga_::Square_Lattice::Sink_Rule::Fill_To_Four) {
-    ImGui::TextColored(
-        ImVec4(1.f, 0.f, 0.f, 1.f),
-        "Fill To Four in combination with circular on both axis can cause "
-        "program crash. There isn't any vertex connected to the sink resulting "
-        "in infinite grain'pocalypse.");
-  }
+  ImGui::InputInt("n", &cfg.vertices);
+  ImGui::TextDisabled("N = # vertices in final graph");
+
+  ImGui::InputDouble("p", &cfg.edge_probability);
+  ImGui::TextDisabled("p = probability of edge existing");
+}
+
+void draw_gga(gga_::Barabasi_Albert &cfg) {
+
+  ImGui::InputInt("n", &cfg.vertices);
+  ImGui::TextDisabled("N = # vertices in final graph");
+
+  ImGui::InputInt("m", &cfg.edges_per_node);
+  ImGui::TextDisabled("m = # edges created for new vertex in each step");
 }
 
 void draw_gga(gga_::Watts_Strogatz_2D &cfg) {
-  ImGui::TextUnformatted(
-      "This model is constructed in two steps:\n1. build square lattice (N "
-      "vertices) circular on both X and Y axis (have K neighbours)\n2. for "
-      "every vertex, examine all it's rightmost edges (K/2) and with "
-      "probability (B) rewire them to any random vertex\n* more info on "
-      "wikipedia: "
-      "https://en.wikipedia.org/wiki/Watts%E2%80%93Strogatz_model#Algorithm");
-  ImGui::SeparatorText("Dimensions");
-  ImGui::InputInt("sqrt(N)", &cfg.size);
-  ImGui::TextDisabled("#vertices = N ( = sqrt(N)^2 for 2D ), it's the same "
-                      "number as in square lattice");
+  ImGui::InputInt("N", &cfg.vertices);
+  ImGui::TextDisabled("N = # vertices");
   ImGui::InputInt("K", &cfg.neighbourhood_size);
   ImGui::TextDisabled("Vertex mean degree K, should be even integer.");
 
   ImGui::InputDouble("B (beta)", &cfg.p);
   ImGui::TextDisabled("Rewiring probability (if B=0 it's just square lattice "
                       "circular on both axis).");
-
-  ImGui::SeparatorText("Sandpile Rules");
-
-  const char *rule_names[] = {"All Once", "As Many As Neighbours"};
-  int current_rule = static_cast<int>(cfg.sink_rule);
-
-  if (ImGui::Combo("Sink Rule", &current_rule, rule_names,
-                   IM_ARRAYSIZE(rule_names))) {
-    cfg.sink_rule =
-        static_cast<gga_::Watts_Strogatz_2D::Sink_Rule>(current_rule);
-  }
 }
+
+// ============================================================================
+// VISUAL
 
 void draw_vis_config_s(Vis_Config &cfg) { draw_gla_s(cfg.gla); }
 
