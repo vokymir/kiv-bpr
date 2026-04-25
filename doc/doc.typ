@@ -18,6 +18,9 @@
 // #show figure: it => []
 // #show math.equation: it => []
 
+// ensure all inline math equation won't break at the end of line
+#show math.equation: it => box(it)
+
 // references should stay as close to default as possible, here is a list of
 // needed changes:
 // 1. Equation 1 => Equation (1)
@@ -486,8 +489,8 @@ $
   D: v arrow NN " ."
 $
 
-For example, the graph representation of the original model uses a _Fill to
-Four_ rule. It states that the degree of any vertex must be four or more. The
+For example, the graph representation of the original model uses a *Fill to
+Four* rule. It states that the degree of any vertex must be four or more. The
 sink vertex is connected to all vertices as many times it is needed to fulfil
 that rule. For the square lattice, only vertices on the edge are connected
 (exactly once except for corner vertices, which are connected twice).
@@ -514,7 +517,7 @@ one sink is sufficient to ensure dissipation. This might be useful for the
 sandpile model is only interested on connected graphs where they exhibit
 critical behaviour.
 
-One possible rule which guarantees dissipation on any graph is _All Once_. It
+One possible rule which guarantees dissipation on any graph is *All Once*. It
 ensures just the necessary condition that every vertex must be connected to sink
 at least once but nothing more. The rule is fair to all vertices as the
 connection to the sink is not exclusive to vertices of some characteristic
@@ -524,13 +527,17 @@ $
   D(v) = 1 " ."
 $
 
-One rule sufficient for connected graph is _As Many As Neighbours_. This
+One rule sufficient for connected graph is *As Many As Neighbours*. This
 rule connects every vertex to sink proportionally to its neighbourhood size.
 When considering connected graph this rule ensures dissipation and even provide
 a connection to the sink to all vertices.
 $
   D(v) = d(v) " ."
 $
+
+The *Fill to four* rule may be seen as a generalization of *Fill to N* rule. The
+specific case where $N = 4$ is useful for (two dimensional) lattice, but for
+three dimensional lattice, for example, is more adept $N = 6$.
 
 TODO: MAYBE fill to N / fill to heighest d(v)
 
