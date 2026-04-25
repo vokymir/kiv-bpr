@@ -277,6 +277,14 @@ size_t App::check_topple(int option) {
       heights[neighbour] += 1;
       to_topple_.push_back(neighbour);
     }
+
+    // STOP if avalanche happened
+    // NOTE: this is clunky, but it works nevertheless...
+    if (running_ && run_mode_ == Run_Mode::Until_Avalanche && toppled > 1) {
+      running_ = false;
+      avalanche_topples_ += toppled;
+      return toppled;
+    }
   }
 
   avalanche_topples_ += toppled;
