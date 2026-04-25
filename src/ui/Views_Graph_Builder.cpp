@@ -114,6 +114,14 @@ void draw_sink_rule(Sink_Rule &rule) {
                    IM_ARRAYSIZE(rule_names))) {
     rule.type = static_cast<t>(current_rule);
   }
+
+  if (rule.type == t::Fill_To_N) { // only show parameter when needed
+    // MUST not be "N", that is already ID of another input
+    if (ImGui::InputInt(" N ", &rule.parameter)) {
+      if (rule.parameter < 0)
+        rule.parameter = 0;
+    }
+  }
 }
 
 void draw_gga(gga_::Square_Lattice &cfg) {
