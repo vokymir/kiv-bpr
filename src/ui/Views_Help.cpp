@@ -83,7 +83,7 @@ void draw_help_top_left(float left_w) {
       "Model on various graph topologies. "
       "It was developed for the needs of bachelor thesis. "
       "There are not many helper texts explaining what are the possibilities - "
-      "for that, go read the thesis itself. (See the github repository.)");
+      "for that, read the thesis itself. (See the github repository.)");
 
   ImGui::Spacing();
 
@@ -119,8 +119,7 @@ void draw_help_top_right() {
       "...\n\n"
 
       "Systems in critical state are most responsive to input and behave "
-      "unpredictably "
-      "@Bak1996. This is the case for phase transition and forest fires. "
+      "unpredictably. This is the case for phase transition and forest fires. "
       "However, "
       "there is a significant difference. Criticality can be reached in many "
       "systems by "
@@ -140,7 +139,7 @@ void draw_help_top_right() {
       "from graph theory.");
 
   ImGui::TextDisabled("That was an excerpt from the thesis. To gain full "
-                      "understanding go read the thesis.");
+                      "understanding read the thesis.");
 
   ImGui::EndChild();
 }
@@ -184,7 +183,14 @@ void draw_help_bottom_right() {
   ImGui::Text("About");
   ImGui::Separator();
 
-  ImGui::TextWrapped("TODO: Why this app was created. all info on GH:");
+  ImGui::TextWrapped(
+      "Created by Jakub Vokoun for the purposes of Bachelor Thesis led by Petr "
+      "Stehlík.\n"
+      "At Department of Informatics and Computer Technology,\n"
+      "Faculty of Applied Sciences,\n"
+      "University of West Bohemia,\n"
+      "Anno Domini 2026.\n\n"
+      "For the Thesis and/or Source Code visit the GitHub repository:");
 
   ImGui::Spacing();
 
