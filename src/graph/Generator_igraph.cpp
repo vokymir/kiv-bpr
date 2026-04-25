@@ -14,7 +14,50 @@
 
 namespace ssoc::graph::generate {
 
-// generate 2D square lattice based on config->gga instruction
+std::unique_ptr<Graph> igraph_from_config(const Sim_Config &sim_cfg,
+                                          const Vis_Config &vis_cfg) {
+  igraph_::unique_ptr_ igraph_graph = igraph_lib::generate_igraph(sim_cfg.gga);
+
+  std::unique_ptr<Graph> graph = convert::to_ssoc_graph(*igraph_graph);
+
+  // store cfg for later reference
+  graph->sim_cfg(sim_cfg);
+  graph->vis_cfg(vis_cfg);
+
+  igraph_lib::generate_layout(*igraph_graph, *graph, vis_cfg.gla);
+
+  return graph;
+}
+
+namespace igraph_lib {
+
+// ===
+// GENERATING
+// ===
+
+igraph_::unique_ptr_ generate_igraph(const Graph_Generation_Algorithm &gga) {
+  igraph_setup();
+
+  igraph_::igraph_Deleter deleter;
+  igraph_::unique_ptr_ igp(new igraph_t, deleter);
+
+  // choose according to config, if any error happens, will propagate up
+  std::visit(
+      [&igp](auto generation_alg) {
+        using T = std::decay_t<decltype(generation_alg)>;
+        if constexpr (std::is_same_v<T, gga_::Square_Lattice_2D>) {
+          square_lattice_2d_variant(*igp, generation_alg);
+        } else if constexpr (std::is_same_v<T, gga_::Watts_Strogatz_2D>) {
+          watts_strogatz_2d_variant(*igp, generation_alg);
+        } else {
+          throw std::runtime_error("Unknown graph generation algorithm.\n");
+        }
+      },
+      gga);
+
+  return igp;
+}
+
 void square_lattice_2d_variant(igraph_t &ig,
                                const gga_::Square_Lattice_2D &gga) {
   // prepare instructions from gga
@@ -145,39 +188,10 @@ void watts_strogatz_2d_variant(igraph_t &ig,
   igraph_vector_int_destroy(&degrees);
 }
 
-// generate igraph
-// - delegate the generation to specialized method based on configs' gga
-igraph_::unique_ptr_ generate_igraph(const Graph_Generation_Algorithm &gga) {
-  igraph_setup();
-
-  igraph_::igraph_Deleter deleter;
-  igraph_::unique_ptr_ igp(new igraph_t, deleter);
-
-  // choose according to config, if any error happens, will propagate up
-  std::visit(
-      [&igp](auto generation_alg) {
-        using T = std::decay_t<decltype(generation_alg)>;
-        if constexpr (std::is_same_v<T, gga_::Square_Lattice_2D>) {
-          square_lattice_2d_variant(*igp, generation_alg);
-        } else if constexpr (std::is_same_v<T, gga_::Watts_Strogatz_2D>) {
-          watts_strogatz_2d_variant(*igp, generation_alg);
-        } else {
-          throw std::runtime_error("Unknown graph generation algorithm.\n");
-        }
-      },
-      gga);
-
-  return igp;
-}
-
 // =====
 // LAYOUT SECTION
 // =====
 
-// generate the layout of igraph g and save it to matrix layout
-// use instruction stored in gla
-// return error code - for better error propagation and memory work (only one
-// free in mother function)
 igraph_error_t
 fruchterman_reingold_2d_variant(igraph_t &ig, igraph_matrix_t &layout,
                                 const gla_::Fruchterman_Reingold_2D &gla) {
@@ -208,7 +222,6 @@ fruchterman_reingold_2d_variant(igraph_t &ig, igraph_matrix_t &layout,
       weights, min_x, max_x, min_y, max_y);
 }
 
-// convert layout from igraph to graph
 void layout_igraph_to_graph(Graph &g, const igraph_matrix_t &layout) {
   if (std::holds_alternative<gla_::Hidden_GLA>(g.vis_cfg_const().gla)) {
     return;
@@ -233,9 +246,6 @@ void layout_igraph_to_graph(Graph &g, const igraph_matrix_t &layout) {
   positions[real_num_vertices] = {0, 0};
 }
 
-// - decide which algorithm to use & delegate the work
-// - save the layout from igraph format to graph
-// - free any igraph remaining memory
 void generate_layout(igraph_t &ig, Graph &g,
                      const Graph_Layout_Algorithm &gla) {
   // subgraph without sink
@@ -279,19 +289,6 @@ void generate_layout(igraph_t &ig, Graph &g,
   igraph_matrix_destroy(&layout);
 }
 
-std::unique_ptr<Graph> igraph_from_config(const Sim_Config &sim_cfg,
-                                          const Vis_Config &vis_cfg) {
-  igraph_::unique_ptr_ igraph_graph = generate_igraph(sim_cfg.gga);
-
-  std::unique_ptr<Graph> graph = convert::to_ssoc_graph(*igraph_graph);
-
-  // store cfg for later reference
-  graph->sim_cfg(sim_cfg);
-  graph->vis_cfg(vis_cfg);
-
-  generate_layout(*igraph_graph, *graph, vis_cfg.gla);
-
-  return graph;
-}
+} // namespace igraph_lib
 
 } // namespace ssoc::graph::generate
