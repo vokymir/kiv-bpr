@@ -47,10 +47,6 @@ int max_vertex_degree(igraph_t &ig);
 void square_lattice_2d_variant(igraph_t &ig, const gga_::Square_Lattice &gga,
                                const Sink_Rule &rule);
 
-// generate WS (in 2 dimensions) from config
-void watts_strogatz_2d_variant(igraph_t &ig, const gga_::Watts_Strogatz_2D &gga,
-                               const Sink_Rule &rule);
-
 void erdos_renyi_edges_variant(igraph_t &ig, const gga_::Erdos_Renyi_nm &gga,
                                const Sink_Rule &rule);
 
@@ -59,6 +55,10 @@ void erdos_renyi_prob_variant(igraph_t &ig, const gga_::Erdos_Renyi_np &gga,
 
 void barabasi_albert_variant(igraph_t &ig, const gga_::Barabasi_Albert &gga,
                              const Sink_Rule &rule);
+
+// generate WS (in 2 dimensions) from config
+void watts_strogatz_2d_variant(igraph_t &ig, const gga_::Watts_Strogatz_2D &gga,
+                               const Sink_Rule &rule);
 
 // ===
 // LAYOUT

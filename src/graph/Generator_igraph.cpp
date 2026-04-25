@@ -169,21 +169,6 @@ void square_lattice_2d_variant(igraph_t &ig, const gga_::Square_Lattice &gga,
   add_sink(ig, rule);
 }
 
-void watts_strogatz_2d_variant(igraph_t &ig, const gga_::Watts_Strogatz_2D &gga,
-                               const Sink_Rule &rule) {
-  // let library generate
-  auto err = igraph_watts_strogatz_game(
-      &ig, 2, gga.size, gga.neighbourhood_size, gga.p, IGRAPH_SIMPLE_SW);
-
-  if (err != IGRAPH_SUCCESS) {
-    throw std::runtime_error(
-        std::format("External library: igraph: watts-strogatz error: {}",
-                    igraph_strerror(err)));
-  }
-
-  add_sink(ig, rule);
-}
-
 void erdos_renyi_edges_variant(igraph_t &ig, const gga_::Erdos_Renyi_nm &gga,
                                const Sink_Rule &rule) {
   auto err = igraph_erdos_renyi_game_gnm(&ig, gga.vertices, gga.edges,
@@ -226,6 +211,24 @@ void barabasi_albert_variant(igraph_t &ig, const gga_::Barabasi_Albert &gga,
   if (err != IGRAPH_SUCCESS) {
     throw std::runtime_error(
         std::format("External library: igraph: barabasi-albert error: {}",
+                    igraph_strerror(err)));
+  }
+
+  add_sink(ig, rule);
+}
+
+void watts_strogatz_2d_variant(igraph_t &ig, const gga_::Watts_Strogatz_2D &gga,
+                               const Sink_Rule &rule) {
+  int ring_lattice_size = static_cast<int>(std::sqrt(gga.vertices));
+
+  // let library generate
+  auto err = igraph_watts_strogatz_game(&ig, 2, ring_lattice_size,
+                                        gga.neighbourhood_size, gga.p,
+                                        IGRAPH_SIMPLE_SW);
+
+  if (err != IGRAPH_SUCCESS) {
+    throw std::runtime_error(
+        std::format("External library: igraph: watts-strogatz error: {}",
                     igraph_strerror(err)));
   }
 

@@ -14,12 +14,6 @@ struct Square_Lattice {
   bool circular_on_y = false;
 };
 
-struct Watts_Strogatz_2D {
-  int size = 3; // total vertices are size*size (for 2D)
-  int neighbourhood_size = 3;
-  double p = 0.5; // rewiring probability
-};
-
 struct Erdos_Renyi_nm {
   int vertices = 9;
   int edges = 3;
@@ -35,12 +29,18 @@ struct Barabasi_Albert {
   int edges_per_node = 3;
 };
 
+struct Watts_Strogatz_2D {
+  int vertices = 9;
+  int neighbourhood_size = 3;
+  double p = 0.5; // rewiring probability
+};
+
 } // namespace gga_
 
 using Graph_Generation_Algorithm =
-    std::variant<gga_::Square_Lattice, gga_::Watts_Strogatz_2D,
-                 gga_::Erdos_Renyi_nm, gga_::Erdos_Renyi_np,
-                 gga_::Barabasi_Albert>;
+    std::variant<gga_::Square_Lattice, gga_::Erdos_Renyi_nm,
+                 gga_::Erdos_Renyi_np, gga_::Barabasi_Albert,
+                 gga_::Watts_Strogatz_2D>;
 
 // Strategy for how many times a sink should be connected to all vertices.
 // parameter IS ONLY used for N in type Fill_To_N. otherwise it may be
