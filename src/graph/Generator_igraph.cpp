@@ -16,7 +16,8 @@ namespace ssoc::graph::generate {
 
 std::unique_ptr<Graph> igraph_from_config(const Sim_Config &sim_cfg,
                                           const Vis_Config &vis_cfg) {
-  igraph_::unique_ptr_ igraph_graph = igraph_lib::generate_igraph(sim_cfg.gga);
+  igraph_::unique_ptr_ igraph_graph =
+      igraph_lib::generate_igraph(sim_cfg.gga, sim_cfg.sink_rule);
 
   std::unique_ptr<Graph> graph = convert::to_ssoc_graph(*igraph_graph);
 
@@ -35,7 +36,8 @@ namespace igraph_lib {
 // GENERATING
 // ===
 
-igraph_::unique_ptr_ generate_igraph(const Graph_Generation_Algorithm &gga) {
+igraph_::unique_ptr_ generate_igraph(const Graph_Generation_Algorithm &gga,
+                                     const Sink_Rule &rule) {
   igraph_setup();
 
   igraph_::igraph_Deleter deleter;
@@ -43,12 +45,18 @@ igraph_::unique_ptr_ generate_igraph(const Graph_Generation_Algorithm &gga) {
 
   // choose according to config, if any error happens, will propagate up
   std::visit(
-      [&igp](auto generation_alg) {
+      [&igp, &rule](auto generation_alg) {
         using T = std::decay_t<decltype(generation_alg)>;
         if constexpr (std::is_same_v<T, gga_::Square_Lattice>) {
-          square_lattice_2d_variant(*igp, generation_alg);
+          square_lattice_2d_variant(*igp, generation_alg, rule);
         } else if constexpr (std::is_same_v<T, gga_::Watts_Strogatz_2D>) {
-          watts_strogatz_2d_variant(*igp, generation_alg);
+          watts_strogatz_2d_variant(*igp, generation_alg, rule);
+        } else if constexpr (std::is_same_v<T, gga_::Erdos_Renyi_nm>) {
+          erdos_renyi_edges_variant(*igp, generation_alg, rule);
+        } else if constexpr (std::is_same_v<T, gga_::Erdos_Renyi_nm>) {
+          erdos_renyi_prob_variant(*igp, generation_alg, rule);
+        } else if constexpr (std::is_same_v<T, gga_::Erdos_Renyi_nm>) {
+          barabasi_albert_variant(*igp, generation_alg, rule);
         } else {
           throw std::runtime_error("Unknown graph generation algorithm.\n");
         }
@@ -58,7 +66,80 @@ igraph_::unique_ptr_ generate_igraph(const Graph_Generation_Algorithm &gga) {
   return igp;
 }
 
-void square_lattice_2d_variant(igraph_t &ig, const gga_::Square_Lattice &gga) {
+void add_sink(igraph_t &ig, const Sink_Rule &rule) {
+
+  // = find the highest degree, only if necessary
+  int max_degree = 0;
+  if (rule.type == Sink_Rule::Type::Fill_Up) {
+    max_degree = max_vertex_degree(ig);
+  }
+
+  // = add sink vertex
+  auto num_v = igraph_vcount(&ig);
+  igraph_add_vertices(&ig, 1, nullptr);
+  auto sink_idx = num_v;
+
+  // = get degrees of all vertices
+  igraph_vector_int_t degrees;
+  igraph_vector_int_init(&degrees, 0);
+
+  igraph_degree(&ig, &degrees, igraph_vss_range(0, sink_idx), IGRAPH_ALL,
+                IGRAPH_LOOPS);
+
+  // = prepare all missing edges
+  igraph_vector_int_t edges_to_add;
+  igraph_vector_int_init(&edges_to_add, 0);
+
+  for (igraph_integer_t i = 0; i < sink_idx; ++i) {
+    auto degree = VECTOR(degrees)[i];
+
+    int missing = 0;
+    switch (rule.type) {
+      using t = Sink_Rule::Type;
+
+    case t::Fill_To_N:
+      missing = std::max(0, rule.parameter - static_cast<int>(degree));
+      break;
+    case t::All_Once:
+      missing = 1;
+      break;
+    case t::As_Many_As_Nei:
+      missing = static_cast<int>(degree);
+      break;
+    case t::Fill_Up:
+      missing = std::max(0, max_degree - static_cast<int>(degree));
+      break;
+    }
+
+    for (int m = 0; m < missing; ++m) {
+      igraph_vector_int_push_back(&edges_to_add, i);
+      igraph_vector_int_push_back(&edges_to_add, sink_idx);
+    }
+  }
+
+  // = add all missing edges
+  igraph_add_edges(&ig, &edges_to_add, nullptr);
+
+  // = cleanup
+  igraph_vector_int_destroy(&edges_to_add);
+  igraph_vector_int_destroy(&degrees);
+}
+
+int max_vertex_degree(igraph_t &ig) {
+  igraph_vector_int_t degs;
+  igraph_vector_int_init(&degs, 0);
+
+  igraph_degree(&ig, &degs, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS);
+
+  igraph_integer_t max_deg = igraph_vector_int_max(&degs);
+
+  igraph_vector_int_destroy(&degs);
+
+  return static_cast<int>(max_deg);
+}
+
+void square_lattice_2d_variant(igraph_t &ig, const gga_::Square_Lattice &gga,
+                               const Sink_Rule &rule) {
   // prepare instructions from gga
   igraph_vector_int_t dimensions;
   igraph_vector_int_init(&dimensions, 2); // always 2D
@@ -85,53 +166,11 @@ void square_lattice_2d_variant(igraph_t &ig, const gga_::Square_Lattice &gga) {
                     igraph_strerror(err)));
   }
 
-  // SINK RULES
-
-  // = add sink vertex
-  auto num_v = igraph_vcount(&ig);
-  igraph_add_vertices(&ig, 1, nullptr);
-  auto sink_idx = num_v;
-
-  // = get degrees of all vertices
-  igraph_vector_int_t degrees;
-  igraph_vector_int_init(&degrees, 0);
-
-  igraph_degree(&ig, &degrees, igraph_vss_range(0, sink_idx), IGRAPH_ALL,
-                IGRAPH_LOOPS);
-
-  // = prepare all missing edges
-  igraph_vector_int_t edges_to_add;
-  igraph_vector_int_init(&edges_to_add, 0);
-
-  for (igraph_integer_t i = 0; i < sink_idx; ++i) {
-    auto degree = VECTOR(degrees)[i];
-
-    int missing = 0;
-    switch (gga.sink_rule) {
-    case gga_::Square_Lattice_2D::Sink_Rule::All_Once:
-      missing = 1;
-      break;
-    case gga_::Square_Lattice_2D::Sink_Rule::Fill_To_Four:
-      missing = std::max(0, 4 - static_cast<int>(degree));
-      break;
-    }
-
-    for (int m = 0; m < missing; ++m) {
-      igraph_vector_int_push_back(&edges_to_add, i);
-      igraph_vector_int_push_back(&edges_to_add, sink_idx);
-    }
-  }
-
-  // = add all missing edges
-  igraph_add_edges(&ig, &edges_to_add, nullptr);
-
-  // = cleanup
-  igraph_vector_int_destroy(&edges_to_add);
-  igraph_vector_int_destroy(&degrees);
+  add_sink(ig, rule);
 }
 
-void watts_strogatz_2d_variant(igraph_t &ig,
-                               const gga_::Watts_Strogatz_2D &gga) {
+void watts_strogatz_2d_variant(igraph_t &ig, const gga_::Watts_Strogatz_2D &gga,
+                               const Sink_Rule &rule) {
   // let library generate
   auto err = igraph_watts_strogatz_game(
       &ig, 2, gga.size, gga.neighbourhood_size, gga.p, IGRAPH_SIMPLE_SW);
@@ -142,49 +181,55 @@ void watts_strogatz_2d_variant(igraph_t &ig,
                     igraph_strerror(err)));
   }
 
-  // SINK RULES
+  add_sink(ig, rule);
+}
 
-  // = add sink vertex
-  auto num_v = igraph_vcount(&ig);
-  igraph_add_vertices(&ig, 1, nullptr);
-  auto sink_idx = num_v;
+void erdos_renyi_edges_variant(igraph_t &ig, const gga_::Erdos_Renyi_nm &gga,
+                               const Sink_Rule &rule) {
+  auto err = igraph_erdos_renyi_game_gnm(&ig, gga.vertices, gga.edges,
+                                         IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS,
+                                         IGRAPH_EDGE_UNLABELED);
 
-  // = get degrees of all vertices
-  igraph_vector_int_t degrees;
-  igraph_vector_int_init(&degrees, 0);
-
-  igraph_degree(&ig, &degrees, igraph_vss_range(0, sink_idx), IGRAPH_ALL,
-                IGRAPH_LOOPS);
-
-  // = prepare all missing edges
-  igraph_vector_int_t edges_to_add;
-  igraph_vector_int_init(&edges_to_add, 0);
-
-  for (igraph_integer_t i = 0; i < sink_idx; ++i) {
-    auto degree = VECTOR(degrees)[i];
-
-    int missing = 0;
-    switch (gga.sink_rule) {
-    case gga_::Watts_Strogatz_2D::Sink_Rule::All_Once:
-      missing = 1;
-      break;
-    case gga_::Watts_Strogatz_2D::Sink_Rule::As_Many_As_Nei:
-      missing = static_cast<int>(degree);
-      break;
-    }
-
-    for (int m = 0; m < missing; ++m) {
-      igraph_vector_int_push_back(&edges_to_add, i);
-      igraph_vector_int_push_back(&edges_to_add, sink_idx);
-    }
+  if (err != IGRAPH_SUCCESS) {
+    throw std::runtime_error(
+        std::format("External library: igraph: erdos-renyi G(n,m) error: {}",
+                    igraph_strerror(err)));
   }
 
-  // = add all missing edges
-  igraph_add_edges(&ig, &edges_to_add, nullptr);
+  add_sink(ig, rule);
+}
 
-  // = cleanup
-  igraph_vector_int_destroy(&edges_to_add);
-  igraph_vector_int_destroy(&degrees);
+void erdos_renyi_prob_variant(igraph_t &ig, const gga_::Erdos_Renyi_np &gga,
+                              const Sink_Rule &rule) {
+  auto err = igraph_erdos_renyi_game_gnp(
+      &ig, gga.vertices, gga.edge_probability, IGRAPH_UNDIRECTED,
+      IGRAPH_NO_LOOPS, IGRAPH_EDGE_UNLABELED);
+
+  if (err != IGRAPH_SUCCESS) {
+    throw std::runtime_error(
+        std::format("External library: igraph: erdos-renyi G(n,p) error: {}",
+                    igraph_strerror(err)));
+  }
+
+  add_sink(ig, rule);
+}
+
+void barabasi_albert_variant(igraph_t &ig, const gga_::Barabasi_Albert &gga,
+                             const Sink_Rule &rule) {
+  // believe me, the parameters are just what is needed.
+  // you can read about them here:
+  // https://igraph.org/c/html/latest/igraph-Games.html#igraph_barabasi_game
+  auto err = igraph_barabasi_game(&ig, gga.vertices, 1, gga.edges_per_node,
+                                  nullptr, false, 1.0, IGRAPH_UNDIRECTED,
+                                  IGRAPH_BARABASI_PSUMTREE, nullptr);
+
+  if (err != IGRAPH_SUCCESS) {
+    throw std::runtime_error(
+        std::format("External library: igraph: barabasi-albert error: {}",
+                    igraph_strerror(err)));
+  }
+
+  add_sink(ig, rule);
 }
 
 // =====

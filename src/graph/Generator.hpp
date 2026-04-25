@@ -35,24 +35,30 @@ namespace igraph_lib {
 // generate igraph
 // - delegate the generation to specialized method based on configs' gga
 igraph_::unique_ptr_ generate_igraph(const Graph_Generation_Algorithm &gga,
-                                     Sink_Rule &rule);
+                                     const Sink_Rule &rule);
+
+// add sink vertex to igraph and connect it based on rule
+void add_sink(igraph_t &ig, const Sink_Rule &rule);
+
+// find the vertex with highest degree and return that degree
+int max_vertex_degree(igraph_t &ig);
 
 // generate square lattice based on config->gga instruction
 void square_lattice_2d_variant(igraph_t &ig, const gga_::Square_Lattice &gga,
-                               Sink_Rule &rule);
+                               const Sink_Rule &rule);
 
 // generate WS (in 2 dimensions) from config
 void watts_strogatz_2d_variant(igraph_t &ig, const gga_::Watts_Strogatz_2D &gga,
-                               Sink_Rule &rule);
+                               const Sink_Rule &rule);
 
 void erdos_renyi_edges_variant(igraph_t &ig, const gga_::Erdos_Renyi_nm &gga,
-                               Sink_Rule &rule);
+                               const Sink_Rule &rule);
 
 void erdos_renyi_prob_variant(igraph_t &ig, const gga_::Erdos_Renyi_np &gga,
-                              Sink_Rule &rule);
+                              const Sink_Rule &rule);
 
 void barabasi_albert_variant(igraph_t &ig, const gga_::Barabasi_Albert &gga,
-                             Sink_Rule &rule);
+                             const Sink_Rule &rule);
 
 // ===
 // LAYOUT
