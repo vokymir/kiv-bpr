@@ -73,14 +73,14 @@ void draw_gga_s(Graph_Generation_Algorithm &gga) {
     if (ImGui::RadioButton(labels[i], idx == i)) {
       switch (i) {
       case 0:
-        gga = gga_::Square_Lattice_2D{};
+        gga = gga_::Square_Lattice{};
         break;
       case 1:
         gga = gga_::Watts_Strogatz_2D{};
         break;
 
       default:
-        gga = gga_::Square_Lattice_2D{};
+        gga = gga_::Square_Lattice{};
         break;
       }
     }
@@ -89,7 +89,7 @@ void draw_gga_s(Graph_Generation_Algorithm &gga) {
   std::visit([](auto &alg) { draw_gga(alg); }, gga);
 }
 
-void draw_gga(gga_::Square_Lattice_2D &cfg) {
+void draw_gga(gga_::Square_Lattice &cfg) {
   ImGui::SeparatorText("Dimensions");
   ImGui::InputInt("Width", &cfg.width);
   ImGui::InputInt("Height", &cfg.height);
@@ -105,13 +105,12 @@ void draw_gga(gga_::Square_Lattice_2D &cfg) {
 
   if (ImGui::Combo("Sink Rule", &current_rule, rule_names,
                    IM_ARRAYSIZE(rule_names))) {
-    cfg.sink_rule =
-        static_cast<gga_::Square_Lattice_2D::Sink_Rule>(current_rule);
+    cfg.sink_rule = static_cast<gga_::Square_Lattice::Sink_Rule>(current_rule);
   }
 
   if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayShort)) {
     ImGui::BeginTooltip();
-    if (cfg.sink_rule == gga_::Square_Lattice_2D::Sink_Rule::Fill_To_Four) {
+    if (cfg.sink_rule == gga_::Square_Lattice::Sink_Rule::Fill_To_Four) {
       ImGui::Text(
           "Ensures all nodes have degree 4 by adding edges to the sink.");
     } else {
@@ -121,7 +120,7 @@ void draw_gga(gga_::Square_Lattice_2D &cfg) {
   }
 
   if (cfg.circular_on_x && cfg.circular_on_y &&
-      cfg.sink_rule == gga_::Square_Lattice_2D::Sink_Rule::Fill_To_Four) {
+      cfg.sink_rule == gga_::Square_Lattice::Sink_Rule::Fill_To_Four) {
     ImGui::TextColored(
         ImVec4(1.f, 0.f, 0.f, 1.f),
         "Fill To Four in combination with circular on both axis can cause "

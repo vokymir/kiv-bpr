@@ -107,7 +107,7 @@ void draw_sim_config_s(Sim_Config &cfg);
 // algorithm
 void draw_gga_s(Graph_Generation_Algorithm &gga);
 // specific algorithm: square lattice
-void draw_gga(gga_::Square_Lattice_2D &cfg);
+void draw_gga(gga_::Square_Lattice &cfg);
 // specific algorithm: watts strogatz
 void draw_gga(gga_::Watts_Strogatz_2D &cfg);
 

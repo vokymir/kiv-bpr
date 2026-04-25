@@ -23,8 +23,8 @@ void App::init() {
   }
   rng_ = std::default_random_engine(rd_());
 
-  sim_cfg_.gga = gga_::Square_Lattice_2D{
-      3, 4, false, false, gga_::Square_Lattice_2D::Sink_Rule::Fill_To_Four};
+  sim_cfg_.gga = gga_::Square_Lattice{3, 4, false, false};
+  sim_cfg_.sink_rule = Sink_Rule{Sink_Rule::Type::Fill_To_N, 4};
   vis_cfg_.gla = gla_::Fruchterman_Reingold_2D{gla_::FR2D_Accuracy::High};
 
   // start with SOME graph

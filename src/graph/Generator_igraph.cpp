@@ -45,7 +45,7 @@ igraph_::unique_ptr_ generate_igraph(const Graph_Generation_Algorithm &gga) {
   std::visit(
       [&igp](auto generation_alg) {
         using T = std::decay_t<decltype(generation_alg)>;
-        if constexpr (std::is_same_v<T, gga_::Square_Lattice_2D>) {
+        if constexpr (std::is_same_v<T, gga_::Square_Lattice>) {
           square_lattice_2d_variant(*igp, generation_alg);
         } else if constexpr (std::is_same_v<T, gga_::Watts_Strogatz_2D>) {
           watts_strogatz_2d_variant(*igp, generation_alg);
@@ -58,8 +58,7 @@ igraph_::unique_ptr_ generate_igraph(const Graph_Generation_Algorithm &gga) {
   return igp;
 }
 
-void square_lattice_2d_variant(igraph_t &ig,
-                               const gga_::Square_Lattice_2D &gga) {
+void square_lattice_2d_variant(igraph_t &ig, const gga_::Square_Lattice &gga) {
   // prepare instructions from gga
   igraph_vector_int_t dimensions;
   igraph_vector_int_init(&dimensions, 2); // always 2D
