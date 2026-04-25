@@ -110,7 +110,7 @@ void draw_sink_rule(Sink_Rule &rule) {
   // quality-of-life upgrade
   using t = Sink_Rule::Type;
 
-  if (ImGui::Combo("Sink Rule", &current_rule, rule_names,
+  if (ImGui::Combo("Dissipation Rule", &current_rule, rule_names,
                    IM_ARRAYSIZE(rule_names))) {
     rule.type = static_cast<t>(current_rule);
   }
