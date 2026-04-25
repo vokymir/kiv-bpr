@@ -316,11 +316,15 @@ model was later generalized from square lattice to arbitrary graph
 @Holroyd_2008. That generalization is important because it allows us to study
 the model's behaviour for different graph topologies.
 
-TODO: abelianita taky vydrzi a to je dulezity
+Classical model has important property. The final configuration is independent
+of the order in which avalanches happen. This also implies that when adding two
+grains on different cells, the final configuration does not depend on the order
+of adding grains. It is because the addition of a sand grain can be seen as an
+operator, and these operators were proved to form an Abelian group @Dhar1990.
 
-Abelianity on standard sandpile: @Dhar1990
-
-And extended to graph here: @Holroyd_2008
+This property was later shown to hold on finite (un)directed graphs
+@Holroyd_2008, allowing us to study the behaviour of the model on different
+graph topologies, rather than studying the consequences of changinga toppling order.
 
 == Graph Topologies
 
