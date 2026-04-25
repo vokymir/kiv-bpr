@@ -212,7 +212,18 @@ $
   forall u,v in V, u != v: quad "len"(P_(u,v)) > 0 "."
 $
 
-TODO: subgraph, graph component, complete graph
+A subgraph $G'$ of graph $G$ contains subset of its vertices and edges.
+
+$
+  G'(V',E') subset.eq G(V,E) <=> V' subset.eq V and E' subset.eq E
+$
+
+The graph component is a connected subgraph which is not part of any larger
+connected subgraph.
+
+Complete graph $K_x$ is a graph with $x$ vertices and $(x (x - 1)) / 2$ edges.
+This means that every two vertices are directly connected and the average path
+is one.
 
 The measurement of how much do individual vertices in graph cluster together is
 called global clustering coefficient and it is based on triplets of nodes. One
