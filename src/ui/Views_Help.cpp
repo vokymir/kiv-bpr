@@ -78,8 +78,12 @@ void draw_help_top_left(float left_w) {
   ImGui::Separator();
   ImGui::Spacing();
 
-  ImGui::TextWrapped("TODO: here will be some short onboarding, info for who "
-                     "this app is.\n");
+  ImGui::TextWrapped(
+      "This software is capable of simulating Abelian Sandpile "
+      "Model on various graph topologies. "
+      "It was developed for the needs of bachelor thesis. "
+      "There are not many helper texts explaining what are the possibilities - "
+      "for that, go read the thesis itself. (See the github repository.)");
 
   ImGui::Spacing();
 
@@ -92,13 +96,51 @@ void draw_help_top_left(float left_w) {
 }
 
 void draw_help_top_right() {
-  ImGui::BeginChild("soc", ImVec2(0, 0), true);
+  ImGui::BeginChild("hook", ImVec2(0, 0), true);
 
-  ImGui::Text("What is SOC?");
+  ImGui::Text("Abstract?");
   ImGui::Separator();
 
   ImGui::TextWrapped(
-      "TODO: here short description of SOC & its relation to sandpile");
+      "In everyday life, person's outburst is rarely caused by a single large "
+      "event. "
+      "Rather, the tension builds up from small frustrations over time. When "
+      "certain "
+      "treshold is reached, even a minor additional stress can trigger an "
+      "outburst. "
+      "This redistributes the tension to others in their social circle. This "
+      "may in "
+      "turn cause further reactions, leading to a cascade of reach and size "
+      "which are "
+      "difficult to predict. A local event may therefore propagate through a "
+      "network, "
+      "depending on individual thresholds and the shape of the network.\n\n"
+
+      "...\n\n"
+
+      "Systems in critical state are most responsive to input and behave "
+      "unpredictably "
+      "@Bak1996. This is the case for phase transition and forest fires. "
+      "However, "
+      "there is a significant difference. Criticality can be reached in many "
+      "systems by "
+      "fine-tuning certain parameters. In the case of phase transition the "
+      "parameters "
+      "are pressure and temperature. However, there exist systems which reach "
+      "criticality independently of parameters.\n\n"
+
+      "...\n\n"
+
+      "In this thesis, we investigate the behaviour of the sandpile model on "
+      "different "
+      "graph structures. Specifically, on small-world networks which are a "
+      "class of "
+      "random networks. Before this generalization we introduce few necessary "
+      "concepts "
+      "from graph theory.");
+
+  ImGui::TextDisabled("That was an excerpt from the thesis. To gain full "
+                      "understanding go read the thesis.");
 
   ImGui::EndChild();
 }
