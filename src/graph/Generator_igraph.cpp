@@ -49,14 +49,19 @@ igraph_::unique_ptr_ generate_igraph(const Graph_Generation_Algorithm &gga,
         using T = std::decay_t<decltype(generation_alg)>;
         if constexpr (std::is_same_v<T, gga_::Square_Lattice>) {
           square_lattice_2d_variant(*igp, generation_alg, rule);
+
         } else if constexpr (std::is_same_v<T, gga_::Watts_Strogatz_2D>) {
           watts_strogatz_2d_variant(*igp, generation_alg, rule);
+
         } else if constexpr (std::is_same_v<T, gga_::Erdos_Renyi_nm>) {
           erdos_renyi_edges_variant(*igp, generation_alg, rule);
-        } else if constexpr (std::is_same_v<T, gga_::Erdos_Renyi_nm>) {
+
+        } else if constexpr (std::is_same_v<T, gga_::Erdos_Renyi_np>) {
           erdos_renyi_prob_variant(*igp, generation_alg, rule);
-        } else if constexpr (std::is_same_v<T, gga_::Erdos_Renyi_nm>) {
+
+        } else if constexpr (std::is_same_v<T, gga_::Barabasi_Albert>) {
           barabasi_albert_variant(*igp, generation_alg, rule);
+
         } else {
           throw std::runtime_error("Unknown graph generation algorithm.\n");
         }
