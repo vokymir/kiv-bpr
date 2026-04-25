@@ -1,11 +1,4 @@
-jestli dava graph smysl a neudelat jinak? trochu mi to unika.
-pridat nejaky adapter mezi igraph <-> muj graf
-pro logiku udelat: kernel/engine co umi stepovat, generator co vyrabi grafy
-ui: tridy pro ui, mozna visualizer pro vykresleni grafu
-conf: sim_confpro reproducibilitu, vis_config taky
-observer = sbira staty, musi byt nejak napojen na simulaci
-
-ui?
-asi by se hodila, misto toho, aby to bylo v app...
-
-visualizer? to uvidime
+FILL UP dissipation rule
+decompose generator/convertor???
+ER method (2 modes?)
+BA method
