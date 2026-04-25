@@ -171,8 +171,85 @@ void draw_help_bottom_left(float left_w) {
   ImGui::Text("How to use");
   ImGui::Separator();
 
+  ImGui::TextWrapped("After closing this HELP window, you will be presented "
+                     "with \"Simulation configuration\" window.");
+
+  ImGui::Spacing();
+
+  ImGui::TextWrapped("Once there, choose any graph model, dissipation rule and "
+                     "visualization model - "
+                     "adjust parameters and generate graph.");
+
+  ImGui::Spacing();
+  ImGui::Separator();
+  ImGui::Spacing();
+
+  ImGui::TextWrapped("Generating graph will present you with new windows:");
+
+  ImGui::Spacing();
+
+  // == VISUALIZATION
+  ImGui::BulletText("Visualization");
+  ImGui::Indent();
+  ImGui::TextWrapped("In the bottom left, you can see the generated graph. "
+                     "Use left-click to move the view, mouse wheel to zoom, "
+                     "or adjust vertex positions via right-click.");
+  ImGui::Unindent();
+
+  ImGui::Spacing();
+
+  // == CONTROLS
+  ImGui::BulletText("Controlling visualization");
+  ImGui::Indent();
+  ImGui::TextWrapped("In the top left corner, you can control visualization "
+                     "and adjust zoom speed.");
+  ImGui::Unindent();
+
+  ImGui::Spacing();
+
+  // == STATISTICS
+  ImGui::BulletText("Statistics");
+  ImGui::Indent();
+  ImGui::TextWrapped("On the right side, you can inspect various statistics "
+                     "for the current state of the model.");
+  ImGui::Unindent();
+
+  ImGui::Spacing();
+
+  // == SIMULATION
+  ImGui::BulletText("Controlling simulation");
+  ImGui::Indent();
+
   ImGui::TextWrapped(
-      "TODO: detail explanation of individual functionalities in app");
+      "In the top center section you can control the simulation.");
+
+  ImGui::Spacing();
+
+  ImGui::BulletText("Simulation modes");
+  ImGui::Indent();
+  ImGui::TextWrapped(
+      "Step In: drop one grain, see full avalanche step-by-step.\n"
+      "Step Over: drop one grain, resolve avalanche automatically.\n"
+      "Run Until Avalanche: drop grains until avalanche occurs.\n"
+      "Run: continuously drop grains.");
+  ImGui::Unindent();
+
+  ImGui::Spacing();
+
+  ImGui::BulletText("Configuration");
+  ImGui::Indent();
+  ImGui::TextWrapped("Render frequency: only render every Xth frame. Higher "
+                     "values increase speed but reduce responsiveness.\n"
+                     "Random sand: toggle deterministic vs random grain "
+                     "placement. You may specify a vertex ID.\n");
+  ImGui::Unindent();
+
+  ImGui::BulletText("Graph");
+  ImGui::Indent();
+  ImGui::TextWrapped(
+      "Regenerate: generate a new graph with the same parameters.\n"
+      "New: return to simulation configuration window.");
+  ImGui::Unindent();
 
   ImGui::EndChild();
 }
