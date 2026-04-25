@@ -316,6 +316,12 @@ model was later generalized from square lattice to arbitrary graph
 @Holroyd_2008. That generalization is important because it allows us to study
 the model's behaviour for different graph topologies.
 
+TODO: abelianita taky vydrzi a to je dulezity
+
+Abelianity on standard sandpile: @Dhar1990
+
+And extended to graph here: @Holroyd_2008
+
 == Graph Topologies
 
 Standard choice for sandpile model graph is square lattice with arbitrary size.
