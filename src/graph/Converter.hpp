@@ -24,4 +24,12 @@ std::unique_ptr<Graph> to_ssoc_graph(const igraph_t &igraph);
 // must not be simple unique_ptr because it needs custom deleter
 igraph_::unique_ptr_ to_igraph(const Graph &ssoc_graph);
 
+namespace igraph_lib {
+// just resize the graphs internals to match the igraph
+void to_ssoc__resize_internal_vectors(Graph &g);
+
+void to_ssoc__fill_neighbour_lists(Graph &g, const igraph_t &ig);
+
+} // namespace igraph_lib
+
 } // namespace ssoc::graph::convert

@@ -5,6 +5,28 @@
 
 namespace ssoc::graph::convert {
 
+std::unique_ptr<Graph> to_ssoc_graph(const igraph_t &igraph) {
+  auto graph = std::make_unique<Graph>();
+
+  graph->num_vertices(static_cast<size_t>(igraph_vcount(&igraph)));
+  graph->num_edges(static_cast<size_t>(igraph_ecount(&igraph)));
+
+  igraph_lib::to_ssoc__resize_internal_vectors(*graph);
+
+  igraph_lib::to_ssoc__fill_neighbour_lists(*graph, igraph);
+
+  return graph;
+}
+
+// NOTE: won't be able to convert sand
+igraph_::unique_ptr_ to_igraph([[maybe_unused]] const Graph &ssoc_graph) {
+  // TODO: this is only useful if allowed changing layout after generating graph
+  // NOTE: [[maybe]] and null ptr is only to avoid warns
+  return nullptr;
+}
+
+namespace igraph_lib {
+
 // just resize the graphs internals to match the igraph
 void to_ssoc__resize_internal_vectors(Graph &g) {
 
@@ -55,24 +77,6 @@ void to_ssoc__fill_neighbour_lists(Graph &g, const igraph_t &ig) {
   adj_offsets.back() = adj_vertices.size();
 }
 
-std::unique_ptr<Graph> to_ssoc_graph(const igraph_t &igraph) {
-  auto graph = std::make_unique<Graph>();
-
-  graph->num_vertices(static_cast<size_t>(igraph_vcount(&igraph)));
-  graph->num_edges(static_cast<size_t>(igraph_ecount(&igraph)));
-
-  to_ssoc__resize_internal_vectors(*graph);
-
-  to_ssoc__fill_neighbour_lists(*graph, igraph);
-
-  return graph;
-}
-
-// NOTE: won't be able to convert sand
-igraph_::unique_ptr_ to_igraph([[maybe_unused]] const Graph &ssoc_graph) {
-  // TODO: this is only useful if allowed changing layout after generating graph
-  // NOTE: [[maybe]] and null ptr is only to avoid warns
-  return nullptr;
-}
+} // namespace igraph_lib
 
 } // namespace ssoc::graph::convert
