@@ -145,9 +145,9 @@ sandpile model @1987PhRvL..59..381B. The original model was a cellular automaton
 on a square and cubic lattice.
 
 In this thesis, we investigate the behaviour of the sandpile model on different
-graph structures. Specifically, on small-world networks which are a
-class of random networks. Before this generalization we introduce few necessary concepts from
-graph theory.
+graph structures. Specifically, on small-world networks which are a class of
+random networks. Before this generalization we introduce few necessary concepts
+from graph theory.
 
 = Graph Theory <h:graph_theory>
 
@@ -344,7 +344,7 @@ This property was later shown to hold on finite (un)directed graphs
 @Holroyd_2008, allowing us to study the behaviour of the model on different
 graph topologies, rather than studying the consequences of changinga toppling order.
 
-== Graph Topologies
+== Graph Topologies <h:graph_topologies>
 
 Standard choice for sandpile model graph is square lattice with arbitrary size.
 This however do not realistically represent the model from motivation story in
@@ -486,14 +486,11 @@ average path length, the degree distribution is not power law as seen in BA
 model. This divergence from observable small-world networks (e.g. airport
 networks) is reflected in all vertices having similar degree.
 
-TODO: mozna implementuju i ostatni grafy a bude potreba smazat odstavec
-
 Either of these methods of generating small-world network has its imperfections.
-In the interactive tool developed for the needs of this thesis is only
-implemented WS method, solely because its authors concentrated specifically on
-small-world #footnote[BA method is focused on scale-free networks and ER method
-  on random graphs.]. For that reason, in @h:observed_behaviour we will focus
-only on WS method.
+In the interactive tool developed for the needs of this thesis are implemented
+all mentioned methods. Note, that from these only WS method focus solely on
+small-worldness, BA method is focused on scale-free networks and ER method on
+random graphs.
 
 == Dissipation Rules <h:dissipation_rules>
 
@@ -638,8 +635,7 @@ covers the general case.
 
 It might seem as _Fill to N_ rule should be suitable for more dissipation rules,
 but the parameter $N$ is set to be static and thus cannot be set based on graph
-properties. Standard constraints are put on BA and WS models. In BA, $G_0$
-is a complete graph $K_m$. In WS, $N >> K$.
+properties. Standard constraints discussed in @h:graph_topologies are put on BA and WS models.
 
 = Observed Behaviour <h:observed_behaviour>
 
