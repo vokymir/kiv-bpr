@@ -434,7 +434,7 @@ $ <eq:ba_clustering>
 This model generates a connected graph, because when new vertex is added, it is
 connected to exactly $m$ existing vertices.
 
-The WS model authors have also defined the small-world measure (#sym.omega)
+The *WS model* authors have also defined the small-world measure (#sym.omega)
 discussed in @h:graph_theory. WS argued that ER model lacks two important
 properties often observed in small-world network: high clustering coeficient and
 degree distribution convergence to power law. Their model was designed to
@@ -532,10 +532,41 @@ $
   D(v) = d(v) " ."
 $
 
+TODO: MAYBE fill to N / fill to heighest d(v)
+
 Every rule represents a different approach and not all can be applied to all
-types of graph topology. TODO
+types of graph topology. Below are listed necessary requirements on graph for
+all dissipation rules in order to ensure dissipation:
+
+- Fill to four:
+  - Each graph component has at least one vertex which has at most three edges.
+- All once:
+  - No requirement.
+- As many as neighbours:
+  - There is no vertex with degree zero, i.e. the graph is connected.
+
 
 TODO: put graph topology & dissipation rules together
+
+#figure(
+  caption: [Table comparing the suitabilty of different dissipation rules
+    on graph topologies.],
+
+  {
+    let ok = sym.checkmark.heavy
+    let no = sym.crossmark
+
+    table(
+      columns: 5,
+
+      table.header([], [*Square lattice*], [*ER graph*], [*BA graph*], [*WS graph*]),
+
+      [*Fill to four*], ok, no, no, no,
+      [*All once*], ok, ok, ok, ok,
+      [*As many as neighbours*], ok, no, ok, ok,
+    )
+  },
+)
 
 = Observed Behaviour <h:observed_behaviour>
 
