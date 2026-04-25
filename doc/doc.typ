@@ -20,6 +20,8 @@
 
 // ensure all inline math equation won't break at the end of line
 #show math.equation: it => box(it)
+// ensure all bold expressions (almost sub-headings) won't break
+#show strong: it => box(it)
 
 // references should stay as close to default as possible, here is a list of
 // needed changes:
@@ -463,6 +465,8 @@ average path length, the degree distribution is not power law as seen in BA
 model. This divergence from observable small-world networks (e.g. airport
 networks) is reflected in all vertices having similar degree.
 
+TODO: mozna implementuju i ostatni grafy a bude potreba smazat odstavec
+
 Either of these methods of generating small-world network has its imperfections.
 In the interactive tool developed for the needs of this thesis is only
 implemented WS method, solely because its authors concentrated specifically on
@@ -537,9 +541,19 @@ $
 
 The *Fill to four* rule may be seen as a generalization of *Fill to N* rule. The
 specific case where $N = 4$ is useful for (two dimensional) lattice, but for
-three dimensional lattice, for example, is more adept $N = 6$.
+three dimensional lattice, for example, is more adept $N = 6$. The generalized
+rule with static value (e.g. 4 or 6) might be central for particular graph
+topologies (e.g. the lattice).
 
-TODO: MAYBE fill to N / fill to heighest d(v)
+However, if we permit $N$ to vary based on the specific graph parameters, we can
+introduce *Fill to D*, where $D$ is equal to the degree of vertex with largest
+neighbourhood.
+
+$
+  D = max_(v in V) d(v)
+$
+
+TODO: proc je to husty
 
 Every rule represents a different approach and not all can be applied to all
 types of graph topology. Below are listed necessary requirements on graph for
