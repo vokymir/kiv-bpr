@@ -538,12 +538,12 @@ Every rule represents a different approach and not all can be applied to all
 types of graph topology. Below are listed necessary requirements on graph for
 all dissipation rules in order to ensure dissipation:
 
-- Fill to four:
-  - Each graph component has at least one vertex which has at most three edges.
-- All once:
-  - No requirement.
-- As many as neighbours:
-  - There is no vertex with degree zero, i.e. the graph is connected.
+/ Fill to four:
+  Each graph component has at least one vertex which has at most three edges.
+/ All once:
+  No requirement.
+/ As many as neighbours:
+  There is no vertex with degree zero, i.e. the graph is connected.
 
 
 TODO: put graph topology & dissipation rules together
