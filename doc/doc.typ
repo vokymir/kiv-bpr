@@ -415,8 +415,6 @@ Growth simply means that the graph is build up from small number of vertices.
 Preferential attachment means for a vertex, the higher degree it has, the more
 likely it is to be connected to new vertex.
 
-TODO: paramaters G_0, n, m
-
 The algorithm for generating the graph is, simply put, a loop in which one
 vertex is added to the graph and connected $m$ vertices. They are choosed from
 all vertices with probability shown in @eq:ba_prob, where $v$ is the examined
@@ -427,9 +425,14 @@ $
   p(v) = d(v) / (Sigma_u d(u)), quad u,v in V
 $ <eq:ba_prob>
 
-This yields in quick emergence of hubs, vertices with high degree. BA provide
-example, newly create webpage is more likely to link to well-known websites
-which already have high degree.
+The algorithm takes $G_0, n, m$ where the last is the number of edges for each
+new vertex and the second is the number of vertices in final graph. The first
+arguments is a starting graph with at least $m$ vertices. In practice, $G_0$ is
+usually chosen as a complete graph $K_m$ of size $m$.
+
+This algorithm yields in quick emergence of hubs, vertices with high degree. BA
+provide example, newly create webpage is more likely to link to well-known
+websites which already have high degree.
 
 As the consequence of hubs existence, the average path is short. However,
 interesting property of BA model is the dependance of clustering on $N =
@@ -459,12 +462,13 @@ the ring lattice holds. It cannot approach the ER model, because rewiring does
 not remove edges and therefore the graph is connected - not a guaranteed
 property in ER model.
 
-TODO: N > K needed, but N >> K used
-
 The algorithm for WS graph generation needs these parameters: number of
 vertices $N$, mean degree $K$ (even integer) and rewiring probability $beta$.
 When $beta = 1$ it approaches a structure close to ER $G(n,p)$ model with $p =
 K/(N-1)$.
+
+One necessary constraint on parameters is that $N > K$. It is widely agreed upon
+to use $N >> K$ (e.g. $N = 10 K$) when constructing graph.
 
 While this method was designed to have high clustering coefficient and low
 average path length, the degree distribution is not power law as seen in BA
