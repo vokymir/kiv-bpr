@@ -1,3 +1,4 @@
+#include "ui/Layout.hpp"
 #include "ui/Views.hpp"
 
 namespace ssoc::ui::views {
@@ -6,8 +7,7 @@ Master_Action draw_graph_builder_windows(bool &show, Sim_Config &sim_cfg,
                                          Vis_Config &vis_cfg) {
   Master_Action state = Master_Action::None;
 
-  ImGui::SetNextWindowPos(ImVec2(200, 150), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(900, 500), ImGuiCond_FirstUseEver);
+  layout::set_next_window(layout::Window::BUILDER);
   ImGui::Begin("Graph Builder", &show);
 
   ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(10, 8));

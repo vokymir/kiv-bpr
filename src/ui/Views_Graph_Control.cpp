@@ -1,10 +1,10 @@
+#include "ui/Layout.hpp"
 #include "ui/Views.hpp"
 
 namespace ssoc::ui::views {
 
 void draw_graph_control_window(bool &show, Visualizer_Config &cfg) {
-  ImGui::SetNextWindowPos(ImVec2(5, 25), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(290, 270), ImGuiCond_FirstUseEver);
+  layout::set_next_window(layout::Window::CTL_VIS);
   ImGui::Begin("Visualization Control", &show);
 
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(8, 10));

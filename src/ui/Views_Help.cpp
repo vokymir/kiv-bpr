@@ -1,10 +1,10 @@
+#include "ui/Layout.hpp"
 #include "ui/Views.hpp"
 
 namespace ssoc::ui::views {
 
 void draw_welcome_help_window(bool &show) {
-  ImGui::SetNextWindowPos(ImVec2(150, 50), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(1000, 700), ImGuiCond_FirstUseEver);
+  layout::set_next_window(layout::Window::HELP);
   ImGui::SetNextWindowBgAlpha(1.0f);
 
   ImGui::Begin("Welcome | Help", &show, ImGuiWindowFlags_NoCollapse);

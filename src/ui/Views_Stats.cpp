@@ -1,3 +1,4 @@
+#include "ui/Layout.hpp"
 #include "ui/Views.hpp"
 #include <algorithm>
 #include <cmath>
@@ -10,8 +11,7 @@
 namespace ssoc::ui::views {
 
 void draw_stats_window(bool &show, const ssoc::stat::Stats_Collector &sc) {
-  ImGui::SetNextWindowPos(ImVec2(800, 25), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(460, 755), ImGuiCond_FirstUseEver);
+  layout::set_next_window(layout::Window::STATS);
   ImGui::Begin("Statistics", &show);
 
   _detail::draw_stats_overview_s(sc);

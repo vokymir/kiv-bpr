@@ -1,3 +1,4 @@
+#include "ui/Layout.hpp"
 #include "ui/Views.hpp"
 
 namespace ssoc::ui::views {
@@ -6,8 +7,7 @@ Control_Action draw_simulation_control_window(bool &show, Master_State &state,
                                               Sim_Config &cfg) {
   Control_Action action = Control_Action::None;
 
-  ImGui::SetNextWindowPos(ImVec2(300, 25), ImGuiCond_FirstUseEver);
-  ImGui::SetNextWindowSize(ImVec2(495, 270), ImGuiCond_FirstUseEver);
+  layout::set_next_window(layout::Window::CTL_SIM);
   ImGui::Begin("Simulation Control", &show);
 
   ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(10, 8));
