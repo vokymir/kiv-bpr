@@ -63,8 +63,8 @@ void draw_sim_config_s(Sim_Config &cfg) { draw_gga_s(cfg.gga, cfg.sink_rule); }
 
 void draw_gga_s(Graph_Generation_Algorithm &gga, Sink_Rule &rule) {
   constexpr const char *labels[] = {
-      "Square Lattice",     "Watts-Strogatz 2D", "Erdös-Renyi G(n,m)",
-      "Erdös-Renyi G(n,p)", "Barabasi-Albert",
+      "Square Lattice",  "Erdös-Renyi G(n,m)", "Erdös-Renyi G(n,p)",
+      "Barabasi-Albert", "Watts-Strogatz 2D",
   };
 
   size_t idx = gga.index();
@@ -76,16 +76,16 @@ void draw_gga_s(Graph_Generation_Algorithm &gga, Sink_Rule &rule) {
         gga = gga_::Square_Lattice{};
         break;
       case 1:
-        gga = gga_::Watts_Strogatz_2D{};
-        break;
-      case 2:
         gga = gga_::Erdos_Renyi_nm{};
         break;
-      case 3:
+      case 2:
         gga = gga_::Erdos_Renyi_np{};
         break;
-      case 4:
+      case 3:
         gga = gga_::Barabasi_Albert{};
+        break;
+      case 4:
+        gga = gga_::Watts_Strogatz_2D{};
         break;
 
       default:
