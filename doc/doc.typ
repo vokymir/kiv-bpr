@@ -80,7 +80,7 @@ height which clusters around an _average_ with roughly symmetric variation.
 ) <fig:normal_distribution>
 
 Contrary to this, there are systems which could not be described by normal
-distribution @doi:10.1137_070710111 . One example are the forest fire sizes
+distribution @doi:10.1137_070710111. One example are the forest fire sizes
 @doi:10.1126_science.281.5384.1840. If they were to adhere to normal
 distribution, there would be a known _average forest fire size_. Even though
 most forest fires are small, there is nothing limiting the potential size. This
