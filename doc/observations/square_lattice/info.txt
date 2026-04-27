@@ -1,0 +1,9 @@
+1. type of square lattice
+n = normal
+x = circular on y
+b = circular on both x and y
+
+2. dissipation rule
+f = fill up
+o = all once
+n = as many as neighbours
