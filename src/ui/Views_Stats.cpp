@@ -20,10 +20,10 @@ void draw_stats_window(bool &show, const ssoc::stat::Stats_Collector &sc) {
   _detail::draw_stats_avalanche_sizes_s(sc);
   ImGui::Separator();
 
-  // _detail::draw_stats_avalanche_origins_s(sc);
-  // ImGui::Separator();
-  //
-  // _detail::draw_stats_grains_s(sc);
+  _detail::draw_stats_avalanche_origins_s(sc);
+  ImGui::Separator();
+
+  _detail::draw_stats_grains_s(sc);
 
   ImGui::End();
 }
@@ -34,15 +34,7 @@ namespace _detail {
 // OVERVIEW
 
 void draw_stats_overview_s(const stat::Stats_Collector &sc) {
-  auto records = sc.avalanche_records();
-  auto size = records.size();
-  stat::Avalanche_Record record{};
-  size_t step = 0;
-  if (size >= 1) {
-    record = records[records.size() - 1];
-    step = record.step;
-  }
-  ImGui::Text("Steps: %zu", step);
+  ImGui::Text("Steps: %zu", sc.steps_count());
   ImGui::Text("Total avalanches: %zu", sc.avalanche_records().size());
   ImGui::Text("Total size sum: %zu", sc.avalanche_total_sizes());
   ImGui::Text("Max avalanche: %zu", sc.avalanche_max_size());
@@ -102,25 +94,25 @@ void plot_avalanche_size(const stat::Stats_Collector::Avalanche_Analysis &a) {
   }
 
   // LINEAR PLOT
-  // if (ImPlot::BeginPlot("##SizeLinear", ImVec2(-1, 250))) {
-  //   ImPlot::SetupAxes("Avalanche Size", "Count", ImPlotAxisFlags_AutoFit,
-  //                     ImPlotAxisFlags_AutoFit);
-  //
-  //   ImPlot::PlotScatter("Data", a.xs.data(), a.ys.data(),
-  //                       static_cast<int>(a.xs.size()));
-  //
-  //   ImPlot::PlotLine("Power-law", a.xs.data(), power_fit.data(),
-  //                    static_cast<int>(power_fit.size()));
-  //
-  //   // ImPlot::PlotLine("Log-linear", a.xs.data(), log_fit.data(),
-  //   //                  static_cast<int>(log_fit.size()));
-  //   //
-  //   // ImGui::Text("Log-linear a = %.3f", a.log.a);
-  //   // ImGui::Text("Log-linear b = %.3f", a.log.b);
-  //   // ImGui::Text("RMSE (linear) = %.3f", a.log.rmse);
-  //
-  //   ImPlot::EndPlot();
-  // }
+  if (ImPlot::BeginPlot("##SizeLinear", ImVec2(-1, 250))) {
+    ImPlot::SetupAxes("Avalanche Size", "Count", ImPlotAxisFlags_AutoFit,
+                      ImPlotAxisFlags_AutoFit);
+
+    ImPlot::PlotScatter("Data", a.xs.data(), a.ys.data(),
+                        static_cast<int>(a.xs.size()));
+
+    ImPlot::PlotLine("Power-law", a.xs.data(), power_fit.data(),
+                     static_cast<int>(power_fit.size()));
+
+    // ImPlot::PlotLine("Log-linear", a.xs.data(), log_fit.data(),
+    //                  static_cast<int>(log_fit.size()));
+    //
+    // ImGui::Text("Log-linear a = %.3f", a.log.a);
+    // ImGui::Text("Log-linear b = %.3f", a.log.b);
+    // ImGui::Text("RMSE (linear) = %.3f", a.log.rmse);
+
+    ImPlot::EndPlot();
+  }
 }
 
 void draw_stats_avalanche_sizes_s(const stat::Stats_Collector &sc) {

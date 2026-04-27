@@ -33,11 +33,11 @@ void App::init() {
   win_context_ = std::make_unique<ui::Window_Context>();
 
   // use events for stopping avalanche in the correct moment
-  // events_.avalanche.subscribe([this](const stat::Avalanche_Event &) {
-  //   if (run_mode_ == Run_Mode::Until_Avalanche && avalanche_topples_ > 1) {
-  //     running_ = false;
-  //   }
-  // });
+  events_.avalanche.subscribe([this](const stat::Avalanche_Event &) {
+    if (run_mode_ == Run_Mode::Until_Avalanche && avalanche_topples_ > 1) {
+      running_ = false;
+    }
+  });
 
   initialized_ = true;
 }
@@ -70,7 +70,7 @@ void App::run() {
       periodic_step();
     }
 
-    // events_.grains_total.emit({g_->grains_count()});
+    events_.grains_total.emit({g_->grains_count()});
 
     // tick
     counter = (counter + 1) % master_state_.draw_every_safe();
@@ -81,22 +81,22 @@ void App::run() {
     win_context_->begin_frame();
     // vvvvv
 
-    // ui::views::draw_menu(master_state_);
+    ui::views::draw_menu(master_state_);
 
     // order of drawing:
     // - HELP must be last (on top)
     // - BUILDER must be prelast (also on top)
 
-    // if (master_state_.show_visualization_window) {
-    //   ui::views::draw_graph_visualization_window(
-    //       master_state_.show_visualization_window, vis_cfg_, vis_, *g_,
-    //       avalanche_origin_current_, to_topple_);
-    // }
-    // if (master_state_.show_visualization_config_window) {
-    //   ui::views::draw_graph_control_window(
-    //       master_state_.show_visualization_config_window,
-    //       vis_cfg_.visualizer_config);
-    // }
+    if (master_state_.show_visualization_window) {
+      ui::views::draw_graph_visualization_window(
+          master_state_.show_visualization_window, vis_cfg_, vis_, *g_,
+          avalanche_origin_current_, to_topple_);
+    }
+    if (master_state_.show_visualization_config_window) {
+      ui::views::draw_graph_control_window(
+          master_state_.show_visualization_config_window,
+          vis_cfg_.visualizer_config);
+    }
     if (master_state_.show_simulation_control_window) {
       control_action(ui::views::draw_simulation_control_window(
           master_state_.show_simulation_control_window, master_state_,
@@ -109,9 +109,9 @@ void App::run() {
       master_action(ui::views::draw_graph_builder_windows(
           master_state_.show_builder_window, sim_cfg_, vis_cfg_));
     }
-    // if (master_state_.show_help_window) { // HELP must be last
-    //   ui::views::draw_welcome_help_window(master_state_.show_help_window);
-    // }
+    if (master_state_.show_help_window) { // HELP must be last
+      ui::views::draw_welcome_help_window(master_state_.show_help_window);
+    }
 
     // ^^^^^
     win_context_->end_frame(bg_clr_);
@@ -202,7 +202,7 @@ size_t App::drop_sand() {
   avalanche_topples_ = 0;
 
   heights[idx] += 1;
-  // events_.grain_dropped.emit({idx});
+  events_.grain_dropped.emit({idx});
   to_topple_.push_back(idx);
 
   return idx;
