@@ -1,5 +1,6 @@
 #pragma once
 
+#include "stat/Fit.hpp"
 #include "stat/Simulation_Events.hpp"
 #include "stat/events.hpp"
 #include <cstddef>
@@ -15,6 +16,9 @@ struct Avalanche_Record {
 
 class Stats_Collector {
 protected:
+  // ===
+  // COLLECTED STATS
+
   // maybe useful in the future?
   std::vector<Avalanche_Record> avalanche_records_;
   // histogram of sizes-freq
@@ -35,6 +39,21 @@ protected:
   size_t grain_total_dropped_ = 0;
   // how many grains are in sink now
   size_t grain_total_dissipated_ = 0;
+
+  // ===
+  // CALCULATED STATS
+
+public:
+  struct Avalanche_Analysis {
+    std::vector<double> xs, ys;
+
+    Power_Law_Fit power;
+    Log_Linear_Fit log;
+  };
+
+protected:
+  mutable Avalanche_Analysis cached_analysis_;
+  mutable bool avalanche_fit_dirty_ = true;
 
   void handle_avalanche(const Avalanche_Event &e) {
     size_t size = e.topples_to_stabilize;
@@ -58,6 +77,8 @@ protected:
                               : e.topples_to_stabilize;
 
     grain_total_dissipated_ += static_cast<size_t>(e.dissipated_grains_count);
+
+    avalanche_fit_dirty_ = true;
   }
 
   void handle_grains(const Grains_Count_Event &e) {
@@ -98,6 +119,9 @@ public:
     avalanche_total_sizes_ = 0;
     grain_total_dropped_ = 0;
     grain_total_dissipated_ = 0;
+
+    avalanche_fit_dirty_ = true;
+    cached_analysis_ = {};
   }
 
   // === GETTERS ===
@@ -145,6 +169,32 @@ public:
 
   // at which step in simulation we are now
   size_t steps_count() const { return grain_total_dropped_; }
+
+  // CALCULATED STATS
+
+  const Avalanche_Analysis &get_avalanche_analysis() const {
+    if (!avalanche_fit_dirty_) {
+      return cached_analysis_;
+    }
+
+    std::vector<double> xs, ys;
+
+    for (size_t i = 1; i < avalanche_sizes_.size(); ++i) {
+      if (avalanche_sizes_[i] > 0) {
+        xs.push_back(static_cast<double>(i));
+        ys.push_back(static_cast<double>(avalanche_sizes_[i]));
+      }
+    }
+
+    cached_analysis_.power.recompute(xs, ys);
+    cached_analysis_.log.recompute(xs, ys);
+    cached_analysis_.xs = std::move(xs);
+    cached_analysis_.ys = std::move(ys);
+
+    avalanche_fit_dirty_ = false;
+
+    return cached_analysis_;
+  }
 };
 
 } // namespace ssoc::stat

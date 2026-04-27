@@ -31,109 +31,6 @@ void draw_stats_window(bool &show, const ssoc::stat::Stats_Collector &sc) {
 namespace _detail {
 
 // ===
-// INTERNAL HELPERS
-
-Power_Law_Fit fit_power_law(const std::vector<double> &xs,
-                            const std::vector<double> &ys) {
-  Power_Law_Fit res = {0.0, 0.0, 0.0};
-  // function to fit: y = a * x^(-k)
-  //
-  // alpha = -k
-  // C = a
-  //
-  // taking logs: log(y) = alpha * log(x) + log(C)
-
-  double sum_log_x = 0.0;
-  double sum_log_y = 0.0;
-  double sum_log_x2 = 0.0;
-  double sum_log_xy = 0.0;
-
-  auto is_valid_point = [](double x, double y) { return x > 0.0 && y > 0.0; };
-  size_t valid_count = 0;
-
-  for (size_t i = 0; i < xs.size(); ++i) {
-    const double x = xs[i];
-    const double y = ys[i];
-
-    // log undefined for non-positive values
-    if (!is_valid_point(xs[i], ys[i])) {
-      continue;
-    }
-
-    const double log_x = std::log(x);
-    const double log_y = std::log(y);
-
-    sum_log_x += log_x;
-    sum_log_y += log_y;
-    sum_log_x2 += log_x * log_x;
-    sum_log_xy += log_x * log_y;
-
-    ++valid_count;
-  }
-
-  // too little values
-  if (valid_count < 2) {
-    return res;
-  }
-
-  // valid count, but to prevent repeated static cast
-  const double n = static_cast<double>(valid_count);
-
-  const double denominator = n * sum_log_x2 - sum_log_x * sum_log_x;
-  // cannot divide by zero
-  if (denominator == 0.0) {
-    return res;
-  }
-
-  const double alpha = (n * sum_log_xy - sum_log_x * sum_log_y) / denominator;
-
-  // intercept = log(C)
-  const double intercept = (sum_log_y - alpha * sum_log_x) / n;
-
-  // residual sum of squares
-  double rss = 0.0;
-
-  for (size_t i = 0; i < xs.size(); ++i) {
-    double x = xs[i];
-    double y = ys[i];
-
-    if (x <= 0.0 || y <= 0.0)
-      continue;
-
-    double log_x = std::log(x);
-    double log_y = std::log(y);
-
-    double predicted = alpha * log_x + intercept;
-    double residual = log_y - predicted;
-
-    rss += residual * residual;
-  }
-
-  res.coefficient = alpha;
-  res.error = rss;
-  res.intercept = intercept;
-
-  return res;
-}
-
-std::vector<double> make_power_law_fit(const std::vector<double> &xs,
-                                       Power_Law_Fit plf) {
-  // reconstruct: y = C * x^alpha
-  // where C = exp(log_intercept)
-
-  const double C = std::exp(plf.intercept);
-
-  std::vector<double> fitted;
-  fitted.reserve(xs.size());
-
-  for (double x : xs) {
-    fitted.push_back(C * std::pow(x, plf.coefficient));
-  }
-
-  return fitted;
-}
-
-// ===
 // OVERVIEW
 
 void draw_stats_overview_s(const stat::Stats_Collector &sc) {
@@ -147,59 +44,72 @@ void draw_stats_overview_s(const stat::Stats_Collector &sc) {
 // ===
 // AVALANCHE SIZE
 
-std::unique_ptr<AvalancheSizePlotModel>
-build_avalanche_size_model(const std::vector<size_t> &input) {
+void plot_avalanche_size(const stat::Stats_Collector::Avalanche_Analysis &a) {
 
-  if (input.empty())
-    return {};
-
-  std::vector<double> xs, ys;
-
-  for (size_t size = 1; size < input.size(); ++size) {
-    size_t count = input[size];
-    if (count > 0) {
-      xs.push_back(static_cast<double>(size));
-      ys.push_back(static_cast<double>(count));
-    }
+  if (a.xs.empty()) {
+    return;
   }
 
-  auto model = std::make_unique<AvalancheSizePlotModel>(
-      AvalancheSizePlotModel{std::move(xs), std::move(ys), {}});
+  // == Power-law fit
+  std::vector<double> power_fit;
+  power_fit.reserve(a.xs.size());
 
-  model->plf = fit_power_law(model->xs, model->ys);
+  const double C = std::exp(a.power.intercept);
 
-  return model;
-}
+  for (double x : a.xs) {
+    power_fit.push_back(C * std::pow(x, a.power.alpha));
+  }
 
-void plot_avalanche_size(const AvalancheSizePlotModel &m) {
+  // == Log-linear fit
+  // std::vector<double> log_fit;
+  // log_fit.reserve(a.xs.size());
+  //
+  // for (double x : a.xs) {
+  //   double y = a.log.a * std::log(x) + a.log.b;
+  //   log_fit.push_back(y);
+  // }
 
-  if (m.xs.empty())
-    return;
-
+  // LOG-LOG PLOT
   if (ImPlot::BeginPlot("##SizeLogLog", ImVec2(-1, 250))) {
     ImPlot::SetupAxes("Avalanche Size", "Count", ImPlotAxisFlags_AutoFit,
                       ImPlotAxisFlags_AutoFit);
+
     ImPlot::SetupAxisScale(ImAxis_X1, ImPlotScale_Log10);
     ImPlot::SetupAxisScale(ImAxis_Y1, ImPlotScale_Log10);
 
-    ImPlot::PlotScatter("Data", m.xs.data(), m.ys.data(),
-                        static_cast<int>(m.xs.size()));
+    ImPlot::PlotScatter("Data", a.xs.data(), a.ys.data(),
+                        static_cast<int>(a.xs.size()));
 
-    auto fit = make_power_law_fit(m.xs, m.plf);
-    ImPlot::PlotLine("Fit", m.xs.data(), fit.data(),
-                     static_cast<int>(m.xs.size()));
+    ImPlot::PlotLine("Power-law", a.xs.data(), power_fit.data(),
+                     static_cast<int>(power_fit.size()));
 
-    ImGui::Text("coefficient = %.3f", m.plf.coefficient);
-    ImGui::Text("error = %.3f", m.plf.error);
+    // ImPlot::PlotLine("Log-linear", a.xs.data(), log_fit.data(),
+    //                  static_cast<int>(log_fit.size()));
+
+    ImGui::Text("Power-law alpha = %.3f", a.power.alpha);
+    ImGui::Text("RMSE (log) = %.3f", a.power.rmse);
 
     ImPlot::EndPlot();
   }
 
+  // LINEAR PLOT
   if (ImPlot::BeginPlot("##SizeLinear", ImVec2(-1, 250))) {
-    ImPlot::SetupAxes("Size", "Count", ImPlotAxisFlags_AutoFit,
+    ImPlot::SetupAxes("Avalanche Size", "Count", ImPlotAxisFlags_AutoFit,
                       ImPlotAxisFlags_AutoFit);
-    ImPlot::PlotScatter("Data", m.xs.data(), m.ys.data(),
-                        static_cast<int>(m.xs.size()));
+
+    ImPlot::PlotScatter("Data", a.xs.data(), a.ys.data(),
+                        static_cast<int>(a.xs.size()));
+
+    ImPlot::PlotLine("Power-law", a.xs.data(), power_fit.data(),
+                     static_cast<int>(power_fit.size()));
+
+    // ImPlot::PlotLine("Log-linear", a.xs.data(), log_fit.data(),
+    //                  static_cast<int>(log_fit.size()));
+    //
+    // ImGui::Text("Log-linear a = %.3f", a.log.a);
+    // ImGui::Text("Log-linear b = %.3f", a.log.b);
+    // ImGui::Text("RMSE (linear) = %.3f", a.log.rmse);
+
     ImPlot::EndPlot();
   }
 }
@@ -207,20 +117,20 @@ void plot_avalanche_size(const AvalancheSizePlotModel &m) {
 void draw_stats_avalanche_sizes_s(const stat::Stats_Collector &sc) {
 
   const auto &data = sc.avalanche_sizes();
-  if (data.empty())
+  if (data.empty()) {
     return;
+  }
 
   ImGui::Text("Distribution of Avalanche Sizes");
 
-  auto model = build_avalanche_size_model(data);
-  if (model)
-    plot_avalanche_size(*model);
+  auto analysis = sc.get_avalanche_analysis();
+  plot_avalanche_size(analysis);
 }
 
 // ===
 // ORIGINS
 
-std::unique_ptr<AvalancheOriginPlotModel>
+std::unique_ptr<Avalanche_Origin_Plot_Model>
 build_origin_model(const stat::Stats_Collector &sc) {
 
   const auto &g = sc.grain_dropped_counts();
@@ -264,11 +174,12 @@ build_origin_model(const stat::Stats_Collector &sc) {
     v *= inv_o;
   }
 
-  return std::make_unique<AvalancheOriginPlotModel>(AvalancheOriginPlotModel{
-      std::move(x), std::move(grains), std::move(origins)});
+  return std::make_unique<Avalanche_Origin_Plot_Model>(
+      Avalanche_Origin_Plot_Model{std::move(x), std::move(grains),
+                                  std::move(origins)});
 }
 
-void plot_origin_grouped(const AvalancheOriginPlotModel &m) {
+void plot_origin_grouped(const Avalanche_Origin_Plot_Model &m) {
   if (ImPlot::BeginPlot("##OriginsGrouped", ImVec2(-1, 250))) {
     ImPlot::SetupAxes("Vertex ID", "Count", ImPlotAxisFlags_AutoFit,
                       ImPlotAxisFlags_AutoFit);
@@ -311,7 +222,7 @@ void draw_stats_avalanche_origins_s(const stat::Stats_Collector &sc) {
 // ===
 // GRAINS
 
-std::unique_ptr<GrainsPlotModel>
+std::unique_ptr<Grains_Plot_Model>
 build_grains_model(const std::vector<size_t> &grains, int display,
                    int window_size) {
   if (grains.empty())
@@ -352,11 +263,11 @@ build_grains_model(const std::vector<size_t> &grains, int display,
     ma.push_back(full_ma[i]);
   }
 
-  return std::make_unique<GrainsPlotModel>(
-      GrainsPlotModel{std::move(recent), std::move(ma)});
+  return std::make_unique<Grains_Plot_Model>(
+      Grains_Plot_Model{std::move(recent), std::move(ma)});
 }
 
-void plot_grains(const GrainsPlotModel &model) {
+void plot_grains(const Grains_Plot_Model &model) {
   if (ImPlot::BeginPlot("##GrainsLine", ImVec2(-1, 150),
                         ImPlotFlags_NoMouseText | ImPlotFlags_NoLegend)) {
     ImPlot::SetupAxes("Steps (relative)", "Grains", ImPlotAxisFlags_AutoFit,

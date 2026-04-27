@@ -128,12 +128,6 @@ void draw_gla(gla_::Hidden_GLA &cfg);
 // =====>
 // STATS
 
-struct Power_Law_Fit {
-  double coefficient;
-  double error; // residual sum of squares
-  double intercept;
-};
-
 // ===
 // OVERVIEW
 
@@ -142,24 +136,15 @@ void draw_stats_overview_s(const stat::Stats_Collector &sc);
 // ===
 // AVALANCHE SIZE
 
-struct AvalancheSizePlotModel {
-  std::vector<double> xs;
-  std::vector<double> ys;
-
-  Power_Law_Fit plf;
-};
-
-std::unique_ptr<AvalancheSizePlotModel>
-build_avalanche_size_model(const std::vector<size_t> &input);
-
-void plot_avalanche_size(const AvalancheSizePlotModel &model);
+void plot_avalanche_size(
+    const stat::Stats_Collector::Avalanche_Analysis &model);
 
 void draw_stats_avalanche_sizes_s(const stat::Stats_Collector &sc);
 
 // ===
 // AVALANCHE ORIGINS
 
-struct AvalancheOriginPlotModel {
+struct Avalanche_Origin_Plot_Model {
   std::vector<double> x;
   std::vector<double> grains;
   std::vector<double> origins;
@@ -167,40 +152,28 @@ struct AvalancheOriginPlotModel {
   size_t max_vertex = 0;
 };
 
-std::unique_ptr<AvalancheOriginPlotModel>
+std::unique_ptr<Avalanche_Origin_Plot_Model>
 build_origin_model(const stat::Stats_Collector &sc);
 
-void plot_origin(const AvalancheOriginPlotModel &model);
+void plot_origin(const Avalanche_Origin_Plot_Model &model);
 
 void draw_stats_avalanche_origins_s(const stat::Stats_Collector &sc);
 
 // ===
 // GRAINS
 
-struct GrainsPlotModel {
+struct Grains_Plot_Model {
   std::vector<double> recent;
   std::vector<double> moving_avg;
 };
 
-std::unique_ptr<GrainsPlotModel>
+std::unique_ptr<Grains_Plot_Model>
 build_grains_model(const std::vector<size_t> &grains, int display_count,
                    int window_size);
 
-void plot_grains(const GrainsPlotModel &model);
+void plot_grains(const Grains_Plot_Model &model);
 
 void draw_stats_grains_s(const stat::Stats_Collector &sc);
-
-// ===
-// INTERNAL HELPERS
-
-// linear regression in log-log space
-// return
-Power_Law_Fit fit_power_law(const std::vector<double> &xs,
-                            const std::vector<double> &ys);
-
-// evaluate the fitted power-law curve at given x values
-std::vector<double> make_power_law_fit(const std::vector<double> &xs,
-                                       Power_Law_Fit plf);
 
 } // namespace _detail
 
