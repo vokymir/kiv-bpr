@@ -86,8 +86,9 @@ void plot_avalanche_size(const stat::Stats_Collector::Avalanche_Analysis &a) {
     // ImPlot::PlotLine("Log-linear", a.xs.data(), log_fit.data(),
     //                  static_cast<int>(log_fit.size()));
 
-    ImGui::Text("Power-law alpha = %.3f", a.power.alpha);
-    ImGui::Text("RMSE (log) = %.3f", a.power.rmse);
+    ImGui::Text("Power-law coefficient = %.3f", a.power.alpha);
+    ImGui::Text("RSS = %.3f", a.power.rss);
+    ImGui::Text("RMSE= %.3f", a.power.rmse);
 
     ImPlot::EndPlot();
   }
