@@ -128,6 +128,12 @@ void draw_gla(gla_::Hidden_GLA &cfg);
 // =====>
 // STATS
 
+struct Power_Law_Fit {
+  double coefficient;
+  double error; // residual sum of squares
+  double intercept;
+};
+
 // ===
 // OVERVIEW
 
@@ -140,8 +146,7 @@ struct AvalancheSizePlotModel {
   std::vector<double> xs;
   std::vector<double> ys;
 
-  double alpha = 0.0;
-  double intercept = 0.0;
+  Power_Law_Fit plf;
 };
 
 std::unique_ptr<AvalancheSizePlotModel>
@@ -189,13 +194,13 @@ void draw_stats_grains_s(const stat::Stats_Collector &sc);
 // INTERNAL HELPERS
 
 // linear regression in log-log space
-// return (alpha, log_C)
-std::pair<double, double> fit_power_law(const std::vector<double> &xs,
-                                        const std::vector<double> &ys);
+// return
+Power_Law_Fit fit_power_law(const std::vector<double> &xs,
+                            const std::vector<double> &ys);
 
 // evaluate the fitted power-law curve at given x values
 std::vector<double> make_power_law_fit(const std::vector<double> &xs,
-                                       double alpha, double intercept);
+                                       Power_Law_Fit plf);
 
 } // namespace _detail
 

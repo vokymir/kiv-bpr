@@ -33,8 +33,9 @@ namespace _detail {
 // ===
 // INTERNAL HELPERS
 
-std::pair<double, double> fit_power_law(const std::vector<double> &xs,
-                                        const std::vector<double> &ys) {
+Power_Law_Fit fit_power_law(const std::vector<double> &xs,
+                            const std::vector<double> &ys) {
+  Power_Law_Fit res = {0.0, 0.0, 0.0};
   // function to fit: y = a * x^(-k)
   //
   // alpha = -k
@@ -72,7 +73,7 @@ std::pair<double, double> fit_power_law(const std::vector<double> &xs,
 
   // too little values
   if (valid_count < 2) {
-    return {0.0, 0.0};
+    return res;
   }
 
   // valid count, but to prevent repeated static cast
@@ -81,28 +82,52 @@ std::pair<double, double> fit_power_law(const std::vector<double> &xs,
   const double denominator = n * sum_log_x2 - sum_log_x * sum_log_x;
   // cannot divide by zero
   if (denominator == 0.0) {
-    return {0.0, 0.0};
+    return res;
   }
 
   const double alpha = (n * sum_log_xy - sum_log_x * sum_log_y) / denominator;
 
+  // intercept = log(C)
   const double intercept = (sum_log_y - alpha * sum_log_x) / n;
 
-  return {alpha, intercept}; // intercept = log(C)
+  // residual sum of squares
+  double rss = 0.0;
+
+  for (size_t i = 0; i < xs.size(); ++i) {
+    double x = xs[i];
+    double y = ys[i];
+
+    if (x <= 0.0 || y <= 0.0)
+      continue;
+
+    double log_x = std::log(x);
+    double log_y = std::log(y);
+
+    double predicted = alpha * log_x + intercept;
+    double residual = log_y - predicted;
+
+    rss += residual * residual;
+  }
+
+  res.coefficient = alpha;
+  res.error = rss;
+  res.intercept = intercept;
+
+  return res;
 }
 
 std::vector<double> make_power_law_fit(const std::vector<double> &xs,
-                                       double alpha, double log_intercept) {
+                                       Power_Law_Fit plf) {
   // reconstruct: y = C * x^alpha
   // where C = exp(log_intercept)
 
-  const double C = std::exp(log_intercept);
+  const double C = std::exp(plf.intercept);
 
   std::vector<double> fitted;
   fitted.reserve(xs.size());
 
   for (double x : xs) {
-    fitted.push_back(C * std::pow(x, alpha));
+    fitted.push_back(C * std::pow(x, plf.coefficient));
   }
 
   return fitted;
@@ -139,11 +164,9 @@ build_avalanche_size_model(const std::vector<size_t> &input) {
   }
 
   auto model = std::make_unique<AvalancheSizePlotModel>(
-      AvalancheSizePlotModel{std::move(xs), std::move(ys)});
+      AvalancheSizePlotModel{std::move(xs), std::move(ys), {}});
 
-  auto [a, b] = fit_power_law(model->xs, model->ys);
-  model->alpha = a;
-  model->intercept = b;
+  model->plf = fit_power_law(model->xs, model->ys);
 
   return model;
 }
@@ -162,11 +185,12 @@ void plot_avalanche_size(const AvalancheSizePlotModel &m) {
     ImPlot::PlotScatter("Data", m.xs.data(), m.ys.data(),
                         static_cast<int>(m.xs.size()));
 
-    auto fit = make_power_law_fit(m.xs, m.alpha, m.intercept);
+    auto fit = make_power_law_fit(m.xs, m.plf);
     ImPlot::PlotLine("Fit", m.xs.data(), fit.data(),
                      static_cast<int>(m.xs.size()));
 
-    ImGui::Text("coefficient = %.3f", m.alpha);
+    ImGui::Text("coefficient = %.3f", m.plf.coefficient);
+    ImGui::Text("error = %.3f", m.plf.error);
 
     ImPlot::EndPlot();
   }
