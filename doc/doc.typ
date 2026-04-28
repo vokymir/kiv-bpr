@@ -707,8 +707,6 @@ be replaced, only the generating part have to be rewritten. Similarly, when
 extending the app of another graph generating library, look only inside
 `graph/Generator.hpp` and `graph/Converter.hpp`.
 
-
-
 #bibliography("refs.bib")
 
 #heading([TODO], numbering: none)
