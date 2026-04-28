@@ -653,7 +653,43 @@ TODO
 
 = Technical Documentation
 
-TODO
+The accompanying interactive tool for this thesis allows users to simulate SOC
+on sandpile model with all discussed graph topologies and dissipation rules. It
+serves primarily as a visualization of the problem with simple statistics
+alongside it.
+
+The technologies used were the programming language
+*#link("https://isocpp.org/", [C++23])*, with libraries
+_#link("https://igraph.org/", [igraph])_,
+_#link("https://github.com/ocornut/imgui", [Dear ImGui])_,
+_#link("https://wiki.libsdl.org/SDL3/FrontPage", [SDL3])_ and
+_#link("https://www.opengl.org/", [OpenGL])_. For compilation was used
+_#link("https://cmake.org/", [CMake])_ with _#link("https://clang.llvm.org/", [Clang])_ or _#link("https://gcc.gnu.org/", [GCC])_. Libraries are managed via
+_#link("https://vcpkg.io/en/", [vcpkg])_ or as _#link("https://git-scm.com/", [Git])_ submodules. _#link("https://github.com/bombela/backward-cpp", [Backward-cpp])_ was used for beautiful stack trace. The whole project is hosted on
+_#link("https://github.com/vokymir/kiv-bpr", [GitHub])_.
+
+Naming convention:
+
+/ *Classes, structs, enums*:
+  PascalCase with underscores \
+  _Example:_ `Square_Lattice`
+
+/ *Variables, parameters, functions, methods, namespaces*:
+  snake_case \
+  _Example:_ `sink_rule`
+
+/ *Private members (or to avoid name clashes)*:
+  Trailing underscore \
+  _Example:_ `avalanche_sizes_`
+
+The application is a visual tool and as such have an infinite render loop. The
+main logic is inside _App_ class. This class run the main loop and using various
+functions in _ui_ namespace renders the right parts of the ui. Note that Dear
+ImGui is an immediate mode GUI thus the state of UI is directly obtained from
+application state every time the UI is rendered.
+
+As the application allows user to select any combination of graph topology and
+dissipation rule, the state is hold in structure _Sim\_Config_
 
 #bibliography("refs.bib")
 
