@@ -671,7 +671,7 @@ _#link("https://github.com/vokymir/kiv-bpr", [GitHub])_.
 Naming convention:
 
 / *Classes, structs, enums*:
-  PascalCase with underscores \
+  Pascal Snake Case \
   _Example:_ `Square_Lattice`
 
 / *Variables, parameters, functions, methods, namespaces*:
@@ -689,7 +689,25 @@ ImGui is an immediate mode GUI thus the state of UI is directly obtained from
 application state every time the UI is rendered.
 
 As the application allows user to select any combination of graph topology and
-dissipation rule, the state is hold in structure _Sim\_Config_
+dissipation rule, the state is stored in structure _Sim\_Config_. The
+selected visualization method is held by _Vis\_Config_.
+
+For the graph representation serves the _Graph_ class, which stores all vertices
+and edges in offset and neighbours list representation, also called compressed
+adjacency list. That representation is fitting as no graph manipulation happens
+during the simulation. The Graph also holds the sand height for simulation and
+vertex positions for visualization.
+
+For constructing of the graph was used the _igraph_ library which already
+implements all discussed graph topologies, however the sink is added manually
+based on the specific dissipation rule.
+
+The implementation aims to be library-independent, therefore if igraph were to
+be replaced, only the generating part have to be rewritten. Similarly, when
+extending the app of another graph generating library, look only inside
+`graph/Generator.hpp` and `graph/Converter.hpp`.
+
+
 
 #bibliography("refs.bib")
 
