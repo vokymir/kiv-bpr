@@ -707,11 +707,12 @@ number of grains, cluster and avalanche sizes both have power-law distribution.
   image("img/cluster_avalanche_size.png", width: 200pt),
 ) <fig:cluster_avalanche_size>
 
-To verify, a square lattice with $n = 10.000$ was created and over one million
-grains dropped. The @fig:sl_avalanche shows the measured data alongside
+To verify, a square lattice with $n = 100 times 100$ was created and over one
+million grains dropped. The @fig:sl_avalanche shows the measured data alongside
 power-law fit. Over multiple runs, the coefficient in power-law is
-approximatedly $-1.2$ which is comparable to $-5/4$, the numerically found
-value for square lattice @priezzhev_etal.
+approximatedly $-1.2$ which is comparable to $-5/4$, the numerically found value
+for square lattice @priezzhev_etal. As can be seen, larger avalanches happened
+sligthly less often than predicted, skewing the fit.
 
 #figure(
   caption: [The distribution of avalanche sizes on a square lattice shown on
@@ -719,6 +720,80 @@ value for square lattice @priezzhev_etal.
 
   image("img/sl_n_f_1.png"),
 ) <fig:sl_avalanche>
+
+The sandpile model does behave as expected on standard square lattice graph with
+classic _Fill to Four_ rule. The question is, does power-law hold for different
+graph topologies and dissipation rules?
+
+The ER model is the least to be expected to have similar properties to square
+lattice, as it does not guarantee connected graph. For $G(n,p), n = 100, p =
+0.5$ the resulting graphs are shown in @fig:er_np_avalanche, in both log-log and
+linear plot.
+
+#figure(
+  caption: [The distribution of avalanche sizes on a ER $G(n,p)$ graph. \ The
+    log-log plot on the left, linear plot on the right.],
+  grid(
+    columns: 2,
+    gutter: 0.5em,
+    image("img/er_np_100_0-5_1M.png"), image("img/er_np_100_0-5_1M_linear.png"),
+  ),
+) <fig:er_np_avalanche>
+
+Suprising at first is the size of the greatest avalanche, which is equal to $n$.
+However, even though this model does not guarantee connected graph, the
+probability of not being so is very small. In fact, for mentioned parameters,
+the probability of one fixed vertex being disconnected is
+
+$
+  p = (1/2)^100 ","
+$
+
+which is still a big number in comparison to the probability of the graph being
+disconnected.
+
+The distribution doesn't seem to fit power-law on the whole interval, but rather
+it resembles a distribution more fitting a complete graph. However, if the edge
+existence probability is set to be lower, the distribution changes a lot.
+
+#figure(
+  caption: [ER $G(n,p)$ distribution with (from left) $p = 0.25$ and $p =
+    0.1$.],
+
+  {
+    let img(path) = image(path)
+    grid(
+      columns: 2,
+      gutter: 0.5em,
+      img("img/er_np_100_0-25_2M.png"), img("img/er_np_100_0-1.png"),
+    )
+  },
+)
+
+That shows, the ER $G(n,p)$ model can be fine-tuned to reach criticality. This
+is, however, not sel-organized criticality then. Or rather, the ER graph does
+not ensure the emergence of self-organized criticality of sandpile model with
+arbitrarily chosen parameter $p$. The ER $G(n,m)$ model exhibit equivalent
+behaviour with the parameter $m$.
+
+#figure(
+  caption: [Comparing ER $G(n,p)$ graphs with (from left) $p = 0.5$, $p = 0.25$,
+    $p = 0.1$ and $p = 0.01$.],
+  {
+    let img(path) = image(path, width: 100%, height: 120pt, fit: "cover")
+    grid(
+      columns: 4,
+      gutter: 0.5em,
+      img("img/er_np_100_0-5_view.png"),
+      img("img/er_np_100_0-25_view.png"),
+      img("img/er_np_100_0-1_view.png"),
+      img("img/er_np_100_0-01_view.png"),
+    )
+  },
+)
+
+TODO: BA, WS continue here
+
 
 TODO: how did it work for different types of graphs and dissipation rules? also
 the graph configurations (eg $beta$ for WS)
