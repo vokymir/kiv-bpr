@@ -677,6 +677,47 @@ connected graph.
 
 = Observed Behaviour <h:observed_behaviour>
 
+In the original paper, BTW focused among other things on cluster sizes. They
+define clusters as cells (vertices) that can be reached through the domino
+process originated by the toppling of only a single cell. They found the
+distribution of cluster sizes obeys power-law.
+
+The goal of this thesis is to explore the behaviour of sandpile model on
+discussed graphs and with different dissipation rules. The main focus is
+distribution of avalache sizes (equivalent to cluster sizes).
+
+BTW examined many stable configuration repeatedly and recorded all clusters,
+therefrom obtaining cluster sizes. Avalanche sizes, on the contrary, are only
+sizes of clusters which are toppled. However, the size of an avalanche might be
+bigger than the cluster size.
+
+As shown in @fig:cluster_avalanche_size, during avalanche, additional vertices
+might become unstable and be toppled. Furthermore, one vertex can be toppled
+multiple times during single avalanche. However, for a large enough graph and
+number of grains, cluster and avalanche sizes are equivalent.
+
+#figure(
+  caption: [Example clusters on square lattice. Every cluster is bounded by a
+    white border. \ The numbers show the size of vertex for respective number of
+    grains. \ There are two clusters, one of size 3, other of 6. \ Avalanches
+    are represented as yellow borders extending the white. Avalanche sizes are 3
+    and 8 respectivelly. If grain is dropped onto the vertex with yellow
+    outline, the avalanche size is 9.],
+
+  image("img/cluster_avalanche_size.png", width: 200pt),
+) <fig:cluster_avalanche_size>
+
+
+On square lattice
+
+#figure(
+  caption: [The distribution of avalanche sizes on square lattice $G(n), n =
+    10.000$ on
+    log-log plot with over one million grains dropped.],
+
+  image("img/sl_n_f_1.png"),
+)
+
 TODO: how did it work for different types of graphs and dissipation rules? also
 the graph configurations (eg $beta$ for WS)
 
