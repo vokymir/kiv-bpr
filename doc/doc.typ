@@ -257,7 +257,7 @@ measure ($omega$) defined as follows @telesford2011ubiquitysmallworldnetworks
 
 $
   omega(G) = "len"(R) / "len"(G) - C(G) / C(L) "."
-$
+$ <eq:small_worldness>
 
 Where $G$ is the analyzed network, $R$ is an equivalent random network to $G$,
 and $L$ is an equivalent (ring) lattice network to $G$. This method aims to
@@ -392,27 +392,25 @@ grains go during a topple. If it has more neighbours, does it artifically
 generate more grains, or distribute fewer grains between randomly selected
 neighbours?
 
-TODO: continue here
-
 Note that in these reasonings, the neighbourhood of a vertex $cal(N)(v)$
 contains sink vertex, and possibly multiple times. The toppling rule will not
 work if $K(v) = 0$. We acknowledge this constraint but leave its resolution to
 dissipation rules.
 
 With $K$, toppling rule and dissipation rules specified, we now continue onto
-the properties of different graph topologies. Sqaure lattice is a regular graph,
+the properties of different graph topologies. Square lattice is a regular graph,
 meaning the degree of all vertices is the same @Chen1997GraphTheory, if we
 consider sink vertex.
 
 Regularity is not often found in human social networks, meaning graphs where
 vertices represent individuals and edges their mutual acquaintance. Purely
-random graph also would not be optimal for although it is not regular, human
+random graph also would not be optimal since it is not regular. However, human
 networks are not completely random. Fortunately, a small-world network (better
 described in @h:graph_theory) are almost perfect.
 
 The three most known random graph generators are the Erdős–Rényi (ER) model
 @Erdos2022OnRG, Barabási-Albert (BA) @Baraba_si_1999 model and Watts-Strogatz
-(WS) model @Watts1998. Each of this methods generates the graph differently
+(WS) model @Watts1998. Each of these methods generates the graph differently
 resulting in various _small-worldness_.
 
 The *ER model* was the first discovered. There are two variants, both of which
@@ -421,8 +419,8 @@ from the set of all possible graphs with $n$ vertices and $m$ edges. The
 $G(n,p)$ model creates all possible edges but only with the probability $p$.
 
 The $G(n,m)$ model ensures that any edge is equally likely and the number of
-edges is known before. This, however, do not provide the resulting graph being
-connected. The $G(n,p)$ model ensures that every edge has fixed probability of
+edges is known before. This, however, does not provide the resulting graph being
+connected. The $G(n,p)$ model ensures that every edge has a fixed probability of
 being present, also not ensuring connected graph.
 
 Another drawback of this model is the low clustering coefficient. That is a
@@ -439,41 +437,44 @@ Preferential attachment means for a vertex, the higher degree it has, the more
 likely it is to be connected to new vertex.
 
 The algorithm for generating the graph is, simply put, a loop in which one
-vertex is added to the graph and connected $m$ vertices. They are choosed from
-all vertices with probability shown in @eq:ba_prob, where $v$ is the examined
-vertex and $u$ represents all vertices. The newly added vertex is yet not
-considered.
+vertex is added to the graph and connected $m$ vertices. They are chosen from
+all vertices with probability
 
 $
-  p(v) = d(v) / (Sigma_u d(u)), quad u,v in V
+  p(v) = d(v) / (Sigma_u d(u)), quad u,v in V ","
 $ <eq:ba_prob>
 
-The algorithm takes $G_0, n, m$ where the last is the number of edges for each
-new vertex and the second is the number of vertices in final graph. The first
+where $v$ is the examined vertex and $u$ represents all vertices. The newly
+added vertex is yet not considered.
+
+The algorithm takes $G_0, n, m$ where $m$ is the number of edges for each
+new vertex and $n$ represents the number of vertices in final graph. The first
 arguments is a starting graph with at least $m$ vertices. In practice, $G_0$ is
 usually chosen as a complete graph $K_m$ of size $m$.
 
-This algorithm yields in quick emergence of hubs, vertices with high degree. BA
-provide example, newly create webpage is more likely to link to well-known
+This algorithm yields a quick emergence of hubs, vertices with high degree. BA
+provides example i.e., newly create webpage is more likely to link to well-known
 websites which already have high degree.
 
-As the consequence of hubs existence, the average path is short. However,
-interesting property of BA model is the dependance of clustering on $N =
-abs(V)$, in @eq:ba_clustering (both @Baraba_si_1999). This behaviour is
-different from small-world network where clustering is independent of size.
+As the consequence of hubs' existence, the average path is short. However,
+interesting property of BA model is the dependance of clustering $C$ on $N =
+abs(V)$,
 
 $
-  C ~ ln(N^2) / N
+  C ~ ln(N^2) / N "."
 $ <eq:ba_clustering>
+
+This behaviour is different from small-world network where clustering is
+independent of size @Baraba_si_1999.
 
 This model generates a connected graph, because when new vertex is added, it is
 connected to exactly $m$ existing vertices.
 
-The *WS model* authors have also defined the small-world measure (#sym.omega)
-discussed in @h:graph_theory. WS argued that ER model lacks two important
-properties often observed in small-world network: high clustering coeficient and
-degree distribution convergence to power law. Their model was designed to
-address the first issue.
+In the *WS model*, authors have also defined the small-world measure
+(#sym.omega) discussed in @eq:small_worldness. WS argued that ER model lacks two
+important properties often observed in small-world networks: high clustering
+coeficient and the convergence of degree distribution to power law. Their model
+was designed to address the first issue.
 
 The generation algorithm is simple: 1. start with a regular ring lattice, 2.
 rewire every edge with probability #sym.beta. The idea is to preserve the short
