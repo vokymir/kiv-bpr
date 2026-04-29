@@ -816,7 +816,7 @@ included in this statistic.
   },
 ) <fig:ba_origins>
 
-The plot at @fig:ba_origins demonstrate the prefferential attachement of BA
+The plot at @fig:ba_origins demonstrate the preferential attachement of BA
 model. It is apparent that vertices which were added to the graph earlier
 started far less avalanches. That comes from the fact that these vertices have
 higher degree on average. It is more likely some vertex with lower degree starts
@@ -826,6 +826,104 @@ That was recoreded with the dissipation rule _All Once_. The change when this
 rule is swapped for _Fill Up_ is peculiar. With that, all vertices have the same
 degree and the uniform distribution of grains is reflected on the distribution
 of avalanche origins.
+
+While trying to fit power-law for avalanche size distribution does not make
+sense for general ER, it might for BA. If the _All Once_ rule is applied (which
+may be seen on @fig:ba_all_once), the distribution become too unpredictable with
+higher $m$ and avalanche size. Therefore, letting $m$ be small (preventing the
+graph to become too connected) is better.
+
+#figure(
+  caption: [Comparing BA method with _All Once_ dissipation rule where the
+    parameters in $G(G_0,n,m)$ are: $n = 10.000$, $G_0 = K_m$ and $m$ is 10, 100
+    and 1000 from the left respectivelly.],
+
+  {
+    let img(path) = image(path, width: 100%, height: 80pt, fit: "cover")
+    grid(
+      columns: 3,
+      gutter: 0.5em,
+      img("img/ba_m_o_5.png"), img("img/ba_mm_o_3.png"), img("img/ba_mmm_o_1.png"),
+    )
+  },
+) <fig:ba_all_once>
+
+The rule _Fill Up_ becomes more interesting. While it does make the avalanche
+origins distribution uniform, it also makes the observed data more consistent
+with power-law fit even for higher $m$.
+
+#figure(
+  caption: [Comparing BA method with _Fill Up_ dissipation rule where the
+    parameters in $G(G_0,n,m)$ are: $n = 100$, $G_0 = K_m$ and $m$ is 10, 25
+    and 50 from the left respectivelly.],
+
+  {
+    let img(path) = image(path, width: 100%, height: 80pt, fit: "cover")
+    grid(
+      columns: 3,
+      gutter: 0.5em,
+      img("img/ba_100_10_f.png"), img("img/ba_100_25_f.png"), img("img/ba_100_50_f.png"),
+    )
+  },
+) <fig:ba_fill_up>
+
+The third rule, _As Many As Neighbours_, combine the properties of previous two
+rules. The avalanche origin distribution is similar to _All Once_ rule, while
+the avalanche size distribution resembles _Fill Up_ method more.
+
+#figure(
+  caption: [Comparing BA method with _As Many As Neighbours_ dissipation rule
+    where the parameters in $G(G_0,n,m)$ are: $n = 100$, $G_0 = K_m$ and $m$ is
+    10, 25 and 50 from the left respectivelly.],
+
+  {
+    let img(path) = image(path, width: 100%, height: 80pt, fit: "cover")
+    grid(
+      columns: 3,
+      gutter: 0.5em,
+      img("img/ba_100_10_n.png"), img("img/ba_100_25_n.png"), img("img/ba_100_50_n.png"),
+    )
+  },
+) <fig:ba_neighbours>
+
+The degree of all vertices is higher,
+
+$
+  d_("As Many As Neighbours")(v) = 2( d_("All Once")(v) - 1 ) ","
+$
+
+because sink is connected more times to each vertex. It does, however, preserve
+the difference between vertices, thus the similarity of avalanche origin
+distribution with _All Once_ rule. Doubling the vertex degree, effectively,
+vertex degrees become closer. That is the reason for avalanche size being
+similar to _Fill Up_ (where all vertex degrees are exactly the same).
+
+We can use BA method to observe the behaviour of sanpile model on a spanning
+tree. That could be generated when $n$ is set to one. Spanning trees generated
+via this method still have preferential attachement.
+
+As can be seen on @fig:spanning_tree, the power-law distribution is present.
+
+TODO: maji podobny degree vsichni, celkem
+
+#figure(
+  caption: [Comparing spanning trees (created by BA method
+    with $m = 1$) and their avalanche size distributions with regard to
+    dissipation rule. From the left, _All Once_, _Fill Up_, _As Many As
+    Neighbours_.],
+
+  {
+    let img(path, height: 80pt) = image(path, width: 100%, height: height, fit: "cover")
+    let img2(path) = img(path, height: 140pt)
+    grid(
+      columns: 3,
+      gutter: 0.5em,
+      img("img/ba_100_ST_o.png"), img("img/ba_100_ST_f.png"), img("img/ba_100_ST_n.png"),
+
+      img2("img/ba_100_ST_o_view.png"), img2("img/ba_100_ST_f_view.png"), img2("img/ba_100_ST_n_view.png"),
+    )
+  },
+) <fig:spanning_tree>
 
 
 TODO: how did it work for different types of graphs and dissipation rules? also
