@@ -437,7 +437,7 @@ Preferential attachment means for a vertex, the higher degree it has, the more
 likely it is to be connected to new vertex.
 
 The algorithm for generating the graph is, simply put, a loop in which one
-vertex is added to the graph and connected $m$ vertices. They are chosen from
+vertex is added to the graph and connected to $m$ vertices. They are chosen from
 all vertices with probability
 
 $
@@ -615,9 +615,11 @@ random method may be suitable for additional dissipation rules, the table
 covers the general case.
 
 #figure(
-  caption: [The suitabilty comparison for different dissipation rules on
-    graph topologies. Rule is suitable (#sym.checkmark.heavy), not suitable
-    (#sym.crossmark.heavy) or only suitable for graphs with extra constraints.],
+  caption: [The suitabilty comparison for different dissipation rules on graph
+    topologies. Rule is suitable (#sym.checkmark.heavy), not suitable
+    (#sym.crossmark.heavy) or only suitable for graphs with extra constraints.
+    Standard constraints discussed in @h:graph_topologies are put on BA and WS
+    models.],
 
   {
     let ok = sym.checkmark.heavy
@@ -638,17 +640,40 @@ covers the general case.
 
       table.hline(stroke: 2pt),
 
-      [*Fill to N*], $N >= 4$, no, no, no, no,
+      [*Fill to N*], $N >= 3$, no, no, no, no,
       [*All once*], ok, ok, ok, ok, ok,
-      [*As many as neighbours*], ok, no, no, $m > 1$, ok,
+      [*As many as neighbours*], ok, no, no, $m >= 1$, ok,
       [*Fill up*], ok, $p = 1$, $m >= 1$, ok, ok,
     )
   },
 ) <tab:topo_diss>
 
-It might seem as _Fill to N_ rule should be suitable for more dissipation rules,
-but the parameter $N$ is set to be static and thus cannot be set based on graph
-properties. Standard constraints discussed in @h:graph_topologies are put on BA and WS models.
+The square lattice is suitable for all discussed dissipation rules. Each vertex
+has exactly four neighbours, except for border vertices which only have three
+and corner vertices with only two. For _Fill to N_, the smallest possible $N$
+must be higher than the smallest degree in graph. Thus the $N >= 3$ condition.
+
+It might seem as _Fill to N_ rule should be suitable for more graph topologies,
+but the parameter $N$ is set to be static and therefore cannot be set based on
+graph properties. For the remaining topologies, the only plausable way would be
+to set $N$ equal the number of vertices or edges, whichever is lesser.
+
+The _All once_ rule is designed to work with any graph, which could be
+confirmed in the table. The fact it does not have any requirement makes it a
+rather dissipation rule.
+
+Both ER methods does not guarantee connected graph. Therefore the _As many as
+neighbours_ rule requirement is not fulfilled. On the other hand, the _Fill up_
+rule might be used with some conditions. In the $G(n,p)$ method, to ensure at
+least one edge existing, the probability of edge creation must be set to $100%$
+(creating a complete graph $K_n$).
+For $G(n,m)$ the condition is weaker, as the argument $m$ _is_ the number of
+edges in final graph.
+
+Both BA and WS methods create a connected graph, passing the requirement for _As
+many as neighbours_. The condition for BA is rather symbolic: if $m = 1$, the
+graph is its own spanning tree. Any $m$ lesser than that does not result in
+connected graph.
 
 = Observed Behaviour <h:observed_behaviour>
 
