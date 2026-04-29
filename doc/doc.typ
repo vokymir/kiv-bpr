@@ -1,4 +1,3 @@
-
 // my own modules for various graphs
 #import "diagrams.typ": diagram
 #import "plots.typ": plot
@@ -684,8 +683,8 @@ Naming convention:
 
 The application is a visual tool and as such have an infinite render loop. The
 main logic is inside _App_ class. This class run the main loop and using various
-functions in _ui_ namespace renders the right parts of the ui. Note that Dear
-ImGui is an immediate mode GUI thus the state of UI is directly obtained from
+functions in _ui_ namespace renders the right parts of the ui. Note that _Dear
+ImGui_ is an immediate mode GUI thus the state of UI is directly obtained from
 application state every time the UI is rendered.
 
 As the application allows user to select any combination of graph topology and
@@ -702,10 +701,16 @@ For constructing of the graph was used the _igraph_ library which already
 implements all discussed graph topologies, however the sink is added manually
 based on the specific dissipation rule.
 
-The implementation aims to be library-independent, therefore if igraph were to
+The implementation aims to be library-independent, therefore if _igraph_ were to
 be replaced, only the generating part have to be rewritten. Similarly, when
-extending the app of another graph generating library, look only inside
+extending the app of another graph generating library, only look inside
 `graph/Generator.hpp` and `graph/Converter.hpp`.
+
+The statistics are collected using event listeners in class _Stats\_Collector_.
+There are only three events, however that could be extended if desired.
+
+The window the application is viewed in is created via _SDL_ and _OpenGL_, the
+minimal implementation is in `ssoc::ui::Window_Context`.
 
 #bibliography("refs.bib")
 
