@@ -3,6 +3,7 @@
 #import "plots.typ": plot
 
 #set text(lang: "en")
+#set par(justify: true)
 #set heading(numbering: "1.")
 #set math.equation(numbering: "(1)")
 #set page(
@@ -713,11 +714,3 @@ The window the application is viewed in is created via _SDL_ and _OpenGL_, the
 minimal implementation is in `ssoc::ui::Window_Context`.
 
 #bibliography("refs.bib")
-
-#heading([TODO], numbering: none)
-
-- otázka: mám , a . v rovnicích dávat s mezerou, nebo bez?
-
-#heading([TODO PS], numbering: none)
-
--
