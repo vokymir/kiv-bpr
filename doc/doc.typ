@@ -694,7 +694,7 @@ bigger than the cluster size.
 As shown in @fig:cluster_avalanche_size, during avalanche, additional vertices
 might become unstable and be toppled. Furthermore, one vertex can be toppled
 multiple times during single avalanche. However, for a large enough graph and
-number of grains, cluster and avalanche sizes are equivalent.
+number of grains, cluster and avalanche sizes both have power-law distribution.
 
 #figure(
   caption: [Example clusters on square lattice. Every cluster is bounded by a
@@ -707,16 +707,18 @@ number of grains, cluster and avalanche sizes are equivalent.
   image("img/cluster_avalanche_size.png", width: 200pt),
 ) <fig:cluster_avalanche_size>
 
-
-On square lattice
+To verify, a square lattice with $n = 10.000$ was created and over one million
+grains dropped. The @fig:sl_avalanche shows the measured data alongside
+power-law fit. Over multiple runs, the coefficient in power-law is
+approximatedly $-1.2$ which is comparable to $-5/4$, the numerically found
+value for square lattice @priezzhev_etal.
 
 #figure(
-  caption: [The distribution of avalanche sizes on square lattice $G(n), n =
-    10.000$ on
-    log-log plot with over one million grains dropped.],
+  caption: [The distribution of avalanche sizes on a square lattice shown on
+    log-log plot.],
 
   image("img/sl_n_f_1.png"),
-)
+) <fig:sl_avalanche>
 
 TODO: how did it work for different types of graphs and dissipation rules? also
 the graph configurations (eg $beta$ for WS)
