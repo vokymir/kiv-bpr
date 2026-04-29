@@ -56,7 +56,7 @@
 
 In everyday life, person's outburst is rarely caused by a single large event.
 Rather, the tension builds up from small frustrations over time. When certain
-treshold is reached, even a minor additional stress can trigger an outburst.
+threshold is reached, even a minor additional stress can trigger an outburst.
 That redistributes the tension to others in their social circle. This may in
 turn cause further reactions, leading to a cascade of reach and size which are
 difficult to predict. A local event may therefore propagate through a network,
@@ -90,23 +90,17 @@ scale-invariance.
 Normal distribution is exponentially bounded, meaning that most of values are
 distributed within small range around the center (mean) and values far from it
 are very impropable. The probability density function of normal distribution
-with mean $mu in RR$ and variance $sigma^2 > 0$ is described in
-@eq:normal_distribution.
-
+with mean $mu in RR$ and variance $sigma^2 > 0$ is
 $
-  f(x) & = 1 / sqrt(2 pi sigma^2) e^(- (x - mu)^2 \/ (2 sigma^2)) #h(1mm) .
+  f(x) & = 1 / sqrt(2 pi sigma^2) e^(- (x - mu)^2 \/ (2 sigma^2)) "."
 $ <eq:normal_distribution>
 
-As opposed to this, the power law #footnote[Power law on $(0, infinity)$ cannot
-  be a probability distribution, because the areas near 0 and under the tail are
-  infinite. However, with simple restrictions: $f(x) = a x^(-k), quad k > 1,
-  quad x > x_(min)$ it is a valid distribution. TODO: nerozumím poznámce; stačí
-  asymptoticky] is _heavy tailed_. Its
-exponential character described in @eq:power-law result in higher probability
-of extreme values. That corresponds with the scale-invariance: Any (forest
-fire) size is realistically possible, even though smaller sizes are more likely.
-Power law exhibit linear relationship between $log f(x)$ and $log x$. In a
-`log-log plot` it forms a straight line, as can be seen on @fig:cmp_scale.
+As opposed to this, the power law  is _heavy tailed_. Its exponential character
+described in @eq:power-law result in higher probability of extreme values. That
+corresponds with the scale-invariance: Any (forest fire) size is realistically
+possible, even though smaller sizes are more likely. Power law exhibit linear
+relationship between $log f(x)$ and $log x$. In a `log-log plot` it forms a
+straight line, as can be seen on @fig:cmp_scale.
 
 $
        f(x) & = a x^(-k) \
@@ -152,51 +146,59 @@ from graph theory.
 = Graph Theory <h:graph_theory>
 
 An undirected graph is defined as a pair, containing set of vertices and set
-of edges. The graph has $n$ vertices and $m$ edges.
+of edges. The graph $G$ has $n$ vertices and $m$ edges,
+
 $
   G & = (V,E) \
   V & = {v_1, v_2, ..., v_n} \
-  E & subset.eq { {u, v} | u, v in V, u != v }, quad abs(E) = m
+  E & subset.eq { {u, v} | u, v in V, u != v }, quad abs(E) = m "."
 $
 
-The neighbourhood of a vertex is a set of vertices connected to it via an edge.
+The neighbourhood $cal(N)$ of a vertex $v$ is a set of vertices connected to it
+via an edge,
+
 $
-  cal(N) (v) = {u | {u, v} in E},
+  cal(N) (v) = {u | {u, v} in E}"."
 $
 
-The vertex degree is defined as the size of vertex neighbourhood.
+The vertex degree $d(v)$ is defined as the size of vertex neighbourhood,
 $
-  d(v) = abs(cal(N) (v))
+  d(v) = abs(cal(N) (v)) "."
 $
 
 Path between two vertices $u$ and $v$ is a sequence of vertices beginning in
 the first and ending in the second where every two vertices in path must be
-directly connected.
-$
-  P(u,v) = (v_1, v_2, ..., v_k), quad v_1 = u, quad v_k = v, \
-  quad {v_l, v_(l+1)} in E quad forall l in {1, ..., k-1}
-$
-If there exist no such path, let $P_(u,v) = ()$.
+directly connected,
 
-Similarily, path length is the number of _steps_ (edges) needed to walk the
-path. If path doesn't exist we define its legth as zero.
+$
+  P_(u,v) = (v_1, v_2, ..., v_k), quad v_1 = u, quad v_k = v, \
+  quad {v_l, v_(l+1)} in E quad forall l in {1, ..., k-1} ","
+$
+
+if there exist no such path, let $P_(u,v) = ()$.
+
+Similarly, the path length is the number of _steps_ (edges) needed to walk the
+path,
+
 $
   "len"(P_(u,v)) = cases(
     abs(P_(u,v)) - 1 quad & abs(P_(u,v)) >= 2",",
-    0 quad & "else ."
+    0 quad & "else,"
   )
 $
 
+if a path doesn't exist we define its legth as zero.
+
 The shortest path between vertices $u$ and $v$ is the path with minimal
 length among all paths connecting these vertices. Let $PP(u, v)$ be the set
-of all paths between $u$ and $v$:
+of all paths between $u$ and $v$,
 $
-  P^*_(u, v) = min_(P in PP(u, v)) "len"(P) " ."
+  P^*_(u, v) = min_(P in PP(u, v)) "len"(P) "."
 $
 
-A graph has an average (shortest) path length $"len"(G)$.
+A graph has an average (shortest) path length,
 $
-  "len"(G) = 1/n(n-1) Sigma_(u != v) "len"(P^*_(u, v)) " ."
+  "len"(G) = 1/n(n-1) Sigma_(u != v) "len"(P^*_(u, v)) "."
 $
 
 We say that two vertices $u$, $v$ are connected if at least one path between
@@ -206,22 +208,22 @@ $
   "len"(P_(u,v)) > 0 "."
 $
 
-The graph is connected if all its vertices are connected:
+The graph is connected if all its vertices are connected,
 
 $
   forall u,v in V, u != v: quad "len"(P_(u,v)) > 0 "."
 $
 
-A subgraph $G'$ of graph $G$ contains subset of its vertices and edges.
+A subgraph $G'$ of graph $G$ contains a subset of its vertices and edges,
 
 $
-  G'(V',E') subset.eq G(V,E) <=> V' subset.eq V and E' subset.eq E
+  G'(V',E') subset.eq G(V,E) <=> V' subset.eq V and E' subset.eq E "."
 $
 
 The graph component is a connected subgraph which is not part of any larger
 connected subgraph.
 
-Complete graph $K_x$ is a graph with $x$ vertices and $(x (x - 1)) / 2$ edges.
+Complete graph $K_n$ is a graph with $n$ vertices and $(n (n - 1)) / 2$ edges.
 This means that every two vertices are directly connected and the average path
 is one.
 
@@ -229,20 +231,20 @@ The measurement of how much do individual vertices in graph cluster together is
 called global clustering coefficient and it is based on triplets of nodes. One
 triplet is defined as three vertices with two or three edges between them. If
 the number of mutual edges is two, the triplet is called open, if it is three,
-the triplet is called closed. The global clustering coefficient of graph $C(G)$ is defined
-as:
+the triplet is called closed. The global clustering coefficient of graph $C(G)$
+is defined as
 
 $
-  C(G) = "# closed triplets" / "# all triplets"
+  C(G) = "# closed triplets" / "# all triplets" "."
 $ <eq:clustering_coefficient>
 
 Small world network is a graph with certain characteristic @Watts1998. It has
 high clustering coefficient and low distances. One example of small world
 network might be a human relationships network. The low distances might be
-expressed with respect to number of vertices as:
+expressed with respect to number of vertices as
 
 $
-  "len"(G) prop log(abs(V))
+  "len"(G) prop log(abs(V)) "."
 $
 
 Small world networks tend to contain complete subgraphs (cliques). This is
@@ -251,10 +253,10 @@ path is small, they often contain _hubs_ (vertices with high degree) which
 serves as connections between other vertices.
 
 One of methods to quantify the _small-worldness_ of a network is a small-world
-measure ($omega$) defined as follows @telesford2011ubiquitysmallworldnetworks:
+measure ($omega$) defined as follows @telesford2011ubiquitysmallworldnetworks
 
 $
-  omega(G) = "len"(R) / "len"(G) - C(G) / C(L)
+  omega(G) = "len"(R) / "len"(G) - C(G) / C(L) "."
 $
 
 Where $G$ is the analyzed network, $R$ is an equivalent random network to $G$,
@@ -263,6 +265,8 @@ quantify the formulating properties of small-world network: high clustering
 coefficient which is _ideal_ in lattice networks, and low average path which is
 _ideal_ in random networks.
 
+TODO: priklad, visual + vypocet
+
 
 = Sandpile Model <h:sandpile_model_general>
 
@@ -270,11 +274,13 @@ The very original sandpile model is a cellular automaton on a lattice. Every
 cell can hold up to $K$ grains, the height of a cell is a function of position
 $z(x,y,...)$. Fixed boundary conditions are used, on a boundary $z = 0$ cannot
 be changed. In two dimensions $z$ is updated as follows:
+
 $
                 z(x,y) & arrow z(x,y) - 4 \
   z(x plus.minus 1, y) & arrow z(x plus.minus 1, y) + 1 \
   z(x, y plus.minus 1) & arrow z(x, y plus.minus 1) + 1
 $ <eq:cell-automaton_topple_rules_2d>
+
 if $z$ exceeds (or meets) critical value $K = 4$. The system is initialized
 randomly but with $z >> K$. That initial state or rather the size of a lattice
 along with $Z$ (the height of all cells) is called _configuration_.
@@ -334,43 +340,46 @@ model was later generalized from square lattice to arbitrary graph
 @Holroyd_2008. That generalization is important because it allows us to study
 the model's behaviour for different graph topologies.
 
-Classical model has important property. The final configuration is independent
-of the order in which avalanches happen. This also implies that when adding two
-grains on different cells, the final configuration does not depend on the order
-of adding grains. It is because the addition of a sand grain can be seen as an
-operator, and these operators were proved to form an Abelian group @Dhar1990.
+The classical model has the following important property. The final
+configuration is independent of the order in which avalanches happen. This also
+implies that when adding two grains on different cells, the final configuration
+does not depend on the order of adding grains. It is because the addition of a
+sand grain can be seen as an operator, and these operators were proved to form
+an Abelian group @Dhar1990.
 
 This property was later shown to hold on finite (un)directed graphs
 @Holroyd_2008, allowing us to study the behaviour of the model on different
-graph topologies, rather than studying the consequences of changinga toppling order.
+graph topologies, rather than studying the consequences of changing a toppling
+order.
 
 == Graph Topologies <h:graph_topologies>
 
-Standard choice for sandpile model graph is square lattice with arbitrary size.
-This however do not realistically represent the model from motivation story in
-@h:intro. That is why we introduce different graph topologies.
+Standard choice for the sandpile model graph is the square lattice with
+arbitrary size. This however does not realistically represent the model from the
+motivation story in @h:intro and other possible applications. That is why we
+introduce different graph topologies.
 
 Before leaving square lattice entirely, we discuss toppling and dissipation
-rules on it. The original model presents to us a toppling rule described in
+rules on it. The original model presents a toppling rule described in
 @eq:cell-automaton_topple_rules_2d and $K=4$, where $K$ is the number of grains
 which cause a single cell (vertex) to topple.
 
-Dissipation rules on general graph are more complex and further discussed later
-in @h:dissipation_rules. While the different definitions of $K$ and toppling
-rules might be more deeply explored, we will only consider $K$ being a function
-of vertex:
+Dissipation rules on a general graph are more complex and further discussed
+later in @h:dissipation_rules. While the different definitions of $K$ and
+toppling rules might be more deeply explored, we will only consider $K$ being a
+function of a vertex,
 
 $
   K(v) = d(v), quad v in V "."
 $ <eq:definition_max_grains>
 
-And the toppling rule is also expressed as a function of vertex. Similarily to
+The toppling rule is also expressed as a function of a vertex. Similarily to the
 original definition as cellular automaton, the height of a vertex is expressed
-as a function $z(v)$:
+as a function
 
 $
   z(v) arrow z(v) - K(v) \
-  z(n) arrow z(n) + 1, quad n in cal(N)(v)
+  z(n) arrow z(n) + 1, quad n in cal(N)(v) "."
 $ <eq:toppling_rule>
 
 This simple rule states, that during the toppling process the original vertex
@@ -379,8 +388,11 @@ The benefit of this $K$ and toppling rule is their simplicity.
 
 For example, it might be interesting to set $K = "const"$, but that would create
 problems. If a vertex has less neighbours, it is unclear where the additional
-grains go during a topple, and if it has more neighbours, does it artifically
-generate more grains, or randomly distribute fewer than $K$.
+grains go during a topple. If it has more neighbours, does it artifically
+generate more grains, or distribute fewer grains between randomly selected
+neighbours?
+
+TODO: continue here
 
 Note that in these reasonings, the neighbourhood of a vertex $cal(N)(v)$
 contains sink vertex, and possibly multiple times. The toppling rule will not
