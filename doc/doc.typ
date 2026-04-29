@@ -792,7 +792,40 @@ behaviour with the parameter $m$.
   },
 )
 
-TODO: BA, WS continue here
+The BA model is interesting for its avalanche origins distribution. That is
+another valuable metric, as the grains are distributed uniformly amongst all
+vertices, some of those are more likely to start an avalanche. Note that even
+avalanche of size one (i.e. no chain reaction, only one vertex topples) is
+included in this statistic.
+
+#figure(
+  caption: [The avalanche distribution graph for BA generated graph with
+    $n = 100, m = 10$. Blue bars show normalized count of grains dropped to
+    vertex. Orange bars show normalized count of avalanches started at that
+    vertex. Vertices with lower ID were added to the graph earlier during
+    generation. \ All once dissipation rule on the left, fill up rule on the
+    right.],
+
+  {
+    let img(path) = image(path, width: 100%, height: 130pt, fit: "cover")
+    grid(
+      columns: 2,
+      gutter: 0.5em,
+      img("img/ba_100_10_origins.png"), img("img/ba_100_3_f_origins.png"),
+    )
+  },
+) <fig:ba_origins>
+
+The plot at @fig:ba_origins demonstrate the prefferential attachement of BA
+model. It is apparent that vertices which were added to the graph earlier
+started far less avalanches. That comes from the fact that these vertices have
+higher degree on average. It is more likely some vertex with lower degree starts
+an avalanche, albeit smaller in size.
+
+That was recoreded with the dissipation rule _All Once_. The change when this
+rule is swapped for _Fill Up_ is peculiar. With that, all vertices have the same
+degree and the uniform distribution of grains is reflected on the distribution
+of avalanche origins.
 
 
 TODO: how did it work for different types of graphs and dissipation rules? also
