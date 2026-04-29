@@ -898,17 +898,35 @@ distribution with _All Once_ rule. Doubling the vertex degree, effectively,
 vertex degrees become closer. That is the reason for avalanche size being
 similar to _Fill Up_ (where all vertex degrees are exactly the same).
 
+#figure(
+  caption: [The difference between BA models with parameter $n = 100$ and
+    variable $m$. On the left, $m = 3$. On the right, $m = 10$. The right
+    image shows alternative approach to showing count of grains on vertices.
+    The color gradient, from purple to yellow to green, represents relative
+    number of grains instead of size. The green number is vertex ID, the white
+    is grains count],
+
+  {
+    let img(path, height: 180pt) = image(path, height: height)
+    grid(
+      columns: 2,
+      gutter: 0.5em,
+      img("img/ba_100_3_view.png"), img("img/ba_100_10_view_info.png"),
+    )
+  },
+) <fig:ba_views>
+
 We can use BA method to observe the behaviour of sanpile model on a spanning
 tree. That could be generated when $n$ is set to one. Spanning trees generated
 via this method still have preferential attachement.
 
-As can be seen on @fig:spanning_tree, the power-law distribution is present.
-
-TODO: maji podobny degree vsichni, celkem
+As can be seen on @fig:spanning_tree, the power-law distribution in avalanche
+sizes is present. The reason might be the similar degree of all vertices as
+most of them are only connected to one or two other.
 
 #figure(
   caption: [Comparing spanning trees (created by BA method
-    with $m = 1$) and their avalanche size distributions with regard to
+    with $m = 1$) avalanche size distributions with regard to
     dissipation rule. From the left, _All Once_, _Fill Up_, _As Many As
     Neighbours_.],
 
@@ -920,23 +938,21 @@ TODO: maji podobny degree vsichni, celkem
       gutter: 0.5em,
       img("img/ba_100_ST_o.png"), img("img/ba_100_ST_f.png"), img("img/ba_100_ST_n.png"),
 
-      img2("img/ba_100_ST_o_view.png"), img2("img/ba_100_ST_f_view.png"), img2("img/ba_100_ST_n_view.png"),
+      // img2("img/ba_100_ST_o_view.png"), img2("img/ba_100_ST_f_view.png"), img2("img/ba_100_ST_n_view.png"),
     )
   },
 ) <fig:spanning_tree>
 
+The small world TODO: WS
 
-TODO: how did it work for different types of graphs and dissipation rules? also
-the graph configurations (eg $beta$ for WS)
-
-TODO: metrics, how it changed criticality? origin distribution, avalanche size
-(max, avg)
-
-TODO: imagery from the app
+TODO: avalanche sizes maybe? power-law fit yes (for all where it make sense)
 
 = Conclusion
 
-TODO
+TODO: porovnali jsme vsechno sakumprask, power-law se drzi na square lattice,
+ale na small-world network taky a mozna i lip??? pro maly pocet hran je to
+vzdycky lepsi. dissip rules hrajou roli, dobry pro sandpile je fill up.
+topologie taky, nejlepsi je WS a nebo spanning tree?
 
 = Technical Documentation
 
