@@ -714,7 +714,7 @@ multiple times during single avalanche. However, for a large enough graph and
 number of grains, cluster and avalanche sizes both have power-law distribution.
 
 #figure(
-  caption: [Example clusters on a square lattice. Every cluster is bounded by a
+  caption: [Example clusters on a square lattice size $5 times 5$. Every cluster is bounded by a
     red border. The numbers show the size of vertex for respective number of
     grains. There are two clusters, one of size 3, other of 6. Avalanches
     are represented as yellow borders extending the red. Avalanche sizes are 3
