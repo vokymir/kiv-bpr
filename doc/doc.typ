@@ -96,11 +96,11 @@ $
 $ <eq:normal_distribution>
 
 As opposed to this, the power law  is _heavy tailed_. Its exponential character
-described in @eq:power-law result in higher probability of extreme values. That
-corresponds with the scale-invariance: Any (forest fire) size is realistically
-possible, even though smaller sizes are more likely. Power law exhibit linear
-relationship between $log f(x)$ and $log x$. In a `log-log plot` it forms a
-straight line, as can be seen on @fig:cmp_scale.
+described in @eq:power-law result in a higher probability of extreme values.
+That corresponds with the scale-invariance: Any (forest fire) size is
+realistically possible, even though smaller sizes are more likely. Power law
+exhibit linear relationship between $log f(x)$ and $log x$. In a `log-log plot`
+it forms a straight line, as can be seen on @fig:cmp_scale.
 
 $
        f(x) & = a x^(-k) \
@@ -445,7 +445,7 @@ consequence of all edges having the same probability, which is not usually seen
 in social networks and in turn in small-world networks.
 
 The latest to be discovered is the *BA model*. The important observation BA made
-is that many observed networks are _scale-free_, meaning they have power-law
+is that many observed networks are _scale-free_, meaning they have a power-law
 degree distribution. Their method of generating has two key concepts: growth and
 preferential attachment.
 
@@ -694,61 +694,62 @@ connected graph.
 
 = Observed Behaviour <h:observed_behaviour>
 
-In the original paper, BTW focused among other things on cluster sizes. They
-define clusters as cells (vertices) that can be reached through the domino
-process originated by the toppling of only a single cell. They found that the
-distribution of cluster sizes obeys power-law.
+In the original paper, BTW @1987PhRvL..59..381B focused, among other things, on
+cluster sizes. They define clusters as cells (vertices) that can be reached
+through the domino process originated by the toppling of only a single cell.
+They found that the distribution of cluster sizes obeys a power law.
 
-The goal of this thesis is to explore the behaviour of sandpile model on
-discussed graphs and with different dissipation rules. The main focus is
+The goal of this thesis is to explore the behaviour of the sandpile model on
+discussed graphs and with different dissipation rules. The main focus is the
 distribution of avalanche sizes (equivalent to cluster sizes).
 
-BTW examined many stable configuration repeatedly and recorded all clusters,
+BTW examined many stable configurations repeatedly and recorded all clusters,
 therefrom obtaining cluster sizes. Avalanche sizes, on the contrary, are only
 sizes of those clusters, which were toppled. However, the size of an avalanche might be
 bigger than the cluster size.
 
-As shown in @fig:cluster_avalanche_size, during avalanche, additional vertices
-might become unstable and be toppled. Furthermore, one vertex can be toppled
-multiple times during single avalanche. However, for a large enough graph and
-number of grains, cluster and avalanche sizes both have power-law distribution.
+As shown in @fig:cluster_avalanche_size, during an avalanche, additional
+vertices might become unstable and be toppled. Furthermore, one vertex can be
+toppled multiple times during a single avalanche. However, for a large enough
+graph and a number of grains, cluster and avalanche sizes all have a power-law
+distribution.
 
 #figure(
-  caption: [Example clusters on a square lattice size $5 times 5$. Every cluster is bounded by a
-    red border. The numbers show the size of vertex for respective number of
-    grains. There are two clusters, one of size 3, other of 6. Avalanches
+  caption: [Example clusters on a square lattice of size $5 times 5$. Every cluster is bounded by a
+    red border. The numbers show the size of the vertex for the respective number of
+    grains. There are two clusters, one of size 3, the other of 6. Avalanches
     are represented as yellow borders extending the red. Avalanche sizes are 3
-    and 8 respectively. If grain is dropped onto the vertex with blue
+    and 8 respectively. If a grain is dropped onto the vertex with blue
     outline, the avalanche size is 9.],
 
   image("img/cluster_avalanche_sizes_grains.jpeg", width: 200pt),
 ) <fig:cluster_avalanche_size>
 
-To verify, a square lattice with $n = 100 times 100$ was created and over one
-million grains dropped. The @fig:sl_avalanche shows the measured data alongside
-power-law fit. Over multiple runs, the coefficient in power-law is
+To verify, a square lattice with $n = 100 times 100$ was created, and over one
+million grains were dropped. @fig:sl_avalanche shows the measured data
+alongside a power-law fit. Over multiple runs, the coefficient in the power law is
 approximately $-1.2$ which is comparable to $-5/4$, the numerically found value
 for square lattice @priezzhev_etal. As can be seen, larger avalanches happened
 slightly less often than predicted, skewing the fit.
 
 #figure(
   caption: [The distribution of avalanche sizes on a square lattice shown on
-    log-log plot.],
+    a log-log plot.],
 
   image("img/sl_n_f_1.png"),
 ) <fig:sl_avalanche>
 
-The sandpile model does behave as expected on standard square lattice graph with
-classic _Fill to Four_ rule. The question is, does power-law hold for different
-graph topologies and dissipation rules?
+The sandpile model does behave as expected on a standard square lattice graph
+with classic _Fill to Four_ rule. The question is, does a power-law hold for
+different graph topologies and dissipation rules?
 
 The ER model is the least to be expected to have similar properties to square
-lattice, as it does not guarantee connected graph. For $G(n,p), n = 100, p =
+lattice, as it does not guarantee a connected graph. For $G(n,p), n = 100, p =
 0.5$ the resulting graphs are shown in @fig:er_np_avalanche, in both log-log and
 linear plot.
 
 #figure(
-  caption: [The distribution of avalanche sizes on a ER $G(n,p)$ graph. \ The
+  caption: [The distribution of avalanche sizes on a ER $G(n,p)$ graph. The
     log-log plot on the left, linear plot on the right.],
   grid(
     columns: 2,
@@ -769,7 +770,7 @@ $
 which is still a big number in comparison to the probability of the graph being
 disconnected.
 
-The distribution doesn't seem to fit power-law on the whole interval, but rather
+The distribution doesn't seem to fit a power-law on the whole interval, but rather
 it resembles a distribution more fitting a complete graph. However, if the edge
 existence probability is set to be lower, the distribution changes a lot.
 
@@ -789,8 +790,8 @@ existence probability is set to be lower, the distribution changes a lot.
 
 That shows, the ER $G(n,p)$ model can be fine-tuned to reach criticality. This
 is, however, not sel-organized criticality then. Or rather, the ER graph does
-not ensure the emergence of self-organized criticality of sandpile model with
-arbitrarily chosen parameter $p$. The ER $G(n,m)$ model exhibit equivalent
+not ensure the emergence of self-organized criticality of the sandpile model
+with arbitrarily chosen parameter $p$. The ER $G(n,m)$ model exhibits equivalent
 behaviour with the parameter $m$.
 
 #figure(
@@ -812,7 +813,7 @@ behaviour with the parameter $m$.
 The BA model is interesting for its avalanche origins distribution. That is
 another valuable metric, as the grains are distributed uniformly amongst all
 vertices, some of those are more likely to start an avalanche. Note that even
-avalanche of size one (i.e. no chain reaction, only one vertex topples) is
+an avalanche of size one (i.e. no chain reaction, only one vertex topples) is
 included in this statistic.
 
 #figure(
@@ -833,7 +834,7 @@ included in this statistic.
   },
 ) <fig:ba_origins>
 
-The plot at @fig:ba_origins demonstrate the preferential attachment of BA
+The plot at @fig:ba_origins demonstrate the preferential attachment of the BA
 model. It is apparent that vertices which were added to the graph earlier
 started far less avalanches. That comes from the fact that these vertices have
 higher degree on average. It is more likely some vertex with lower degree starts
@@ -844,11 +845,11 @@ rule is swapped for _Fill Up_ is peculiar. With that, all vertices have the same
 degree and the uniform distribution of grains is reflected on the distribution
 of avalanche origins.
 
-While trying to fit power-law for avalanche size distribution does not make
-sense for general ER, it might for BA. If the _All Once_ rule is applied (which
-may be seen on @fig:ba_all_once), the distribution become too unpredictable with
-higher $m$ and avalanche size. Therefore, letting $m$ be small (preventing the
-graph to become too connected) is better.
+While trying to fit a power-law for the avalanche size distribution does not
+make sense for general ER, it might for BA. If the _All Once_ rule is applied
+(which may be seen on @fig:ba_all_once), the distribution becomes too
+unpredictable with higher $m$ and avalanche size. Therefore, letting $m$ be
+small (preventing the graph to become too connected) is better.
 
 #figure(
   caption: [Comparing BA method with _All Once_ dissipation rule where the
@@ -884,7 +885,7 @@ with power-law fit even for higher $m$.
   },
 ) <fig:ba_fill_up>
 
-The third rule, _As Many As Neighbours_, combine the properties of previous two
+The third rule, _As Many As Neighbours_, combines the properties of previous two
 rules. The avalanche origin distribution is similar to _All Once_ rule, while
 the avalanche size distribution resembles _Fill Up_ method more.
 
@@ -909,11 +910,11 @@ $
   d_("As Many As Neighbours")(v) = 2( d_("All Once")(v) - 1 ) ","
 $
 
-because sink is connected more times to each vertex. It does, however, preserve
-the difference between vertices, thus the similarity of avalanche origin
-distribution with _All Once_ rule. Doubling the vertex degree, effectively,
-vertex degrees become closer. That is the reason for avalanche size being
-similar to _Fill Up_ (where all vertex degrees are exactly the same).
+because the sink is connected more times to each vertex. It does, however,
+preserve the difference between vertices, thus the similarity of avalanche
+origin distribution with _All Once_ rule. Doubling the vertex degree,
+effectively, the vertex degrees become closer. That is the reason for avalanche
+size being similar to _Fill Up_ (where all vertex degrees are exactly the same).
 
 #figure(
   caption: [The difference between BA models with parameter $n = 100$ and
@@ -933,13 +934,13 @@ similar to _Fill Up_ (where all vertex degrees are exactly the same).
   },
 ) <fig:ba_views>
 
-We can use BA method to observe the behaviour of sandpile model on a spanning
+We can use BA method to observe the behaviour of the sandpile model on a spanning
 tree. That could be generated when $n$ is set to one. Spanning trees generated
 via this method still have preferential attachment.
 
 As can be seen on @fig:spanning_tree, the power-law distribution in avalanche
 sizes is present. The reason might be the similar degree of all vertices as
-most of them are only connected to one or two other.
+most of them are only connected to one or two others.
 
 #figure(
   caption: [Comparing spanning trees (created by BA method
@@ -960,10 +961,10 @@ most of them are only connected to one or two other.
   },
 ) <fig:spanning_tree>
 
-The WS model is the nearest to small world network from all discussed models.
+The WS model is the nearest to a small world network from all discussed models.
 The distribution of avalanche sizes is almost identical for any chosen $beta$
 and dissipation rule. For the creation algorithm, $G(N,K,beta)$, $K$ must be
-much smaller than $N$ otherwise the graph is closer to connected graph than to
+much smaller than $N$ otherwise the graph is closer to a connected graph than to
 small world network.
 
 #figure(
@@ -982,22 +983,26 @@ small world network.
   },
 ) <fig:ws_models>
 
-To measure the impact of different dissipation rules and graph topologies, multiple simulations were run and the average value of avalanche size distribution power-law fit entered into @tab:aval_size_comp. Note that the power-law fit is computed in the interactive tool as power-law regression. It assumes data follows
+To measure the impact of different dissipation rules and graph topologies,
+multiple simulations were run and the average value of avalanche size
+distribution power-law fit entered into @tab:aval_size_comp. Note that the
+power-law fit is computed in the interactive tool as a power-law regression. It assumes data follows
 
 $
   y = a x^k ","
 $
 
-and takes logarithm of both sides
+and takes the logarithm of both sides
 
 $
   log(y) = k log(x) + log(a) ","
 $
 
-thus transforming it to linear regression in log-log space. This kind of
+thus transforming it to a linear regression in log-log space. This kind of
 regression is prone to outliers. When measuring, sometimes the avalanche size
-distribution does exhibit power-law only on sub-range. One example is shown on
-@fig:sl_anti_avalanche. The fit is not very accurate there since it includes all sizes.
+distribution does exhibit a power-law only on a sub-range. One example is shown
+on @fig:sl_anti_avalanche. The fit is not very accurate there since it includes
+all sizes.
 
 #figure(
   caption: [Avalanche size distribution of square lattice $G(n=1000)$ with _All Once_ rule \ after $approx 10^9$ dropped grains.],
@@ -1010,14 +1015,14 @@ known (discussed at the beginning of this section) to be $approx 5/4$, the
 measured coefficient is higher even for the _Fill Up_ rule (which is defacto _Fill
 to Four_ on square lattice).
 
-The reason for it is the issue with fit discussed previously. All combinations
-of graphs and dissipation rules exhibit that to some degree.
+The reason for it is the issue with the fit discussed previously. All
+combinations of graphs and dissipation rules exhibit that to a certain degree.
 
 #figure(
   caption: [How dissipation rules and graph topology influence the
-    power-law fit in avalanche size distribution. All graphs contains exactly 1000
+    power-law fit in avalanche size distribution. All graphs contain exactly 1000
     vertices and number of grains dropped is higher than 1 million. All values are
-    rounded to nearest 0.5. Values are $k$ from $y = a x^k$.],
+    rounded to the nearest 0.5. Values are $k$ from $y = a x^k$.],
 
   {
     table(
@@ -1048,9 +1053,9 @@ the most stable. Changing parameters of this creation method does not influence
 the power-law fit for individual dissipation rules.
 
 The _All Once_ dissipation rule does produce the lowest $abs(k)$ on average, on
-different graph topologies. This means, the slope of exponential function
+different graph topologies. This means, the slope of the exponential function
 approach zero slower. On log-log plot, the line descends slower. It does so
-because there is higher count of smaller avalanches. This may be explained by
+because there is a higher count of smaller avalanches. This may be explained by
 the average vertex degree. This rule only adds one edge to all vertices, while
 other rules add more on average.
 
@@ -1058,37 +1063,39 @@ Surprisingly enough, WS graphs exhibit power-law in avalanche size distributions
 
 = Conclusion
 
-The abelian sandpile model generalized from square lattice to arbitrary graph
+The abelian sandpile model generalized from square lattice to an arbitrary graph
 does not guarantee the same power-law distribution of avalanche sizes. To ensure
 dissipation of sand grains from the graph, the single global sink is used with
-different dissipation rules. Dissipation rule dictate the number of edges from
+different dissipation rules. Dissipation rules dictate the number of edges from
 sink to all individual vertices.
 
-From examined combinations of graph topologies and dissipation rules could be established few properties. It was found that for lower relative number of edges to vertices, the avalanche size distribution fit better to power-law.
+From the examined combinations of graph topologies and dissipation rules could
+be established a few properties. It was found that for a lower relative number
+of edges to vertices, the avalanche size distribution fit better to a power-law.
 
 From all discussed small-world networks, the Erdős-Renyi graph does not fulfill
-important requirement, it is not a connected graph. Based on this and the nature
-of discussed dissipation rules, it is almost unviable for sandpile model.
+an important requirement, it is not a connected graph. Based on this and the nature
+of discussed dissipation rules, it is almost unviable for the sandpile model.
 However, for small edge probability ($p = 0.1$) it could be used. This, however,
 means that ER model must be fine-tuned and thus the self-organized criticality
 is lost.
 
-Both Barabási-Albert and Watts-Strogatz model generate connected graph. Their
-avalanche size distribution fit nicely with power-law and therefore this
+Both Barabási-Albert and Watts-Strogatz model generate a connected graph. Their
+avalanche size distribution fit nicely with a power-law and therefore this
 property is not limited to square lattice. It could be argued, that for these
 graphs it holds even better than in the original square lattice.
 
-Dissipation rules does influence the stability of sandpile model on discussed
-graphs. The rule with the best measured results is the _Fill Up_ rule. This rule
-connects all vertices to sink as many times necessary for the degree of all
-vertices to be the same. The discussed advantage of this rule is just that.
-Avalanche sizes distributions fit power-law better than, it seems.
+Dissipation rules does influence the stability of the sandpile model on the
+discussed graphs. The rule with the best measured results is the _Fill Up_ rule.
+This rule connects all vertices to the sink as many times necessary for the
+degree of all vertices to be the same. The discussed advantage of this rule is
+just that. Avalanche sizes distributions fit a power-law better than, it seems.
 
 = Technical Documentation
 
 The accompanying interactive tool for this thesis allows users to simulate SOC
-on sandpile model with all discussed graph topologies and dissipation rules. It
-serves primarily as a visualization of the problem with simple statistics
+on the sandpile model with all discussed graph topologies and dissipation rules.
+It serves primarily as a visualization of the problem with simple statistics
 alongside it.
 
 The technologies used were the programming language
@@ -1096,7 +1103,7 @@ The technologies used were the programming language
 _#link("https://igraph.org/", [igraph])_,
 _#link("https://github.com/ocornut/imgui", [Dear ImGui])_,
 _#link("https://wiki.libsdl.org/SDL3/FrontPage", [SDL3])_ and
-_#link("https://www.opengl.org/", [OpenGL])_. For compilation was used
+_#link("https://www.opengl.org/", [OpenGL])_. For a compilation was used
 _#link("https://cmake.org/", [CMake])_ with _#link("https://clang.llvm.org/", [Clang])_ or _#link("https://gcc.gnu.org/", [GCC])_. Libraries are managed via
 _#link("https://vcpkg.io/en/", [vcpkg])_ or as _#link("https://git-scm.com/", [Git])_ submodules. _#link("https://github.com/bombela/backward-cpp", [Backward-cpp])_ was used for beautiful stack trace. The whole project is hosted on
 _#link("https://github.com/vokymir/kiv-bpr", [GitHub])_.
@@ -1115,14 +1122,14 @@ Naming convention:
   Trailing underscore \
   _Example:_ `avalanche_sizes_`
 
-The application is a visual tool and as such have an infinite render loop. The
-main logic is inside _App_ class. This class run the main loop and using various
-functions in _ui_ namespace renders the right parts of the ui. Note that _Dear
-ImGui_ is an immediate mode GUI thus the state of UI is directly obtained from
-application state every time the UI is rendered.
+The application is a visual tool and as such has an infinite render loop. The
+main logic is inside _App_ class. This class runs the main loop and using
+various functions in _ui_ namespace renders the right parts of the UI. Note that
+_Dear ImGui_ is an immediate mode GUI thus the state of the UI is directly
+obtained from application state every time the UI is rendered.
 
-As the application allows user to select any combination of graph topology and
-dissipation rule, the state is stored in structure _Sim\_Config_. The
+As the application allows the user to select any combination of graph topology
+and dissipation rule, the state is stored in the structure _Sim\_Config_. The
 selected visualization method is held by _Vis\_Config_.
 
 For the graph representation serves the _Graph_ class, which stores all vertices
@@ -1136,14 +1143,15 @@ implements all discussed graph topologies, however the sink is added manually
 based on the specific dissipation rule.
 
 The implementation aims to be library-independent, therefore if _igraph_ were to
-be replaced, only the generating part have to be rewritten. Similarly, when
-extending the app of another graph generating library, only look inside
+be replaced, only the generating part has to be rewritten. Similarly, when
+extending the app with another graph generating library, only look inside
 `graph/Generator.hpp` and `graph/Converter.hpp`.
 
-The statistics are collected using event listeners in class _Stats\_Collector_.
-There are only three events, however that could be extended if desired.
+The statistics are collected using event listeners in the class
+_Stats\_Collector_. There are only three events, however that could be extended
+if desired.
 
-The window the application is viewed in is created via _SDL_ and _OpenGL_, the
-minimal implementation is in `ssoc::ui::Window_Context`.
+The window that the application is viewed in is created via _SDL_ and _OpenGL_,
+the minimal implementation is in `ssoc::ui::Window_Context`.
 
 #bibliography("refs.bib")
