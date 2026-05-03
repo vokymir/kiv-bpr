@@ -922,7 +922,7 @@ size being similar to _Fill Up_ (where all vertex degrees are exactly the same).
     image shows alternative approach to showing count of grains on vertices.
     The color gradient, from purple to yellow to green, represents relative
     number of grains instead of size. The green number is vertex ID, the white
-    is grains count],
+    is grains count.],
 
   {
     let img(path, height: 180pt) = image(path, height: height)
