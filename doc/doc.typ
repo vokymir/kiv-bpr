@@ -66,7 +66,7 @@ This may seem irregular or unpredictable, but many complex systems exhibit
 stable statistical properties when the number of observation is large. This
 phenomenon is explained by the law of large numbers @Durrett_2019 which applies,
 for example, to repeated coin tosses, dice rolls and also many natural
-phenomenon such as average temperature.
+phenomena such as average temperature.
 
 Furthermore, if many independent effects contribute to an outcome, the
 resulting distribution is often well approximated by a normal distribution
@@ -320,7 +320,7 @@ topple. In case the square does not have four adjacent squares (i.e. it is on
 the edge of chessboard) the remaining grains fall off the board and are
 therefore removed from the model.
 
-We say that cell (square) is stable if it contains less than $K$ grains. The
+We say that cell (square) is stable if it contains fewer grains than $K$. The
 system is stable if all of its cells are stable. If a grain is added to any
 stable cell, it can destabilize it resulting in an avalanche. Avalanche is the
 set of topplings which occur before the system is stabilized again.
@@ -412,7 +412,7 @@ loses as many grains as many neighbours it has and all its neighbours gain one.
 The benefit of this $K$ and toppling rule is their simplicity.
 
 For example, it might be interesting to set $K = "const"$, but that would create
-problems. If a vertex has less neighbours, it is unclear where the additional
+problems. If a vertex has fewer neighbours, it is unclear where the additional
 grains go during a topple. If it has more neighbours, does it artificially
 generate more grains, or distribute fewer grains between randomly selected
 neighbours?
@@ -691,7 +691,7 @@ to set $N$ equal the number of vertices or edges, whichever is lesser.
 
 The _All once_ rule is designed to work with any graph, which could be
 confirmed in the table. The fact it does not have any requirement makes it a
-rather dissipation rule.
+rather useful dissipation rule.
 
 Both ER methods does not guarantee connected graph. Therefore the _As many as
 neighbours_ rule requirement is not fulfilled. On the other hand, the _Fill up_
@@ -703,7 +703,7 @@ edges in final graph.
 
 Both BA and WS methods create a connected graph, passing the requirement for _As
 many as neighbours_. The condition for BA is rather symbolic: if $m = 1$, the
-graph is its own spanning tree. Any $m$ lesser than that does not result in
+graph is its own spanning tree. Any $m$ smaller than that does not result in
 connected graph.
 
 = Observed Behaviour <h:observed_behaviour>
@@ -846,7 +846,7 @@ included in this statistic.
 
 The plot at @fig:ba_origins demonstrate the preferential attachment of the BA
 model. It is apparent that vertices which were added to the graph earlier
-started far less avalanches. That comes from the fact that these vertices have
+started far fewer avalanches. That comes from the fact that these vertices have
 higher degree on average. It is more likely some vertex with lower degree starts
 an avalanche, albeit smaller in size.
 
