@@ -505,8 +505,9 @@ coefficient and the convergence of degree distribution to power law. Their model
 was designed to address the first issue.
 
 The generation algorithm is simple: 1. start with a regular ring lattice, 2.
-rewire every edge with probability #sym.beta. The idea is to preserve the short
-average path present in ER model, but simultaneously create high clustering.
+rewire (i.e. remove the edge but add another from the same vertex) every edge
+with probability #sym.beta. The idea is to preserve the short average path
+present in ER model, but simultaneously create high clustering.
 
 This is done by interpolating between the regular ring lattice (which has high
 clustering coefficient) and ER model. When $beta = 0$, no edge is rewired and
