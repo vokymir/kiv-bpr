@@ -1,0 +1,3 @@
+Zminovana aplikace je na githubu. Pro jednoduchost je zkompilovana pro WIN a LNX
+na: https://github.com/vokymir/kiv-bpr/releases/latest
+Mohu dodat i zdrojovy kod v ZIPu sem, ale zatim je take na githubu.
