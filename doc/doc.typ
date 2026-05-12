@@ -132,6 +132,12 @@ fine-tuning certain parameters. In the case of phase transition the parameters
 are pressure and temperature. However, there exist systems which reach
 criticality independently of parameters.
 
+A small local disturbance only manifest locally (e.g. throwing a pebble into a
+pond makes water rings from the origin, but the water on the other side of pond
+is not affected). However, in critical systems a small change can trigger
+response from afar (e.g. a forest fire might affect trees located hundereds of
+miles away).
+
 The phenomenon of systems reaching criticality by themselves is called
 _self-organized criticality (SOC)_. The concept of SOC was first discovered in
 1987 by Bak, Tang and Wiesenfeld and its properties were demonstrated on a
