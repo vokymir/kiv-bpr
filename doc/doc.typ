@@ -470,11 +470,14 @@ $
 $ <eq:ba_prob>
 
 where $v$ is the examined vertex and $u$ represents all vertices. The newly
-added vertex is yet not considered.
+added vertex is not yet considered. The sum of all $p$ is equal to one and edges
+are selected by repeatedly ($m$ times) generating random number from 0 to 1 and
+taking corresponding edge (the original paper does not specify case when one
+edge is selected multiple times).
 
 The algorithm takes $G_0, n, m$ where $m$ is the number of edges for each
 new vertex and $n$ represents the number of vertices in final graph. The first
-arguments is a starting graph with at least $m$ vertices. In practice, $G_0$ is
+argument is a starting graph with at least $m$ vertices. In practice, $G_0$ is
 usually chosen as a complete graph $K_m$ of size $m$.
 
 This algorithm yields a quick emergence of hubs, vertices with high degree. BA
