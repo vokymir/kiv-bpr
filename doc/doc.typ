@@ -1096,10 +1096,9 @@ property is not limited to square lattice. It could be argued, that for these
 graphs it holds even better than in the original square lattice.
 
 Dissipation rules does influence the stability of the sandpile model on the
-discussed graphs. The rule with the best measured results is the _Fill Up_ rule.
-This rule connects all vertices to the sink as many times necessary for the
-degree of all vertices to be the same. The discussed advantage of this rule is
-just that. Avalanche sizes distributions fit a power-law better than, it seems.
+discussed graphs. One interesting is the _Fill Up_ rule. This rule connects all
+vertices to the sink as many times necessary for the degree of all vertices to
+be the same. As discussed, this is advantageous for the sanpile model stability.
 
 = Technical Documentation
 
