@@ -1012,7 +1012,8 @@ thus transforming it to a linear regression in log-log space. This kind of
 regression is prone to outliers. When measuring, sometimes the avalanche size
 distribution does exhibit a power-law only on a sub-range. One example is shown
 on @fig:sl_anti_avalanche. The fit is not very accurate there since it includes
-all sizes.
+all sizes. As a measure for the fit, the residual sum of squares (RSS) and root
+mean square error (RMSE) were used.
 
 #figure(
   caption: [Avalanche size distribution of square lattice $G(n=1000)$ with _All Once_ rule \ after $approx 10^9$ dropped grains.],
