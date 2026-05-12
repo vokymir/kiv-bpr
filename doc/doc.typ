@@ -730,8 +730,7 @@ distribution.
 
 #figure(
   caption: [Example clusters on a square lattice of size $5 times 5$. Every cluster is bounded by a
-    red border. The numbers show the size of the vertex for the respective number of
-    grains. There are two clusters, one of size 3, the other of 6. Avalanches
+    red border. There are two clusters, one of size 3, the other of 6. Avalanches
     are represented as yellow borders extending the red. Avalanche sizes are 3
     and 8 respectively. If a grain is dropped onto the vertex with blue
     outline, the avalanche size is 9.],
