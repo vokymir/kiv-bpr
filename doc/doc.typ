@@ -777,11 +777,8 @@ probability of not being so is very small. In fact, for mentioned parameters,
 the probability of one fixed vertex being disconnected is
 
 $
-  p = (1/2)^100 ","
+  p = (1/2)^100 "."
 $
-
-which is still a big number in comparison to the probability of the graph being
-disconnected.
 
 The distribution doesn't seem to fit a power-law on the whole interval, but rather
 it resembles a distribution more fitting a complete graph. However, if the edge
