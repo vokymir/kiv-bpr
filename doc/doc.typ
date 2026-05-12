@@ -265,7 +265,9 @@ $
   omega(G) = "len"(R) / "len"(G) - C(G) / C(L) "."
 $ <eq:small_worldness>
 
-Where $G$ is the analyzed network, $R$ is an equivalent random network to $G$,
+Where $G$ is the analyzed network, $R$ is an equivalent random network (i.e.
+has the same number of vertices and degree distribution
+@telesford2011ubiquitysmallworldnetworks) to $G$,
 and $L$ is an equivalent (ring) lattice network to $G$. This method aims to
 quantify the formulating properties of small-world network: high clustering
 coefficient which is _ideal_ in lattice networks, and low average path which is
