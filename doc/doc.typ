@@ -798,8 +798,8 @@ existence probability is set to be lower, the distribution changes a lot.
   },
 )
 
-That shows, the ER $G(n,p)$ model can be fine-tuned to reach criticality. This
-is, however, not sel-organized criticality then. Or rather, the ER graph does
+That shows, the ER $G(n,p)$ model can be fine-tuned to reach power-law in avalanche size
+distribution. This is, however, not self-organized then. Or rather, the ER graph does
 not ensure the emergence of self-organized criticality of the sandpile model
 with arbitrarily chosen parameter $p$. The ER $G(n,m)$ model exhibits equivalent
 behaviour with the parameter $m$.
@@ -1032,8 +1032,8 @@ combinations of graphs and dissipation rules exhibit that to a certain degree.
 #figure(
   caption: [How dissipation rules and graph topology influence the
     power-law fit in avalanche size distribution. All graphs contain exactly 1000
-    vertices and number of grains dropped is higher than 1 million. All values are
-    rounded to the nearest 0.5. Values are $k$ from $y = a x^k$.],
+    vertices and number of grains dropped is higher than 10 millions. Values are $k$ from
+    $y = a x^k$ and the error is root mean square.],
 
   {
     table(
@@ -1048,13 +1048,25 @@ combinations of graphs and dissipation rules exhibit that to a certain degree.
 
       table.hline(stroke: 2pt),
 
-      align(left)[*Square lattice*], [-3.5], [-3], [-5],
-      align(left)[*ER $G(n,p=0.01)$*], [-2.5], [-4], [-4],
-      align(left)[*BA $G(G_0,n,m=2)$*], [-3], [-5], [-4],
-      align(left)[*BA $G(G_0,n,m=10)$*], [-1.5], [-4], [-3.5],
-      align(left)[*WS $G(N,K=2,beta=0.1)$*], [-2], [-3], [-4],
-      align(left)[*WS $G(N,K=2,beta=0.5)$*], [-2], [-3], [-4],
-      align(left)[*WS $G(N,K=2,beta=0.9)$*], [-2], [-3], [-4],
+      align(left)[*Square lattice*], $-3.955 plus.minus 1.463$, $-4.651 plus.minus 1.487$, $-3.060 plus.minus 1.48$,
+      align(left)[*ER $G(n,p=0.01)$*], $-2.532 plus.minus 0.719$, $-3.961 plus.minus 0.928$, $-3.982 plus.minus 0.852$,
+      align(left)[*BA $G(G_0,n,m=2)$*], $-3.080 plus.minus 0.824$, $-3.742 plus.minus 0.697$, $-5.310 plus.minus 0.419$,
+      align(left)[*BA $G(G_0,n,m=10)$*],
+      $-1.661 plus.minus 0.516$,
+      $-3.685 plus.minus 0.726$,
+      $-3.185 plus.minus 1.325$,
+      align(left)[*WS $G(N,K=2,beta=0.1)$*],
+      $-2.525 plus.minus 0.760$,
+      $-3.964 plus.minus 0.928$,
+      $-3.291 plus.minus 1.042$,
+      align(left)[*WS $G(N,K=2,beta=0.5)$*],
+      $-2.402 plus.minus 0.696$,
+      $-4.124 plus.minus 1.063$,
+      $-3.213 plus.minus 1.100$,
+      align(left)[*WS $G(N,K=2,beta=0.9)$*],
+      $-2.366 plus.minus 0.677$,
+      $-3.990 plus.minus 0.934$,
+      $-3.408 plus.minus 1.028$,
     )
   },
 ) <tab:aval_size_comp>
@@ -1070,7 +1082,11 @@ because there is a higher count of smaller avalanches. This may be explained by
 the average vertex degree. This rule only adds one edge to all vertices, while
 other rules add more on average.
 
-Surprisingly enough, WS graphs exhibit power-law in avalanche size distributions the best from all observed graphs. Based on done observations, for every combination of graph topology and dissipation rule, the fit only holds on sub-range. However, for WS graphs, the disturbance happens only near the max avalanche size.
+Surprisingly enough, WS graphs exhibit power-law in avalanche size distributions
+for longest interval from all observed graphs. Based on done observations, for
+every combination of graph topology and dissipation rule, the fit only holds on a
+sub-range. However, for WS graphs, the disturbance happens only near the max
+avalanche size.
 
 = Conclusion
 
@@ -1163,5 +1179,17 @@ if desired.
 
 The window that the application is viewed in is created via _SDL_ and _OpenGL_,
 the minimal implementation is in `ssoc::ui::Window_Context`.
+
+The stabilization process after a grain is dropped is handled by a queue of vertices to
+check. When a grain is dropped, the corresponding vertex is added to the queue. While queue
+is not empty, check if first vertex should topple (start an avalanche), if so do it and add
+all adjacent vertices to queue.
+
+Parallelization of the stabilization process is not possible in its current form. It may be
+convertible to parallelizable problem. However, if interested in behaviour on one type of
+graph over multiple runs, it might be beneficial to run multiple simulations in parallel.
+
+When taking measurements and running simulations, the time needed was in seconds to minutes
+on Intel64 Family 6 Model 191 Stepping 2 GenuineIntel ~2500 Mhz Processor.
 
 #bibliography("refs.bib")
